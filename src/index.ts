@@ -1,3 +1,1 @@
-export const hello = () => {
-
-}
+export {load} from './load';
