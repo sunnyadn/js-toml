@@ -5,12 +5,15 @@
   "main": "index.js",
   "scripts": {
     "build": "./script/build.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "esbuild": "^0.15.13"
+    "@types/jest": "^29.2.1",
+    "esbuild": "^0.15.13",
+    "esbuild-runner": "^2.2.2",
+    "jest": "^29.2.2"
   }
 }
