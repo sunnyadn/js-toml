@@ -1,3 +1,2 @@
-export const load = (toml: string) => {
-    return {};
-}
+export {load} from './load';
+export {SyntaxParseError} from './SyntaxParseError';

@@ -2,9 +2,13 @@ lockfileVersion: 5.4
 
 specifiers:
   '@types/jest': ^29.2.1
+  chevrotain: ^10.4.1
   esbuild: ^0.15.13
   esbuild-runner: ^2.2.2
   jest: ^29.2.2
+
+dependencies:
+  chevrotain: 10.4.1
 
 devDependencies:
   '@types/jest': 29.2.1
@@ -352,6 +356,29 @@ packages:
   /@bcoe/v8-coverage/0.2.3:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
     dev: true
+
+  /@chevrotain/cst-dts-gen/10.4.1:
+    resolution: {integrity: sha512-wNDw9Rh6dPJKH275er8nijuDIpTcG2GjQANjnG8RaeGkZ3JN99+u6HRtnjKhjoi4NY9rg+udHChHQSskZtlkPw==}
+    dependencies:
+      '@chevrotain/gast': 10.4.1
+      '@chevrotain/types': 10.4.1
+      lodash: 4.17.21
+    dev: false
+
+  /@chevrotain/gast/10.4.1:
+    resolution: {integrity: sha512-HRv66QVbmC7eb/ppwsPCfNH4oZ/VV+thuMZILm7A7W6Q5M0tqiZv0ecdiB8hydmPO8je0aSrXEOCcaA6fuXc3Q==}
+    dependencies:
+      '@chevrotain/types': 10.4.1
+      lodash: 4.17.21
+    dev: false
+
+  /@chevrotain/types/10.4.1:
+    resolution: {integrity: sha512-J8iyZNn/RGYWSyNJdGd3QI01gKFUx4mCSM0+vEqmIw9TXFlxj1IsHteXFahtezSHjgMtBTqWn6hb2YxCLjpHVg==}
+    dev: false
+
+  /@chevrotain/utils/10.4.1:
+    resolution: {integrity: sha512-vPIgzES8QhHMchb5UaQ4V/c9xmoaECN+4EXpuhWE+pu3LXJUUtAwDn/SEKFgtyiRo269Hxv3b0NbPlQfH0jeVA==}
+    dev: false
 
   /@esbuild/android-arm/0.15.13:
     resolution: {integrity: sha512-RY2fVI8O0iFUNvZirXaQ1vMvK0xhCcl0gqRj74Z6yEiO1zAUa7hbsdwZM1kzqbxHK7LFyMizipfXT3JME+12Hw==}
@@ -930,6 +957,17 @@ packages:
     resolution: {integrity: sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==}
     engines: {node: '>=10'}
     dev: true
+
+  /chevrotain/10.4.1:
+    resolution: {integrity: sha512-1y4vnssauVmrrP5MBaJ6DZvsv3BpXLlKVNK5S52fTGQHqg09qxMDBAz0wZbb04Ovc1pBCA4obcCjOlRioIV+cA==}
+    dependencies:
+      '@chevrotain/cst-dts-gen': 10.4.1
+      '@chevrotain/gast': 10.4.1
+      '@chevrotain/types': 10.4.1
+      '@chevrotain/utils': 10.4.1
+      lodash: 4.17.21
+      regexp-to-ast: 0.5.0
+    dev: false
 
   /ci-info/3.5.0:
     resolution: {integrity: sha512-yH4RezKOGlOhxkmhbeNuC4eYZKAUsEaGtBuBzDDP1eFUKiccDWzBABxBfOx31IDwDIXMTxWuwAxUGModvkbuVw==}
@@ -2026,6 +2064,10 @@ packages:
       p-locate: 4.1.0
     dev: true
 
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: false
+
   /lru-cache/6.0.0:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
@@ -2206,6 +2248,10 @@ packages:
   /react-is/18.2.0:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
     dev: true
+
+  /regexp-to-ast/0.5.0:
+    resolution: {integrity: sha512-tlbJqcMHnPKI9zSrystikWKwHkBqu2a/Sgw01h3zFjvYrMxEDYHzzoMZnUrbIfpTFEsoRnnviOXNCzFiSc54Qw==}
+    dev: false
 
   /require-directory/2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}

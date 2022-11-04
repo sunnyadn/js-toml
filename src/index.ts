@@ -1,1 +1,1 @@
-export {load} from './load';
+export {load, SyntaxParseError} from './load';
