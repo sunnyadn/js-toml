@@ -6,3 +6,10 @@ it('should ignore full-line comment', () => {
 
   expect(result).toEqual({});
 });
+
+it('should ignore comment at the end of a line', () => {
+  const input = "key = \"value\" # This is a comment";
+  const result = load(input);
+
+  expect(result).toEqual({key: "value"});
+});
