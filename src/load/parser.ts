@@ -18,6 +18,7 @@ export class Parser extends CstParser {
 
   private expression = this.RULE("expression", () => {
     this.SUBRULE(this.keyValue);
+    // OR TABLE
   });
 
   private keyValue = this.RULE("keyValue", () => {
@@ -28,6 +29,7 @@ export class Parser extends CstParser {
 
   private key = this.RULE("key", () => {
     this.SUBRULE(this.simpleKey);
+    // OR DOTTED KEY
   });
 
   private simpleKey = this.RULE("simpleKey", () => {
@@ -39,17 +41,23 @@ export class Parser extends CstParser {
 
   private quotedKey = this.RULE("quotedKey", () => {
     this.CONSUME(BasicString);
+    // OR LITERAL STRING
   });
 
   private value = this.RULE("value", () => {
     this.SUBRULE(this.string);
+    // OR BOOLEAN
+    // OR ARRAY
+    // OR INLINE TABLE
+    // OR DATE TIME
+    // OR FLOAT
+    // OR INTEGER
   });
 
   private string = this.RULE("string", () => {
-    this.SUBRULE(this.basicString);
-  });
-
-  private basicString = this.RULE("basicString", () => {
+    // OR MULTILINE BASIC STRING
     this.CONSUME(BasicString);
+    // OR MULTILINE LITERAL STRING
+    // OR LITERAL STRING
   });
 }

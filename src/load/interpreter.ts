@@ -53,10 +53,6 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   string(ctx) {
-    return this.visit(ctx.basicString);
-  }
-
-  basicString(ctx) {
     return this.readBasicString(ctx);
   }
 

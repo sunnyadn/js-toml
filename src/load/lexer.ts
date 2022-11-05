@@ -15,7 +15,9 @@ const basicUnescaped = XRegExp.build("{{whiteSpaceChar}}|\x21|[\x23-\x5B]|[\\x5D
   nonAscii
 });
 
-const basicString = XRegExp.build('{{quotationMark}}{{basicUnescaped}}*{{quotationMark}}', {quotationMark, basicUnescaped});
+const basicChar = basicUnescaped; // OR escaped
+
+const basicString = XRegExp.build('{{quotationMark}}{{basicChar}}*{{quotationMark}}', {quotationMark, basicChar});
 
 export const WhiteSpace = createToken({
   name: "WhiteSpace",
