@@ -1,5 +1,5 @@
 import {CstParser} from "chevrotain";
-import {allTokens, BasicString, KeyValueSeparator, LiteralString, Newline, UnquotedKey} from "./lexer";
+import {allTokens, BasicString, DotSeparator, KeyValueSeparator, LiteralString, Newline, UnquotedKey} from "./lexer";
 
 export class Parser extends CstParser {
   constructor() {
@@ -28,8 +28,10 @@ export class Parser extends CstParser {
   });
 
   private key = this.RULE("key", () => {
-    this.SUBRULE(this.simpleKey);
-    // OR DOTTED KEY
+    this.OR([
+      {ALT: () => this.SUBRULE(this.dottedKey)},
+      {ALT: () => this.SUBRULE(this.simpleKey)},
+    ]);
   });
 
   private simpleKey = this.RULE("simpleKey", () => {
@@ -37,6 +39,14 @@ export class Parser extends CstParser {
       {ALT: () => this.SUBRULE(this.quotedKey)},
       {ALT: () => this.CONSUME(UnquotedKey)},
     ]);
+  });
+
+  private dottedKey = this.RULE("dottedKey", () => {
+    this.SUBRULE(this.simpleKey);
+    this.AT_LEAST_ONE(() => {
+      this.CONSUME(DotSeparator);
+      this.SUBRULE1(this.simpleKey);
+    });
   });
 
   private quotedKey = this.RULE("quotedKey", () => {

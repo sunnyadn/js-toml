@@ -10,30 +10,44 @@ export class Interpreter extends BaseCstVisitor {
     this.validateVisitor();
   }
 
-  toml(ctx) {
-    if (!ctx.expression) {
-      return {};
-    }
+  private result: object;
 
-    const expressions = ctx.expression.map((expression) => this.visit(expression));
-    return expressions.reduce((acc, [key, value]) => {
-      acc[key] = value;
-      return acc;
-    }, {});
+  toml(ctx) {
+    this.result = {};
+    ctx.expression?.forEach((expression) => this.visit(expression));
+    return this.result;
   }
 
   expression(ctx) {
-    return this.visit(ctx.keyValue);
+    this.visit(ctx.keyValue);
+  }
+
+  private assignValue(key, value, object = this.result) {
+    if (typeof key === 'string') {
+      object[key] = value;
+    } else {
+      const [first, ...rest] = key;
+      if (rest.length > 0) {
+        object[first] = object[first] || {};
+        this.assignValue(rest, value, object[first]);
+      } else {
+        object[first] = value;
+      }
+    }
   }
 
   keyValue(ctx) {
     const key = this.visit(ctx.key);
     const value = this.visit(ctx.value);
-    return [key, value];
+    this.assignValue(key, value);
   }
 
   key(ctx) {
-    return this.visit(ctx.simpleKey);
+    if (ctx.dottedKey) {
+      return this.visit(ctx.dottedKey);
+    } else {
+      return this.visit(ctx.simpleKey);
+    }
   }
 
   simpleKey(ctx) {
@@ -42,6 +56,10 @@ export class Interpreter extends BaseCstVisitor {
     } else if (ctx.UnquotedKey) {
       return ctx.UnquotedKey[0].image;
     }
+  }
+
+  dottedKey(ctx) {
+    return ctx.simpleKey.map((simpleKey) => this.visit(simpleKey));
   }
 
   quotedKey(ctx) {

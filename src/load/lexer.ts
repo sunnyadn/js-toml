@@ -51,6 +51,8 @@ export const UnquotedKey = createToken({name: "UnquotedKey", pattern: /[a-zA-Z0-
 
 export const KeyValueSeparator = createToken({name: "KeyValueSeparator", pattern: /=/, label: "="});
 
-export const allTokens = [WhiteSpace, Newline, BasicString, LiteralString, UnquotedKey, KeyValueSeparator, Comment];
+export const DotSeparator = createToken({name: "DotSeparator", pattern: /\./, label: "."});
+
+export const allTokens = [WhiteSpace, Newline, BasicString, LiteralString, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
 
 export const lexer = new Lexer(allTokens);
