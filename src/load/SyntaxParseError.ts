@@ -1,6 +1,11 @@
+import {IRecognitionException} from "chevrotain";
+
 export class SyntaxParseError extends Error {
-  constructor(message: string) {
-    super(message);
+  constructor(errors: IRecognitionException[]) {
+    super("Syntax error");
     this.name = 'SyntaxParseError';
+    this.errors = errors;
   }
+
+  errors: IRecognitionException[];
 }
