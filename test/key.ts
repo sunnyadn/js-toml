@@ -32,3 +32,10 @@ it('should throw error if bare key is empty', () => {
 
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should support empty double-quoted keys', () => {
+  const input = '"" = "blank"     # VALID but discouraged';
+  const result = load(input);
+
+  expect(result).toEqual({"": "blank"});
+});
