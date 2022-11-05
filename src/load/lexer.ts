@@ -53,7 +53,7 @@ export const KeyValueSeparator = createToken({name: "KeyValueSeparator", pattern
 
 export const DotSeparator = createToken({name: "DotSeparator", pattern: /\./, label: "."});
 
-export const True = createToken({name: "True", pattern: /true/, label: "true"});
+export const True = createToken({name: "True", pattern: /true/, label: "true", longer_alt: UnquotedKey});
 
 export const allTokens = [WhiteSpace, Newline, BasicString, LiteralString, True, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
 
