@@ -36,15 +36,15 @@ export const Comment = createToken({
 export const Newline = createToken({name: "Newline", pattern: /\r\n|\n/});
 
 export const BasicString = createToken({
-  name: "BasicString", pattern: XRegExp.build('{{quotationMark}}{{basicChar}}*{{quotationMark}}', {
-    quotationMark,
-    basicChar
-  })
+  name: "BasicString",
+  pattern: XRegExp.build('{{quotationMark}}{{basicChar}}*{{quotationMark}}', {quotationMark, basicChar}),
+  label: '"BasicString"'
 });
 
 export const LiteralString = createToken({
   name: "LiteralString",
-  pattern: XRegExp.build('{{apostrophe}}{{literalChar}}*{{apostrophe}}', {apostrophe, literalChar})
+  pattern: XRegExp.build('{{apostrophe}}{{literalChar}}*{{apostrophe}}', {apostrophe, literalChar}),
+  label: "'LiteralString'"
 });
 
 export const UnquotedKey = createToken({name: "UnquotedKey", pattern: /[a-zA-Z0-9_-]+/});

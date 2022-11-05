@@ -158,11 +158,34 @@
     "orgText": "",
     "definition": [
       {
-        "type": "Terminal",
-        "name": "BasicString",
-        "label": "BasicString",
+        "type": "Alternation",
         "idx": 0,
-        "pattern": "(?:\")(?:(?:[ \\t])|!|[#-[]|[\\x5D-~]|(?:[\\x80-\\uD7FF]|[\\uE000-\\uFFFF]))*(?:\")"
+        "definition": [
+          {
+            "type": "Alternative",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "BasicString",
+                "label": "\"BasicString\"",
+                "idx": 0,
+                "pattern": "(?:\")(?:(?:[ \\t])|!|[#-[]|[\\x5D-~]|(?:[\\x80-\\uD7FF]|[\\uE000-\\uFFFF]))*(?:\")"
+              }
+            ]
+          },
+          {
+            "type": "Alternative",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "LiteralString",
+                "label": "'LiteralString'",
+                "idx": 0,
+                "pattern": "(?:')(?:\t|[ -&]|[(-~]|(?:[\\x80-\\uD7FF]|[\\uE000-\\uFFFF]))*(?:')"
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -186,7 +209,7 @@
       {
         "type": "Terminal",
         "name": "BasicString",
-        "label": "BasicString",
+        "label": "\"BasicString\"",
         "idx": 0,
         "pattern": "(?:\")(?:(?:[ \\t])|!|[#-[]|[\\x5D-~]|(?:[\\x80-\\uD7FF]|[\\uE000-\\uFFFF]))*(?:\")"
       }
