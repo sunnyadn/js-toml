@@ -1,4 +1,4 @@
-import {load} from "../../src";
+import {load} from "../src";
 
 it('should treat tab(0x09) as whitespace', () => {
   const input = '\t';

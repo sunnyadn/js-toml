@@ -1,4 +1,4 @@
-import {load} from "../../src";
+import {load} from "../src";
 
 it('should treat LF(0x0A) as newline', () => {
     const input = '\n';
