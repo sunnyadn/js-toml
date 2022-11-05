@@ -50,8 +50,9 @@ it('should support empty single-quoted keys', () => {
 it('should support dotted keys', () => {
   const input = `name = "Orange"
 physical.color = "orange"
-physical.shape = "round"`;
+physical.shape = "round"
+site."google.com" = true`;
   const result = load(input);
 
-  expect(result).toEqual({name: "Orange", physical: {color: "orange", shape: "round"}});
+  expect(result).toEqual({name: "Orange", physical: {color: "orange", shape: "round"}, site: {"google.com": true}});
 });

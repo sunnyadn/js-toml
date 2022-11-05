@@ -53,6 +53,8 @@ export const KeyValueSeparator = createToken({name: "KeyValueSeparator", pattern
 
 export const DotSeparator = createToken({name: "DotSeparator", pattern: /\./, label: "."});
 
-export const allTokens = [WhiteSpace, Newline, BasicString, LiteralString, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
+export const True = createToken({name: "True", pattern: /true/, label: "true"});
+
+export const allTokens = [WhiteSpace, Newline, BasicString, LiteralString, True, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
 
 export const lexer = new Lexer(allTokens);

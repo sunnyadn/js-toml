@@ -67,11 +67,19 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   value(ctx) {
-    return this.visit(ctx.string);
+    if (ctx.string) {
+      return this.visit(ctx.string);
+    } else if (ctx.boolean) {
+      return this.visit(ctx.boolean);
+    }
   }
 
   string(ctx) {
     return this.readSingleLineString(ctx);
+  }
+
+  boolean(ctx) {
+    return !!ctx.True;
   }
 
   private readSingleLineString(ctx) {

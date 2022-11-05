@@ -1,5 +1,14 @@
 import {CstParser} from "chevrotain";
-import {allTokens, BasicString, DotSeparator, KeyValueSeparator, LiteralString, Newline, UnquotedKey} from "./lexer";
+import {
+  allTokens,
+  BasicString,
+  DotSeparator,
+  KeyValueSeparator,
+  LiteralString,
+  Newline,
+  True,
+  UnquotedKey
+} from "./lexer";
 
 export class Parser extends CstParser {
   constructor() {
@@ -57,13 +66,15 @@ export class Parser extends CstParser {
   });
 
   private value = this.RULE("value", () => {
-    this.SUBRULE(this.string);
-    // OR BOOLEAN
-    // OR ARRAY
-    // OR INLINE TABLE
-    // OR DATE TIME
-    // OR FLOAT
-    // OR INTEGER
+    this.OR([
+      {ALT: () => this.SUBRULE(this.string)},
+      {ALT: () => this.SUBRULE(this.boolean)},
+      // OR ARRAY
+      // OR INLINE TABLE
+      // OR DATE TIME
+      // OR FLOAT
+      // OR INTEGER
+    ]);
   });
 
   private string = this.RULE("string", () => {
@@ -73,5 +84,10 @@ export class Parser extends CstParser {
       // OR MULTILINE LITERAL STRING
       {ALT: () => this.CONSUME(LiteralString)}
     ]);
+  });
+
+  private boolean = this.RULE("boolean", () => {
+    this.CONSUME(True);
+    // OR FALSE
   });
 }
