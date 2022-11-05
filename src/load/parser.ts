@@ -1,5 +1,5 @@
 import {CstParser} from "chevrotain";
-import {allTokens, BasicString, KeyValueSeparator, Newline, UnquotedKey} from "./lexer";
+import {allTokens, BasicString, KeyValueSeparator, UnquotedKey} from "./lexer";
 
 export class Parser extends CstParser {
   constructor() {
@@ -8,11 +8,7 @@ export class Parser extends CstParser {
   }
 
   toml = this.RULE("toml", () => {
-    this.MANY_SEP({
-      SEP: Newline, DEF: () => {
-        this.SUBRULE(this.expression);
-      }
-    });
+    this.MANY(() => this.SUBRULE(this.expression));
   });
 
   private expression = this.RULE("expression", () => {

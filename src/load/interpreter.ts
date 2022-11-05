@@ -11,8 +11,15 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   toml(ctx) {
-    const obj = this.visit(ctx.expression);
-    return {...obj};
+    if (!ctx.expression) {
+      return {};
+    }
+
+    const expressions = ctx.expression.map((expression) => this.visit(expression));
+    return expressions.reduce((acc, [key, value]) => {
+      acc[key] = value;
+      return acc;
+    }, {});
   }
 
   expression(ctx) {
@@ -22,7 +29,7 @@ export class Interpreter extends BaseCstVisitor {
   keyValue(ctx) {
     const key = this.visit(ctx.key);
     const value = this.visit(ctx.value);
-    return {[key]: value};
+    return [key, value];
   }
 
   key(ctx) {
