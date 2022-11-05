@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 require('esbuild').build({
-  entryPoints: ['src/index.ts'],
   bundle: true,
+  entryPoints: ['src/index.ts'],
+  external: ['chevrotain'],
   minify: true,
   outdir: 'dist',
 }).catch(() => process.exit(1))
