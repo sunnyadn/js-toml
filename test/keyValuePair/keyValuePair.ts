@@ -19,3 +19,9 @@ it('should throw error if value is missing', () => {
 
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should throw error if no new line after a key-value pair', () => {
+  const input = "first = \"Tom\" last = \"Preston-Werner\" # INVALID";
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});

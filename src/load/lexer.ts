@@ -27,7 +27,7 @@ export const Comment = createToken({
   group: 'comment',
 });
 
-export const Newline = createToken({name: "Newline", pattern: /\r\n|\n/, group: Lexer.SKIPPED});
+export const Newline = createToken({name: "Newline", pattern: /\r\n|\n/});
 
 export const BasicString = createToken({
   name: "BasicString",
