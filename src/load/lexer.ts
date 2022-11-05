@@ -17,7 +17,9 @@ const basicUnescaped = XRegExp.build("{{whiteSpaceChar}}|\x21|[\x23-\x5B]|[\\x5D
 
 const basicChar = basicUnescaped; // OR escaped
 
-const basicString = XRegExp.build('{{quotationMark}}{{basicChar}}*{{quotationMark}}', {quotationMark, basicChar});
+const apostrophe = /'/;
+
+const literalChar = XRegExp.build("\x09|[\x20-\x26]|[\x28-\x7E]|{{nonAscii}}", {nonAscii});
 
 export const WhiteSpace = createToken({
   name: "WhiteSpace",
@@ -33,12 +35,22 @@ export const Comment = createToken({
 
 export const Newline = createToken({name: "Newline", pattern: /\r\n|\n/});
 
-export const BasicString = createToken({name: "BasicString", pattern: basicString});
+export const BasicString = createToken({
+  name: "BasicString", pattern: XRegExp.build('{{quotationMark}}{{basicChar}}*{{quotationMark}}', {
+    quotationMark,
+    basicChar
+  })
+});
+
+export const LiteralString = createToken({
+  name: "LiteralString",
+  pattern: XRegExp.build('{{apostrophe}}{{literalChar}}*{{apostrophe}}', {apostrophe, literalChar})
+});
 
 export const UnquotedKey = createToken({name: "UnquotedKey", pattern: /[a-zA-Z0-9_-]+/});
 
 export const KeyValueSeparator = createToken({name: "KeyValueSeparator", pattern: /=/, label: "="});
 
-export const allTokens = [WhiteSpace, Newline, BasicString, UnquotedKey, KeyValueSeparator, Comment];
+export const allTokens = [WhiteSpace, Newline, BasicString, LiteralString, UnquotedKey, KeyValueSeparator, Comment];
 
 export const lexer = new Lexer(allTokens);

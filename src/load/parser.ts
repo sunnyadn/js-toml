@@ -1,5 +1,5 @@
 import {CstParser} from "chevrotain";
-import {allTokens, BasicString, KeyValueSeparator, Newline, UnquotedKey} from "./lexer";
+import {allTokens, BasicString, KeyValueSeparator, LiteralString, Newline, UnquotedKey} from "./lexer";
 
 export class Parser extends CstParser {
   constructor() {
@@ -40,8 +40,10 @@ export class Parser extends CstParser {
   });
 
   private quotedKey = this.RULE("quotedKey", () => {
-    this.CONSUME(BasicString);
-    // OR LITERAL STRING
+    this.OR([
+      {ALT: () => this.CONSUME(BasicString)},
+      {ALT: () => this.CONSUME(LiteralString)}
+    ]);
   });
 
   private value = this.RULE("value", () => {

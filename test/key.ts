@@ -14,8 +14,15 @@ it('should support quoted keys', () => {
   const input = `"127.0.0.1" = "value"
 "character encoding" = "value"
 "ʎǝʞ" = "value"
-'key2' = "value"`;
+'key2' = "value"
+'quoted "value"' = "value"`;
   const result = load(input);
 
-  expect(result).toEqual({"127.0.0.1": "value", "character encoding": "value", "ʎǝʞ": "value", key2: "value"});
+  expect(result).toEqual({
+    "127.0.0.1": "value",
+    "character encoding": "value",
+    "ʎǝʞ": "value",
+    key2: "value",
+    "quoted \"value\"": "value"
+  });
 });
