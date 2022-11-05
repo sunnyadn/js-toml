@@ -39,3 +39,10 @@ it('should support empty double-quoted keys', () => {
 
   expect(result).toEqual({"": "blank"});
 });
+
+it('should support empty single-quoted keys', () => {
+  const input = "'' = 'blank'     # VALID but discouraged";
+  const result = load(input);
+
+  expect(result).toEqual({"": "blank"});
+});

@@ -57,9 +57,11 @@ export class Parser extends CstParser {
   });
 
   private string = this.RULE("string", () => {
-    // OR MULTILINE BASIC STRING
-    this.CONSUME(BasicString);
-    // OR MULTILINE LITERAL STRING
-    // OR LITERAL STRING
+    this.OR([
+      // OR MULTILINE BASIC STRING
+      {ALT: () => this.CONSUME(BasicString)},
+      // OR MULTILINE LITERAL STRING
+      {ALT: () => this.CONSUME(LiteralString)}
+    ]);
   });
 }

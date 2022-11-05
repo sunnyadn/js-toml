@@ -45,11 +45,7 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   quotedKey(ctx) {
-    if (ctx.BasicString) {
-      return this.readBasicString(ctx);
-    } else if (ctx.LiteralString) {
-      return this.readLiteralString(ctx);
-    }
+    return this.readSingleLineString(ctx);
   }
 
   value(ctx) {
@@ -57,16 +53,12 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   string(ctx) {
-    return this.readBasicString(ctx);
+    return this.readSingleLineString(ctx);
   }
 
-  private readBasicString(ctx) {
-    const result = ctx.BasicString[0].image;
-    return result.substring(1, result.length - 1);
-  }
-
-  private readLiteralString(ctx) {
-    const result = ctx.LiteralString[0].image;
-    return result.substring(1, result.length - 1);
+  private readSingleLineString(ctx) {
+    const tokens = ctx.BasicString || ctx.LiteralString;
+    const string = tokens[0].image;
+    return string.substring(1, string.length - 1);
   }
 }
