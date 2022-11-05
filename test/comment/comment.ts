@@ -13,3 +13,10 @@ it('should ignore comment at the end of a line', () => {
 
   expect(result).toEqual({key: "value"});
 });
+
+it('should not ignore comment in a string', () => {
+  const input = "key = \"# This is not a comment\"";
+  const result = load(input);
+
+  expect(result).toEqual({key: "# This is not a comment"});
+});
