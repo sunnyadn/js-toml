@@ -123,11 +123,46 @@
     "orgText": "",
     "definition": [
       {
-        "type": "Terminal",
-        "name": "UnquotedKey",
-        "label": "UnquotedKey",
+        "type": "Alternation",
         "idx": 0,
-        "pattern": "[a-zA-Z0-9_-]+"
+        "definition": [
+          {
+            "type": "Alternative",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "quotedKey",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Alternative",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "UnquotedKey",
+                "label": "UnquotedKey",
+                "idx": 0,
+                "pattern": "[a-zA-Z0-9_-]+"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "quotedKey",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "BasicString",
+        "label": "BasicString",
+        "idx": 0,
+        "pattern": "(?:\")(?:(?:[ \\t])|!|[#-[]|[\\x5D-~]|(?:[\\x80-\\uD7FF]|[\\uE000-\\uFFFF]))*(?:\")"
       }
     ]
   },

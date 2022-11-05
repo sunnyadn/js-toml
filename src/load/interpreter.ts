@@ -37,7 +37,15 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   simpleKey(ctx) {
-    return ctx.UnquotedKey[0].image;
+    if (ctx.quotedKey) {
+      return this.visit(ctx.quotedKey);
+    } else if (ctx.UnquotedKey) {
+      return ctx.UnquotedKey[0].image;
+    }
+  }
+
+  quotedKey(ctx) {
+    return this.readBasicString(ctx);
   }
 
   value(ctx) {
@@ -49,6 +57,10 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   basicString(ctx) {
+    return this.readBasicString(ctx);
+  }
+
+  private readBasicString(ctx) {
     const result = ctx.BasicString[0].image;
     return result.substring(1, result.length - 1);
   }

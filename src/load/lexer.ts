@@ -15,6 +15,8 @@ const basicUnescaped = XRegExp.build("{{whiteSpaceChar}}|\x21|[\x23-\x5B]|[\\x5D
   nonAscii
 });
 
+const basicString = XRegExp.build('{{quotationMark}}{{basicUnescaped}}*{{quotationMark}}', {quotationMark, basicUnescaped});
+
 export const WhiteSpace = createToken({
   name: "WhiteSpace",
   pattern: XRegExp.build('{{whiteSpaceChar}}+', {whiteSpaceChar}),
@@ -29,10 +31,7 @@ export const Comment = createToken({
 
 export const Newline = createToken({name: "Newline", pattern: /\r\n|\n/});
 
-export const BasicString = createToken({
-  name: "BasicString",
-  pattern: XRegExp.build('{{quotationMark}}{{basicUnescaped}}*{{quotationMark}}', {quotationMark, basicUnescaped})
-});
+export const BasicString = createToken({name: "BasicString", pattern: basicString});
 
 export const UnquotedKey = createToken({name: "UnquotedKey", pattern: /[a-zA-Z0-9_-]+/});
 
