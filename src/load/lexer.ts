@@ -37,7 +37,7 @@ export const BasicString = createToken({name: "BasicString", pattern: basicStrin
 
 export const UnquotedKey = createToken({name: "UnquotedKey", pattern: /[a-zA-Z0-9_-]+/});
 
-export const KeyValueSeparator = createToken({name: "KeyValueSeparator", pattern: /=/});
+export const KeyValueSeparator = createToken({name: "KeyValueSeparator", pattern: /=/, label: "="});
 
 export const allTokens = [WhiteSpace, Newline, BasicString, UnquotedKey, KeyValueSeparator, Comment];
 
