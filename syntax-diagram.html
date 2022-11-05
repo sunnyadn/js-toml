@@ -1,0 +1,178 @@
+
+<!-- This is a generated file -->
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  body {
+    background-color: hsl(30, 20%, 95%)
+  }
+</style>
+
+
+<link rel='stylesheet' href='https://unpkg.com/chevrotain@10.4.1/diagrams/diagrams.css'>
+
+<script src='https://unpkg.com/chevrotain@10.4.1/diagrams/vendor/railroad-diagrams.js'></script>
+<script src='https://unpkg.com/chevrotain@10.4.1/diagrams/src/diagrams_builder.js'></script>
+<script src='https://unpkg.com/chevrotain@10.4.1/diagrams/src/diagrams_behavior.js'></script>
+<script src='https://unpkg.com/chevrotain@10.4.1/diagrams/src/main.js'></script>
+
+<div id="diagrams" align="center"></div>    
+
+<script>
+    window.serializedGrammar = [
+  {
+    "type": "Rule",
+    "name": "toml",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "Option",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "Newline",
+            "label": "Newline",
+            "idx": 0,
+            "pattern": "\\r\\n|\\n"
+          }
+        ]
+      },
+      {
+        "type": "Option",
+        "idx": 1,
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "expression",
+            "idx": 0
+          }
+        ]
+      },
+      {
+        "type": "Repetition",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "Newline",
+            "label": "Newline",
+            "idx": 1,
+            "pattern": "\\r\\n|\\n"
+          },
+          {
+            "type": "NonTerminal",
+            "name": "expression",
+            "idx": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "expression",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "keyValue",
+        "idx": 0
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "keyValue",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "key",
+        "idx": 0
+      },
+      {
+        "type": "Terminal",
+        "name": "KeyValueSeparator",
+        "label": "KeyValueSeparator",
+        "idx": 0,
+        "pattern": "="
+      },
+      {
+        "type": "NonTerminal",
+        "name": "value",
+        "idx": 0
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "key",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "simpleKey",
+        "idx": 0
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "simpleKey",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "UnquotedKey",
+        "label": "UnquotedKey",
+        "idx": 0,
+        "pattern": "[a-zA-Z0-9_-]+"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "value",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "string",
+        "idx": 0
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "string",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "basicString",
+        "idx": 0
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "basicString",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "BasicString",
+        "label": "BasicString",
+        "idx": 0,
+        "pattern": "(?:\")(?:(?:[ \\t])|!|[#-[]|[\\x5D-~]|(?:[\\x80-\\uD7FF]|[\\uE000-\\uFFFF]))*(?:\")"
+      }
+    ]
+  }
+];
+</script>
+
+<script>
+    var diagramsDiv = document.getElementById("diagrams");
+    main.drawDiagramsFromSerializedGrammar(serializedGrammar, diagramsDiv);
+</script>
