@@ -1,4 +1,4 @@
-import {load} from "../src";
+import {load, SyntaxParseError} from "../src";
 
 it('should support bare keys', () => {
   const input = `key = "value"
@@ -25,4 +25,10 @@ it('should support quoted keys', () => {
     key2: "value",
     "quoted \"value\"": "value"
   });
+});
+
+it('should throw error if bare key is empty', () => {
+  const input = "= \"no key name\"  # INVALID";
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
 });
