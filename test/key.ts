@@ -56,3 +56,12 @@ site."google.com" = true`;
 
   expect(result).toEqual({name: "Orange", physical: {color: "orange", shape: "round"}, site: {"google.com": true}});
 });
+
+it('should support whitespace around dots', () => {
+  const input = `fruit.name = "banana"     # this is best practice
+fruit. color = "yellow"    # same as fruit.color
+fruit . flavor = "banana"   # same as fruit.flavor`;
+  const result = load(input);
+
+  expect(result).toEqual({fruit: {name: "banana", color: "yellow", flavor: "banana"}});
+});
