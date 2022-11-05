@@ -1,4 +1,13 @@
 import {createToken, Lexer} from "chevrotain";
+import XRegExp = require("xregexp");
+
+const whiteSpaceChar = /[ \t]/;
+
+export const WhiteSpace = createToken({
+  name: "whiteSpace",
+  pattern: XRegExp.build('{{whitespace}}+', {whitespace: whiteSpaceChar}),
+  group: Lexer.SKIPPED
+});
 
 export const Comment = createToken({
   name: "CommentStartSymbol",
@@ -14,6 +23,6 @@ export const UnquotedKey = createToken({name: "UnquotedKey", pattern: /[a-zA-Z0-
 
 export const KeyValueSeparator = createToken({name: "KeyValueSeparator", pattern: /=/});
 
-export const allTokens = [Newline, BasicString, UnquotedKey, KeyValueSeparator, Comment];
+export const allTokens = [WhiteSpace, Newline, BasicString, UnquotedKey, KeyValueSeparator, Comment];
 
 export const lexer = new Lexer(allTokens);
