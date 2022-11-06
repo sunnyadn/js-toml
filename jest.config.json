@@ -1,4 +1,7 @@
 {
+  "setupFiles": [
+    "<rootDir>/jest.setup.ts"
+  ],
   "testMatch": ["<rootDir>/test/**/*.[jt]s"],
   "transform": {
     "\\.ts$": "esbuild-runner/jest"

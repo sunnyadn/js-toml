@@ -1,5 +1,6 @@
 import {createToken, Lexer} from "chevrotain";
 import XRegExp = require("xregexp");
+import {envs} from "../common/environment";
 
 const digit = /[0-9]/;
 const alpha = /[a-zA-Z]/;
@@ -133,4 +134,4 @@ export const UnsignedDecimalInteger = createToken({
 
 export const allTokens = [WhiteSpace, Newline, MultiLineBasicString, MultiLineLiteralString, BasicString, LiteralString, True, Minus, Plus, UnsignedDecimalInteger, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
 
-export const lexer = new Lexer(allTokens);
+export const lexer = new Lexer(allTokens, {ensureOptimizations: true, skipValidations: !envs.isDebug});
