@@ -68,6 +68,14 @@ str3 = """\\
   });
 });
 
+it('should support escape sequences in multi-line basic strings', () => {
+  const input = `str = "I'm a string. \\"You can quote me\\". Name\\tJos\\u00E9\\nLocation\\tSF."
+otherEscape = "\\b \\f \\\\"`;
+  const result = load(input);
+
+  expect(result).toEqual({str: "I'm a string. \"You can quote me\". Name\tJosé\nLocation\tSF.", otherEscape: "\b \f \\"});
+});
+
 it('should throw error if unsupported control character is not escaped in multi-line basic strings', () => {
   const input = `str = """
 \b
