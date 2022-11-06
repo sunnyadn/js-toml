@@ -5,6 +5,7 @@ const digit = /[0-9]/;
 const alpha = /[a-zA-Z]/;
 const hexDigit = XRegExp.build("{{digit}}|[A-F]", {digit});
 
+const underscore = /_/;
 const digit1_9 = /[1-9]/;
 
 const whiteSpaceChar = /[ \t]/;
@@ -127,7 +128,7 @@ export const Plus = createToken({name: "Plus", pattern: /\+/, label: "+"});
 
 export const UnsignedDecimalInteger = createToken({
   name: "UnsignedDecimalInteger",
-  pattern: XRegExp.build("{{digit1_9}}{{digit}}+|{{digit}}", {digit, digit1_9})
+  pattern: XRegExp.build("{{digit1_9}}({{digit}}|{{underscore}}{{digit}})+|{{digit}}", {digit1_9, digit, underscore})
 });
 
 export const allTokens = [WhiteSpace, Newline, MultiLineBasicString, MultiLineLiteralString, BasicString, LiteralString, True, Minus, Plus, UnsignedDecimalInteger, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
