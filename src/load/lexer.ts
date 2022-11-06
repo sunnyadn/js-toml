@@ -8,6 +8,7 @@ const hexDigit = XRegExp.build("{{digit}}|[A-F]", {digit});
 const digit1_9 = /[1-9]/;
 
 const whiteSpaceChar = /[ \t]/;
+const newline = /\r\n|\n/;
 
 const commentStartChar = /#/;
 // const nonAscii = /[\x80-\uD7FF]|[\uE000-\u{10FFFF}]/u;
@@ -33,6 +34,15 @@ const apostrophe = /'/;
 
 const literalChar = XRegExp.build("\x09|[\x20-\x26]|[\x28-\x7E]|{{nonAscii}}", {nonAscii});
 
+const multiLineBasicStringDelimiter = XRegExp.build('{{quotationMark}}{3}', {quotationMark});
+const multiLineBasicUnescaped = XRegExp.build("{{whiteSpaceChar}}|!|[\x23-\x5B]|[\\x5D-\x7E]|{{nonAscii}}", {
+  whiteSpaceChar,
+  nonAscii
+});
+const multiLineBasicChar = XRegExp.build("{{multiLineBasicUnescaped}}|{{escaped}}", {multiLineBasicUnescaped, escaped});
+const multiLineBasicContent = XRegExp.build("{{multiLineBasicChar}}|{{newline}}", {multiLineBasicChar, newline}); // OR mlb-escaped-nl
+const multiLineBasicBody = XRegExp.build("{{multiLineBasicContent}}*", {multiLineBasicContent}); // OR *(mlb-quotes 1*mlb-content) [mlb-quotes]
+
 export const WhiteSpace = createToken({
   name: "WhiteSpace",
   pattern: XRegExp.build('{{whiteSpaceChar}}+', {whiteSpaceChar}),
@@ -45,7 +55,7 @@ export const Comment = createToken({
   group: 'comment',
 });
 
-export const Newline = createToken({name: "Newline", pattern: /\r\n|\n/});
+export const Newline = createToken({name: "Newline", pattern: newline});
 
 export const BasicString = createToken({
   name: "BasicString",
@@ -57,6 +67,16 @@ export const LiteralString = createToken({
   name: "LiteralString",
   pattern: XRegExp.build('{{apostrophe}}{{literalChar}}*{{apostrophe}}', {apostrophe, literalChar}),
   label: "'LiteralString'"
+});
+
+export const MultiLineBasicString = createToken({
+  name: "MultiLineBasicString",
+  pattern: XRegExp.build('{{multiLineBasicStringDelimiter}}{{newline}}?{{multiLineBasicBody}}{{multiLineBasicStringDelimiter}}', {
+    multiLineBasicStringDelimiter,
+    newline,
+    multiLineBasicBody
+  }),
+  label: '"""MultiLineBasicString"""'
 });
 
 export const UnquotedKey = createToken({
@@ -72,6 +92,6 @@ export const True = createToken({name: "True", pattern: /true/, label: "true", l
 
 export const UnsignedDecimalInteger = createToken({name: "UnsignedDecimalInteger", pattern: unsignedDecimalInteger});
 
-export const allTokens = [WhiteSpace, Newline, BasicString, LiteralString, True, UnsignedDecimalInteger, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
+export const allTokens = [WhiteSpace, Newline, MultiLineBasicString, BasicString, LiteralString, True, UnsignedDecimalInteger, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
 
 export const lexer = new Lexer(allTokens);

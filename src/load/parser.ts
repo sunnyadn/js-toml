@@ -4,7 +4,7 @@ import {
   BasicString,
   DotSeparator,
   KeyValueSeparator,
-  LiteralString,
+  LiteralString, MultiLineBasicString,
   Newline,
   True,
   UnquotedKey, UnsignedDecimalInteger
@@ -80,7 +80,7 @@ export class Parser extends CstParser {
 
   private string = this.RULE("string", () => {
     this.OR([
-      // OR MULTILINE BASIC STRING
+      {ALT: () => this.CONSUME(MultiLineBasicString)},
       {ALT: () => this.CONSUME(BasicString)},
       // OR MULTILINE LITERAL STRING
       {ALT: () => this.CONSUME(LiteralString)}

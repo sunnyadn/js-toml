@@ -70,6 +70,9 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   string(ctx) {
+    if (ctx.MultiLineBasicString) {
+      return this.readMultiLineBasicString(ctx);
+    }
     return this.readSingleLineString(ctx);
   }
 
@@ -108,6 +111,17 @@ export class Interpreter extends BaseCstVisitor {
     } else {
       this.assignPrimitiveValue(first, value, object, rawKey);
     }
+  }
+
+  private removeFirstLeadingNewline(string) {
+    return string.replace(/^(\r\n|\n)/, '');
+  }
+
+  private readMultiLineBasicString(ctx) {
+    const string = (ctx.MultiLineBasicString)[0].image;
+    let raw = string.substring(3, string.length - 3);
+    raw = this.removeFirstLeadingNewline(raw);
+    return this.unescapeString(raw);
   }
 
   private readSingleLineString(ctx) {
