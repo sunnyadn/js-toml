@@ -142,3 +142,10 @@ orange.color = "orange"`;
     orange: {type: "fruit", skin: "thick", color: "orange"}
   });
 });
+
+it('should support dotted keys only containing digits', () => {
+  const input = '3.14159 = "pi"';
+  const result = load(input);
+
+  expect(result).toEqual({"3": {"14159": "pi"}});
+});

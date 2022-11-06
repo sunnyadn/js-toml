@@ -2,12 +2,12 @@ import {CstParser} from "chevrotain";
 import {
   allTokens,
   BasicString,
-  DotSeparator, Integer,
+  DotSeparator,
   KeyValueSeparator,
   LiteralString,
   Newline,
   True,
-  UnquotedKey
+  UnquotedKey, UnsignedDecimalInteger
 } from "./lexer";
 
 export class Parser extends CstParser {
@@ -47,6 +47,7 @@ export class Parser extends CstParser {
     this.OR([
       {ALT: () => this.SUBRULE(this.quotedKey)},
       {ALT: () => this.CONSUME(UnquotedKey)},
+      {ALT: () => this.CONSUME(UnsignedDecimalInteger)},
     ]);
   });
 
@@ -92,6 +93,14 @@ export class Parser extends CstParser {
   });
 
   private integer = this.RULE("integer", () => {
-    this.CONSUME(Integer);
+    this.SUBRULE(this.decimalInteger);
+    // OR HEX INTEGER
+    // OR OCT INTEGER
+    // OR BIN INTEGER
+  });
+
+  private decimalInteger = this.RULE("decimalInteger", () => {
+    // OR +/-
+    this.CONSUME(UnsignedDecimalInteger);
   });
 }

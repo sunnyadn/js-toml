@@ -4,6 +4,8 @@ import XRegExp = require("xregexp");
 const digit = /[0-9]/;
 const alpha = /[a-zA-Z]/;
 
+const digit1_9 = /[1-9]/;
+
 const whiteSpaceChar = /[ \t]/;
 
 const commentStartChar = /#/;
@@ -13,8 +15,7 @@ const nonEol = XRegExp.build("\x09|[\x20-\x7F]|{{nonAscii}}", {nonAscii});
 
 const quotationMark = /"/;
 
-const unsignedDecimalInteger = digit; // OR digit1-9 *digit
-const decimalInteger = unsignedDecimalInteger; // OR +/- unsignedDecimalInteger
+const unsignedDecimalInteger = XRegExp.build("{{digit1_9}}{{digit}}+|{{digit}}", {digit, digit1_9}); // OR digit1-9 1*(underscore digit)
 
 const basicUnescaped = XRegExp.build("{{whiteSpaceChar}}|\x21|[\x23-\x5B]|[\\x5D-\x7E]|{{nonAscii}}", {
   whiteSpaceChar,
@@ -64,8 +65,8 @@ export const DotSeparator = createToken({name: "DotSeparator", pattern: /\./, la
 
 export const True = createToken({name: "True", pattern: /true/, label: "true", longer_alt: UnquotedKey});
 
-export const Integer = createToken({name: "Integer", pattern: decimalInteger, longer_alt: UnquotedKey});
+export const UnsignedDecimalInteger = createToken({name: "UnsignedDecimalInteger", pattern: unsignedDecimalInteger});
 
-export const allTokens = [WhiteSpace, Newline, BasicString, LiteralString, True, Integer, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
+export const allTokens = [WhiteSpace, Newline, BasicString, LiteralString, True, UnsignedDecimalInteger, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
 
 export const lexer = new Lexer(allTokens);

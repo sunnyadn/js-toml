@@ -44,6 +44,8 @@ export class Interpreter extends BaseCstVisitor {
       key = this.visit(ctx.quotedKey);
     } else if (ctx.UnquotedKey) {
       key = ctx.UnquotedKey[0].image;
+    } else if (ctx.UnsignedDecimalInteger) {
+      key = ctx.UnsignedDecimalInteger[0].image;
     }
 
     return [key];
@@ -76,7 +78,11 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   integer(ctx) {
-    return parseInt(ctx.Integer[0].image);
+    return this.visit(ctx.decimalInteger);
+  }
+
+  decimalInteger(ctx) {
+    return parseInt(ctx.UnsignedDecimalInteger[0].image);
   }
 
   private assignPrimitiveValue(key, value, object, rawKey) {

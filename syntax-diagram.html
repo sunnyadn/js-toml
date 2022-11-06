@@ -174,6 +174,18 @@
                 "pattern": "((?:[a-zA-Z])|(?:[0-9])|-|_)+"
               }
             ]
+          },
+          {
+            "type": "Alternative",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "UnsignedDecimalInteger",
+                "label": "UnsignedDecimalInteger",
+                "idx": 0,
+                "pattern": "(?:[1-9])(?:[0-9])+|(?:[0-9])"
+              }
+            ]
           }
         ]
       }
@@ -346,11 +358,23 @@
     "orgText": "",
     "definition": [
       {
+        "type": "NonTerminal",
+        "name": "decimalInteger",
+        "idx": 0
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "decimalInteger",
+    "orgText": "",
+    "definition": [
+      {
         "type": "Terminal",
-        "name": "Integer",
-        "label": "Integer",
+        "name": "UnsignedDecimalInteger",
+        "label": "UnsignedDecimalInteger",
         "idx": 0,
-        "pattern": "[0-9]"
+        "pattern": "(?:[1-9])(?:[0-9])+|(?:[0-9])"
       }
     ]
   }
