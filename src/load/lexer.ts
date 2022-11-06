@@ -1,6 +1,9 @@
 import {createToken, Lexer} from "chevrotain";
 import XRegExp = require("xregexp");
 
+const digit = /[0-9]/;
+const alpha = /[a-zA-Z]/;
+
 const whiteSpaceChar = /[ \t]/;
 
 const commentStartChar = /#/;
@@ -47,7 +50,10 @@ export const LiteralString = createToken({
   label: "'LiteralString'"
 });
 
-export const UnquotedKey = createToken({name: "UnquotedKey", pattern: /[a-zA-Z0-9_-]+/});
+export const UnquotedKey = createToken({
+  name: "UnquotedKey",
+  pattern: XRegExp.build('({{alpha}}|{{digit}}|-|_)+', {alpha, digit})
+});
 
 export const KeyValueSeparator = createToken({name: "KeyValueSeparator", pattern: /=/, label: "="});
 
