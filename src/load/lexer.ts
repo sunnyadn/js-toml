@@ -53,9 +53,9 @@ const multiLineBasicContent = XRegExp.build("{{multiLineBasicChar}}|{{newline}}|
   newline,
   multiLineBasicEscapedNewline
 });
-const multiLineBasicBody = XRegExp.build("{{multiLineBasicContent}}*({{multiLineQuotes}}{{multiLineBasicContent}}+)*{{multiLineQuotes}}?", {
+const multiLineBasicBody = XRegExp.build("{{multiLineBasicContent}}*({{multiLineBasicQuotes}}{{multiLineBasicContent}}+)*{{multiLineBasicQuotes}}?", {
   multiLineBasicContent,
-  multiLineQuotes: multiLineBasicQuotes
+  multiLineBasicQuotes
 });
 
 const multiLineLiteralStringDelimiter = XRegExp.build("{{apostrophe}}{3}", {apostrophe});
