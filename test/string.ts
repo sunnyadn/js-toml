@@ -64,6 +64,14 @@ str3 = """\\
   });
 });
 
+it('should throw error if unsupported control character is not escaped in multi-line basic strings', () => {
+  const input = `str = """
+\b
+"""`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});
+
 it('should support quotation marks in multi-line basic strings', () => {
   const input = `str4 = """Here are two quotation marks: "". Simple enough."""`;
   const result = load(input);
