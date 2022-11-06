@@ -61,6 +61,8 @@ export class Interpreter extends BaseCstVisitor {
       return this.visit(ctx.string);
     } else if (ctx.boolean) {
       return this.visit(ctx.boolean);
+    } else if (ctx.integer) {
+      return this.visit(ctx.integer);
     }
   }
 
@@ -70,6 +72,10 @@ export class Interpreter extends BaseCstVisitor {
 
   boolean(ctx) {
     return !!ctx.True;
+  }
+
+  integer(ctx) {
+    return parseInt(ctx.Integer[0].image);
   }
 
   private assignPrimitiveValue(key, value, object) {

@@ -81,3 +81,14 @@ spelling = "favorite"
 
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should parse if a key has not been directly defined', () => {
+  const input = `# This makes the key "fruit" into a table.
+fruit.apple.smooth = true
+
+# So then you can add to the table "fruit" like so:
+fruit.orange = 2`;
+  const result = load(input);
+
+  expect(result).toEqual({fruit: {apple: {smooth: true}, orange: 2}});
+});

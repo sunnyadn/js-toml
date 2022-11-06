@@ -2,7 +2,7 @@ import {CstParser} from "chevrotain";
 import {
   allTokens,
   BasicString,
-  DotSeparator,
+  DotSeparator, Integer,
   KeyValueSeparator,
   LiteralString,
   Newline,
@@ -20,7 +20,7 @@ export class Parser extends CstParser {
     this.OPTION(() => this.CONSUME(Newline));
     this.OPTION1(() => this.SUBRULE(this.expression));
     this.MANY(() => {
-      this.CONSUME1(Newline);
+      this.AT_LEAST_ONE(() => this.CONSUME1(Newline));
       this.SUBRULE1(this.expression);
     });
   });
@@ -73,7 +73,7 @@ export class Parser extends CstParser {
       // OR INLINE TABLE
       // OR DATE TIME
       // OR FLOAT
-      // OR INTEGER
+      {ALT: () => this.SUBRULE(this.integer)},
     ]);
   });
 
@@ -89,5 +89,9 @@ export class Parser extends CstParser {
   private boolean = this.RULE("boolean", () => {
     this.CONSUME(True);
     // OR FALSE
+  });
+
+  private integer = this.RULE("integer", () => {
+    this.CONSUME(Integer);
   });
 }

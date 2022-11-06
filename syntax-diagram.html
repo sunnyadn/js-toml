@@ -54,11 +54,17 @@
         "idx": 0,
         "definition": [
           {
-            "type": "Terminal",
-            "name": "Newline",
-            "label": "Newline",
-            "idx": 1,
-            "pattern": "\\r\\n|\\n"
+            "type": "RepetitionMandatory",
+            "idx": 0,
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Newline",
+                "label": "Newline",
+                "idx": 1,
+                "pattern": "\\r\\n|\\n"
+              }
+            ]
           },
           {
             "type": "NonTerminal",
@@ -165,7 +171,7 @@
                 "name": "UnquotedKey",
                 "label": "UnquotedKey",
                 "idx": 0,
-                "pattern": "[a-zA-Z0-9_-]+"
+                "pattern": "((?:[a-zA-Z])|(?:[0-9])|-|_)+"
               }
             ]
           }
@@ -268,6 +274,16 @@
                 "idx": 0
               }
             ]
+          },
+          {
+            "type": "Alternative",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "integer",
+                "idx": 0
+              }
+            ]
           }
         ]
       }
@@ -321,6 +337,20 @@
         "label": "true",
         "idx": 0,
         "pattern": "true"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "integer",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "Integer",
+        "label": "Integer",
+        "idx": 0,
+        "pattern": "[0-9]"
       }
     ]
   }

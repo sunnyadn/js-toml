@@ -13,6 +13,9 @@ const nonEol = XRegExp.build("\x09|[\x20-\x7F]|{{nonAscii}}", {nonAscii});
 
 const quotationMark = /"/;
 
+const unsignedDecimalInteger = digit; // OR digit1-9 *digit
+const decimalInteger = unsignedDecimalInteger; // OR +/- unsignedDecimalInteger
+
 const basicUnescaped = XRegExp.build("{{whiteSpaceChar}}|\x21|[\x23-\x5B]|[\\x5D-\x7E]|{{nonAscii}}", {
   whiteSpaceChar,
   nonAscii
@@ -61,6 +64,8 @@ export const DotSeparator = createToken({name: "DotSeparator", pattern: /\./, la
 
 export const True = createToken({name: "True", pattern: /true/, label: "true", longer_alt: UnquotedKey});
 
-export const allTokens = [WhiteSpace, Newline, BasicString, LiteralString, True, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
+export const Integer = createToken({name: "Integer", pattern: decimalInteger, longer_alt: UnquotedKey});
+
+export const allTokens = [WhiteSpace, Newline, BasicString, LiteralString, True, Integer, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
 
 export const lexer = new Lexer(allTokens);
