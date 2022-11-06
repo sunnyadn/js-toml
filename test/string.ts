@@ -1,4 +1,4 @@
-import {load} from "../src";
+import {load, SyntaxParseError} from "../src";
 
 it('should support escaped characters', () => {
   const input = `str = "I'm a string. \\"You can quote me\\". Name\\tJos\\u00E9\\nLocation\\tSF."`;
@@ -56,4 +56,9 @@ it('should support quotation marks in multi-line basic strings', () => {
   const result = load(input);
 
   expect(result).toEqual({str4: 'Here are two quotation marks: "". Simple enough.',});
+});
+
+it('should throw error when there are three adjacent quotation marks in multi-line basic strings', () => {
+  const input = `str5 = """Here are three quotation marks: """."""  # INVALID`;
+  expect(() => load(input)).toThrow(SyntaxParseError);
 });
