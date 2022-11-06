@@ -176,9 +176,6 @@ export class Interpreter extends BaseCstVisitor {
           case '"':
             result += '"';
             break;
-          case '/':
-            result += '/';
-            break;
           case '\\':
             result += '\\';
             break;

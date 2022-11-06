@@ -26,7 +26,7 @@ const basicUnescaped = XRegExp.build("{{whiteSpaceChar}}|!|[\x23-\\x5B]|[\\x5D-\
 });
 
 const escape = /\\/;
-const escapeSeqChar = XRegExp.build('["\\bfnrt]|u{{hexDigit}}{4}|U{{hexDigit}}{8}', {hexDigit});
+const escapeSeqChar = XRegExp.build('["\\\\bfnrt]|u{{hexDigit}}{4}|U{{hexDigit}}{8}', {hexDigit});
 const escaped = XRegExp.build("{{escape}}{{escapeSeqChar}}", {escape, escapeSeqChar});
 
 const basicChar = XRegExp.build("{{basicUnescaped}}|{{escaped}}", {basicUnescaped, escaped});
