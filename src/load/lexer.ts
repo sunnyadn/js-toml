@@ -14,7 +14,7 @@ const newline = /\r\n|\n/;
 const commentStartChar = /#/;
 // const nonAscii = /[\x80-\uD7FF]|[\uE000-\u{10FFFF}]/u;
 const nonAscii = /[\x80-\uD7FF]|[\uE000-\uFFFF]/;
-const nonEol = XRegExp.build("\x09|[\x20-\x7F]|{{nonAscii}}", {nonAscii});
+const nonEol = XRegExp.build("\t|[\x20-\x7F]|{{nonAscii}}", {nonAscii});
 
 const quotationMark = /"/;
 
@@ -33,15 +33,15 @@ const basicChar = XRegExp.build("{{basicUnescaped}}|{{escaped}}", {basicUnescape
 
 const apostrophe = /'/;
 
-const literalChar = XRegExp.build("\x09|[\x20-\x26]|[\x28-\x7E]|{{nonAscii}}", {nonAscii});
+const literalChar = XRegExp.build("\t|[\x20-\x26]|[\\x28-\x7E]|{{nonAscii}}", {nonAscii});
 
 const multiLineBasicStringDelimiter = XRegExp.build('{{quotationMark}}{3}', {quotationMark});
-const multiLineBasicUnescaped = XRegExp.build("{{whiteSpaceChar}}|!|[\x23-\x5B]|[\\x5D-\x7E]|{{nonAscii}}", {
+const multiLineBasicUnescaped = XRegExp.build("{{whiteSpaceChar}}|!|[\x23-\\x5B]|[\\x5D-\x7E]|{{nonAscii}}", {
   whiteSpaceChar,
   nonAscii
 });
 const multiLineBasicChar = XRegExp.build("{{multiLineBasicUnescaped}}|{{escaped}}", {multiLineBasicUnescaped, escaped});
-const multiLineQuotes = XRegExp.build("{{quotationMark}}{1,2}", {quotationMark});
+const multiLineBasicQuotes = XRegExp.build("{{quotationMark}}{1,2}", {quotationMark});
 const multiLineBasicEscapedNewline = XRegExp.build("{{escape}}{{whiteSpace}}{{newline}}({{whiteSpaceChar}}|{{newline}})*", {
   escape,
   whiteSpace,
@@ -55,8 +55,17 @@ const multiLineBasicContent = XRegExp.build("{{multiLineBasicChar}}|{{newline}}|
 });
 const multiLineBasicBody = XRegExp.build("{{multiLineBasicContent}}*({{multiLineQuotes}}{{multiLineBasicContent}}+)*{{multiLineQuotes}}?", {
   multiLineBasicContent,
-  multiLineQuotes
+  multiLineQuotes: multiLineBasicQuotes
 });
+
+const multiLineLiteralStringDelimiter = XRegExp.build("{{apostrophe}}{3}", {apostrophe});
+const multiLineLiteralChar = XRegExp.build("\t|[\x20-\x26]|[\\x28-\x7E]|{{nonAscii}}", {nonAscii});
+const multiLineLiteralQuotes = XRegExp.build("{{apostrophe}}{1,2}", {apostrophe});
+const multiLineLiteralContent = XRegExp.build("{{multiLineLiteralChar}}|{{newline}}", {multiLineLiteralChar, newline});
+const multiLineLiteralBody = XRegExp.build("{{multiLineLiteralContent}}*({{multiLineLiteralQuotes}}{{multiLineLiteralContent}}+)*", {
+  multiLineLiteralContent,
+  multiLineLiteralQuotes
+}); // OR [mll-quotes]
 
 export const WhiteSpace = createToken({
   name: "WhiteSpace",
@@ -94,6 +103,16 @@ export const MultiLineBasicString = createToken({
   label: '"""MultiLineBasicString"""'
 });
 
+export const MultiLineLiteralString = createToken({
+  name: "MultiLineLiteralString",
+  pattern: XRegExp.build('{{multiLineLiteralStringDelimiter}}{{newline}}?{{multiLineLiteralBody}}{{multiLineLiteralStringDelimiter}}', {
+    multiLineLiteralStringDelimiter,
+    newline,
+    multiLineLiteralBody
+  }),
+  label: "'''MultiLineLiteralString'''"
+});
+
 export const UnquotedKey = createToken({
   name: "UnquotedKey",
   pattern: XRegExp.build('({{alpha}}|{{digit}}|-|_)+', {alpha, digit})
@@ -107,6 +126,6 @@ export const True = createToken({name: "True", pattern: /true/, label: "true", l
 
 export const UnsignedDecimalInteger = createToken({name: "UnsignedDecimalInteger", pattern: unsignedDecimalInteger});
 
-export const allTokens = [WhiteSpace, Newline, MultiLineBasicString, BasicString, LiteralString, True, UnsignedDecimalInteger, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
+export const allTokens = [WhiteSpace, Newline, MultiLineBasicString, MultiLineLiteralString, BasicString, LiteralString, True, UnsignedDecimalInteger, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
 
 export const lexer = new Lexer(allTokens);

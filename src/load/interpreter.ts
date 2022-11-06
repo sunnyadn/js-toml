@@ -70,8 +70,8 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   string(ctx) {
-    if (ctx.MultiLineBasicString) {
-      return this.readMultiLineBasicString(ctx);
+    if (ctx.MultiLineBasicString || ctx.MultiLineLiteralString) {
+      return this.readMultiLineString(ctx);
     }
     return this.readSingleLineString(ctx);
   }
@@ -117,11 +117,19 @@ export class Interpreter extends BaseCstVisitor {
     return string.replace(/^(\r\n|\n)/, '');
   }
 
-  private readMultiLineBasicString(ctx) {
-    const string = (ctx.MultiLineBasicString)[0].image;
-    const raw = string.substring(3, string.length - 3);
-    let result = this.removeFirstLeadingNewline(raw);
-    result = this.skipWhitespaceIfFindBackslash(result);
+  private readMultiLineString(ctx) {
+    const string = (ctx.MultiLineBasicString || ctx.MultiLineLiteralString)[0].image;
+    let raw = string.substring(3, string.length - 3);
+    raw = this.removeFirstLeadingNewline(raw);
+    if (ctx.MultiLineBasicString) {
+      return this.readMultiLineBasicString(raw);
+    } else if (ctx.MultiLineLiteralString) {
+      return raw;
+    }
+  }
+
+  private readMultiLineBasicString(raw) {
+    const result = this.skipWhitespaceIfFindBackslash(raw);
     return this.unescapeString(result);
   }
 

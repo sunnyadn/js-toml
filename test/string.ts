@@ -97,3 +97,19 @@ regex    = '<\\i\\c*\\s*>'`;
     regex: '<\\i\\c*\\s*>'
   });
 });
+
+it('should support multi-line literal strings', () => {
+  const input = `regex2 = '''I [dw]on't need \\d{2} apples'''
+lines  = '''
+The first newline is
+trimmed in raw strings.
+   All other whitespace
+   is preserved.
+'''`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    regex2: "I [dw]on't need \\d{2} apples",
+    lines: "The first newline is\ntrimmed in raw strings.\n   All other whitespace\n   is preserved.\n"
+  });
+});

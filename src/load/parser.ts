@@ -4,7 +4,7 @@ import {
   BasicString,
   DotSeparator,
   KeyValueSeparator,
-  LiteralString, MultiLineBasicString,
+  LiteralString, MultiLineBasicString, MultiLineLiteralString,
   Newline,
   True,
   UnquotedKey, UnsignedDecimalInteger
@@ -82,7 +82,7 @@ export class Parser extends CstParser {
     this.OR([
       {ALT: () => this.CONSUME(MultiLineBasicString)},
       {ALT: () => this.CONSUME(BasicString)},
-      // OR MULTILINE LITERAL STRING
+      {ALT: () => this.CONSUME(MultiLineLiteralString)},
       {ALT: () => this.CONSUME(LiteralString)}
     ]);
   });
