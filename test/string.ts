@@ -81,3 +81,19 @@ str7 = """"This," she said, "is just a pointless statement.""""`;
   const result = load(input);
   expect(result).toEqual({str7: '"This," she said, "is just a pointless statement."',});
 });
+
+it('should not escape in a literal string', () => {
+  const input = `# What you see is what you get.
+winpath  = 'C:\\Users\\nodejs\\templates'
+winpath2 = '\\\\ServerX\\admin$\\system32\\'
+quoted   = 'Tom "Dubs" Preston-Werner'
+regex    = '<\\i\\c*\\s*>'`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    winpath: 'C:\\Users\\nodejs\\templates',
+    winpath2: '\\\\ServerX\\admin$\\system32\\',
+    quoted: 'Tom "Dubs" Preston-Werner',
+    regex: '<\\i\\c*\\s*>'
+  });
+});
