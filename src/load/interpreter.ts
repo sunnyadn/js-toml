@@ -187,7 +187,7 @@ export class Interpreter extends BaseCstVisitor {
             i += 4;
             break;
           case 'U':
-            result += String.fromCharCode(parseInt(string.substring(i + 1, i + 9), 16));
+            result += String.fromCodePoint(parseInt(string.substring(i + 1, i + 9), 16));
             i += 8;
             break;
           default:

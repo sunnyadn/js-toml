@@ -7,6 +7,13 @@ it('should support escaped characters', () => {
   expect(result).toEqual({str: "I'm a string. \"You can quote me\". Name\tJosé\nLocation\tSF."});
 });
 
+it('should support unicode escape sequences', () => {
+  const input = `str = "Jos\\u00E9 \\U0001F47B"`;
+  const result = load(input);
+
+  expect(result).toEqual({str: "José 👻"});
+});
+
 it('should support multi-line basic strings', () => {
   const input = `str1 = """
 Roses are red
