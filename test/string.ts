@@ -125,3 +125,10 @@ it('should throw error when there are three adjacent quotation marks in multi-li
   const input = `apos15 = '''Here are fifteen apostrophes: ''''''''''''''''''  # INVALID`;
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should support three adjacent apostrophes in basic strings', () => {
+  const input = `apos15 = "Here are fifteen apostrophes: '''''''''''''''"`;
+  const result = load(input);
+
+  expect(result).toEqual({apos15: "Here are fifteen apostrophes: '''''''''''''''"});
+});
