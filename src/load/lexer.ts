@@ -3,6 +3,7 @@ import XRegExp = require("xregexp");
 
 const digit = /[0-9]/;
 const alpha = /[a-zA-Z]/;
+const hexDigit = XRegExp.build("{{digit}}|[A-F]", {digit});
 
 const digit1_9 = /[1-9]/;
 
@@ -17,12 +18,16 @@ const quotationMark = /"/;
 
 const unsignedDecimalInteger = XRegExp.build("{{digit1_9}}{{digit}}+|{{digit}}", {digit, digit1_9}); // OR digit1-9 1*(underscore digit)
 
-const basicUnescaped = XRegExp.build("{{whiteSpaceChar}}|\x21|[\x23-\x5B]|[\\x5D-\x7E]|{{nonAscii}}", {
+const basicUnescaped = XRegExp.build("{{whiteSpaceChar}}|!|[\x23-\\x5B]|[\\x5D-\x7E]|{{nonAscii}}", {
   whiteSpaceChar,
   nonAscii
 });
 
-const basicChar = basicUnescaped; // OR escaped
+const escape = /\\/;
+const escapeSeqChar = XRegExp.build('["\\bfnrt]|u{{hexDigit}}{4}|U{{hexDigit}}{8}', {hexDigit});
+const escaped = XRegExp.build("{{escape}}{{escapeSeqChar}}", {escape, escapeSeqChar});
+
+const basicChar = XRegExp.build("{{basicUnescaped}}|{{escaped}}", {basicUnescaped, escaped});
 
 const apostrophe = /'/;
 

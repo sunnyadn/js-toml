@@ -111,8 +111,71 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   private readSingleLineString(ctx) {
-    const tokens = ctx.BasicString || ctx.LiteralString;
-    const string = tokens[0].image;
+    if (ctx.BasicString) {
+      return this.readBasicString(ctx);
+    } else if (ctx.LiteralString) {
+      return this.readLiteralString(ctx);
+    }
+  }
+
+  private unescapeString(string) {
+    let result = '';
+    for (let i = 0; i < string.length; i++) {
+      const char = string[i];
+      if (char === '\\') {
+        i++;
+        switch (string[i]) {
+          case 'b':
+            result += '\b';
+            break;
+          case 't':
+            result += '\t';
+            break;
+          case 'n':
+            result += '\n';
+            break;
+          case 'f':
+            result += '\f';
+            break;
+          case 'r':
+            result += '\r';
+            break;
+          case '"':
+            result += '"';
+            break;
+          case '/':
+            result += '/';
+            break;
+          case '\\':
+            result += '\\';
+            break;
+          case 'u':
+            result += String.fromCharCode(parseInt(string.substring(i + 1, i + 5), 16));
+            i += 4;
+            break;
+          case 'U':
+            result += String.fromCharCode(parseInt(string.substring(i + 1, i + 9), 16));
+            i += 8;
+            break;
+          default:
+            throw new InterpreterError(`Invalid escape sequence: \\${string[i]}`);
+        }
+      } else {
+        result += char;
+      }
+    }
+
+    return result;
+  }
+
+  private readBasicString(ctx) {
+    const string = (ctx.BasicString)[0].image;
+    const raw = string.substring(1, string.length - 1);
+    return this.unescapeString(raw);
+  }
+
+  private readLiteralString(ctx) {
+    const string = (ctx.LiteralString)[0].image;
     return string.substring(1, string.length - 1);
   }
 }
