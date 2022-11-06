@@ -138,10 +138,13 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   private readSingleLineString(ctx) {
+    const string = (ctx.BasicString || ctx.LiteralString)[0].image;
+    const raw = string.substring(1, string.length - 1);
+
     if (ctx.BasicString) {
-      return this.readBasicString(ctx);
+      return this.unescapeString(raw);
     } else if (ctx.LiteralString) {
-      return this.readLiteralString(ctx);
+      return raw;
     }
   }
 
@@ -193,16 +196,5 @@ export class Interpreter extends BaseCstVisitor {
     }
 
     return result;
-  }
-
-  private readBasicString(ctx) {
-    const string = (ctx.BasicString)[0].image;
-    const raw = string.substring(1, string.length - 1);
-    return this.unescapeString(raw);
-  }
-
-  private readLiteralString(ctx) {
-    const string = (ctx.LiteralString)[0].image;
-    return string.substring(1, string.length - 1);
   }
 }
