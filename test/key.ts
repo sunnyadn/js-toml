@@ -124,3 +124,21 @@ orange.color = "orange"`;
     orange: {type: "fruit", skin: "thick", color: "orange"}
   });
 });
+
+it('should support ordered dotted keys', () => {
+  const input = `# RECOMMENDED
+
+apple.type = "fruit"
+apple.skin = "thin"
+apple.color = "red"
+
+orange.type = "fruit"
+orange.skin = "thick"
+orange.color = "orange"`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    apple: {type: "fruit", skin: "thin", color: "red"},
+    orange: {type: "fruit", skin: "thick", color: "orange"}
+  });
+});
