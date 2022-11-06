@@ -73,3 +73,11 @@ name = "Pradyun"`;
 
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should throw error when a bare key has the same name as a quoted key', () => {
+  const input = `# THIS WILL NOT WORK
+spelling = "favorite"
+"spelling" = "favourite"`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});
