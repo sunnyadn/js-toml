@@ -18,8 +18,6 @@ const nonEol = XRegExp.build("\t|[\x20-\x7F]|{{nonAscii}}", {nonAscii});
 
 const quotationMark = /"/;
 
-const unsignedDecimalInteger = XRegExp.build("{{digit1_9}}{{digit}}+|{{digit}}", {digit, digit1_9}); // OR digit1-9 1*(underscore digit)
-
 const basicUnescaped = XRegExp.build("{{whiteSpaceChar}}|!|[\x23-\\x5B]|[\\x5D-\x7E]|{{nonAscii}}", {
   whiteSpaceChar,
   nonAscii
@@ -127,7 +125,10 @@ export const True = createToken({name: "True", pattern: /true/, label: "true", l
 export const Minus = createToken({name: "Minus", pattern: /-/, label: "-"});
 export const Plus = createToken({name: "Plus", pattern: /\+/, label: "+"});
 
-export const UnsignedDecimalInteger = createToken({name: "UnsignedDecimalInteger", pattern: unsignedDecimalInteger});
+export const UnsignedDecimalInteger = createToken({
+  name: "UnsignedDecimalInteger",
+  pattern: XRegExp.build("{{digit1_9}}{{digit}}+|{{digit}}", {digit, digit1_9})
+});
 
 export const allTokens = [WhiteSpace, Newline, MultiLineBasicString, MultiLineLiteralString, BasicString, LiteralString, True, Minus, Plus, UnsignedDecimalInteger, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
 
