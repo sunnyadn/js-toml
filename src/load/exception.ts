@@ -9,7 +9,7 @@ export class SyntaxParseError extends Error {
 
 export class LexerError extends SyntaxParseError {
   constructor(errors: ILexingError[]) {
-    super("Syntax error\n" + errors.map((error) => error.message).join(", "));
+    super("Syntax error\n" + errors.map((error) => error.message).join("\n"));
     this.errors = errors;
   }
 
@@ -18,7 +18,7 @@ export class LexerError extends SyntaxParseError {
 
 export class ParserError extends SyntaxParseError {
   constructor(errors: IRecognitionException[]) {
-    super("Syntax error\n" + errors.map((error) => error.message).join(", "));
+    super("Syntax error\n" + errors.map((error) => error.message).join("\n"));
     this.errors = errors;
   }
 
