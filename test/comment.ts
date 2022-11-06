@@ -1,4 +1,4 @@
-import {load} from "../src";
+import {load, SyntaxParseError} from "../src";
 
 it('should ignore full-line comment', () => {
   const input = "# This is a full-line comment";
@@ -28,4 +28,10 @@ another = "# This is not a comment"`;
   const result = load(input);
 
   expect(result).toEqual({key: "value", another: "# This is not a comment"});
+});
+
+it('should throw error if control character is in a comment', () => {
+  const input = "key = \"value\" # INVALID \x07";
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
 });
