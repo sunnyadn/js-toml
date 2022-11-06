@@ -53,10 +53,10 @@ const multiLineBasicContent = XRegExp.build("{{multiLineBasicChar}}|{{newline}}|
   newline,
   multiLineBasicEscapedNewline
 });
-const multiLineBasicBody = XRegExp.build("{{multiLineBasicContent}}*({{multiLineQuotes}}{{multiLineBasicContent}}+)*", {
+const multiLineBasicBody = XRegExp.build("{{multiLineBasicContent}}*({{multiLineQuotes}}{{multiLineBasicContent}}+)*{{multiLineQuotes}}?", {
   multiLineBasicContent,
   multiLineQuotes
-}); // OR [mlb-quotes]
+});
 
 export const WhiteSpace = createToken({
   name: "WhiteSpace",

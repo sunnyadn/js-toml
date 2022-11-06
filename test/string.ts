@@ -73,3 +73,11 @@ str6 = """Here are fifteen quotation marks: ""\\"""\\"""\\"""\\"""\\"."""`;
     str6: 'Here are fifteen quotation marks: """"""""""""""".'
   });
 });
+
+it('should support quotation marks right after and before the opening and closing delimiters in multi-line basic strings', () => {
+  const input = `# "This," she said, "is just a pointless statement."
+str7 = """"This," she said, "is just a pointless statement.""""`;
+
+  const result = load(input);
+  expect(result).toEqual({str7: '"This," she said, "is just a pointless statement."',});
+});
