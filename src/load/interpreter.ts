@@ -119,9 +119,14 @@ export class Interpreter extends BaseCstVisitor {
 
   private readMultiLineBasicString(ctx) {
     const string = (ctx.MultiLineBasicString)[0].image;
-    let raw = string.substring(3, string.length - 3);
-    raw = this.removeFirstLeadingNewline(raw);
-    return this.unescapeString(raw);
+    const raw = string.substring(3, string.length - 3);
+    let result = this.removeFirstLeadingNewline(raw);
+    result = this.skipWhitespaceIfFindBackslash(result);
+    return this.unescapeString(result);
+  }
+
+  private skipWhitespaceIfFindBackslash(string) {
+    return string.replace(/\\[ \t]*(\r\n|\n)+[ \t]*/g, '');
   }
 
   private readSingleLineString(ctx) {

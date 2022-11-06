@@ -8,6 +8,7 @@ const hexDigit = XRegExp.build("{{digit}}|[A-F]", {digit});
 const digit1_9 = /[1-9]/;
 
 const whiteSpaceChar = /[ \t]/;
+const whiteSpace = XRegExp.build("{{whiteSpaceChar}}*", {whiteSpaceChar});
 const newline = /\r\n|\n/;
 
 const commentStartChar = /#/;
@@ -40,7 +41,17 @@ const multiLineBasicUnescaped = XRegExp.build("{{whiteSpaceChar}}|!|[\x23-\x5B]|
   nonAscii
 });
 const multiLineBasicChar = XRegExp.build("{{multiLineBasicUnescaped}}|{{escaped}}", {multiLineBasicUnescaped, escaped});
-const multiLineBasicContent = XRegExp.build("{{multiLineBasicChar}}|{{newline}}", {multiLineBasicChar, newline}); // OR mlb-escaped-nl
+const multiLineBasicEscapedNewline = XRegExp.build("{{escape}}{{whiteSpace}}{{newline}}({{whiteSpaceChar}}|{{newline}})*", {
+  escape,
+  whiteSpace,
+  newline,
+  whiteSpaceChar
+});
+const multiLineBasicContent = XRegExp.build("{{multiLineBasicChar}}|{{newline}}|{{multiLineBasicEscapedNewline}}", {
+  multiLineBasicChar,
+  newline,
+  multiLineBasicEscapedNewline
+});
 const multiLineBasicBody = XRegExp.build("{{multiLineBasicContent}}*", {multiLineBasicContent}); // OR *(mlb-quotes 1*mlb-content) [mlb-quotes]
 
 export const WhiteSpace = createToken({

@@ -25,3 +25,28 @@ str3 = "Roses are red\\r\\nViolets are blue"`;
     str3: "Roses are red\r\nViolets are blue"
   });
 });
+
+it('should support whitespace trimming in multi-line basic strings', () => {
+  const input = `# The following strings are byte-for-byte equivalent:
+str1 = "The quick brown fox jumps over the lazy dog."
+
+str2 = """
+The quick brown \\
+
+
+  fox jumps over \\
+    the lazy dog."""
+
+str3 = """\\
+       The quick brown \\
+       fox jumps over \\
+       the lazy dog.\\
+       """`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    str1: "The quick brown fox jumps over the lazy dog.",
+    str2: "The quick brown fox jumps over the lazy dog.",
+    str3: "The quick brown fox jumps over the lazy dog."
+  });
+});
