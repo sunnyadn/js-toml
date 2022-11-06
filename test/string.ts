@@ -113,3 +113,10 @@ trimmed in raw strings.
     lines: "The first newline is\ntrimmed in raw strings.\n   All other whitespace\n   is preserved.\n"
   });
 });
+
+it('should support quotation marks in multi-line literal strings', () => {
+  const input = `quot15 = '''Here are fifteen quotation marks: """""""""""""""'''`;
+  const result = load(input);
+
+  expect(result).toEqual({quot15: 'Here are fifteen quotation marks: """""""""""""""',});
+});
