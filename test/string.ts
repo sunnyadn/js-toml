@@ -120,3 +120,8 @@ it('should support quotation marks in multi-line literal strings', () => {
 
   expect(result).toEqual({quot15: 'Here are fifteen quotation marks: """""""""""""""',});
 });
+
+it('should throw error when there are three adjacent quotation marks in multi-line literal strings', () => {
+  const input = `apos15 = '''Here are fifteen apostrophes: ''''''''''''''''''  # INVALID`;
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});
