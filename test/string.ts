@@ -173,3 +173,11 @@ str = ''''That,' she said, 'is still pointless.''''`;
 
   expect(result).toEqual({str: "'That,' she said, 'is still pointless.'"});
 });
+
+it('should throw error when there is unsupported control character in multi-line literal strings', () => {
+  const input = `str = '''
+\b
+'''`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});
