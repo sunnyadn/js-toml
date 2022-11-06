@@ -26,7 +26,8 @@ export class Interpreter extends BaseCstVisitor {
   keyValue(ctx) {
     const keys = this.visit(ctx.key);
     const value = this.visit(ctx.value);
-    this.assignValue(keys, value);
+    const rawKey = keys.join('.');
+    this.assignValue(rawKey, keys, value);
   }
 
   key(ctx) {
@@ -78,28 +79,28 @@ export class Interpreter extends BaseCstVisitor {
     return parseInt(ctx.Integer[0].image);
   }
 
-  private assignPrimitiveValue(key, value, object) {
+  private assignPrimitiveValue(key, value, object, rawKey) {
     const realKey = typeof key === 'string' ? key : key[0];
     if (object[realKey]) {
-      throw new InterpreterError(`Duplicate key detect: '${realKey}'`);
+      throw new InterpreterError(`Duplicate key detect: '${rawKey}'`);
     }
     object[key] = value;
   }
 
-  private tryCreatingObject(key, object) {
+  private tryCreatingObject(key, object, rawKey) {
     object[key] = object[key] || {};
     if (typeof object[key] !== 'object') {
-      throw new InterpreterError(`Cannot assign value to key '${key}'`);
+      throw new InterpreterError(`Cannot assign value to key '${rawKey}'`);
     }
   }
 
-  private assignValue(keys, value, object = this.result) {
+  private assignValue(rawKey, keys, value, object = this.result) {
     const [first, ...rest] = keys;
     if (rest.length > 0) {
-      this.tryCreatingObject(first, object);
-      this.assignValue(rest, value, object[first]);
+      this.tryCreatingObject(first, object, rawKey);
+      this.assignValue(rawKey, rest, value, object[first]);
     } else {
-      this.assignPrimitiveValue(first, value, object);
+      this.assignPrimitiveValue(first, value, object, rawKey);
     }
   }
 
