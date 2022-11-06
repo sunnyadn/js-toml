@@ -92,3 +92,16 @@ fruit.orange = 2`;
 
   expect(result).toEqual({fruit: {apple: {smooth: true}, orange: 2}});
 });
+
+it('should throw error if overwrite a primitive value with object', () => {
+  const input = `# THE FOLLOWING IS INVALID
+
+# This defines the value of fruit.apple to be an integer.
+fruit.apple = 1
+
+# But then this treats fruit.apple like it's a table.
+# You can't turn an integer into a table.
+fruit.apple.smooth = true`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});

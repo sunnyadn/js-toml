@@ -86,10 +86,17 @@ export class Interpreter extends BaseCstVisitor {
     object[key] = value;
   }
 
+  private tryCreatingObject(key, object) {
+    object[key] = object[key] || {};
+    if (typeof object[key] !== 'object') {
+      throw new InterpreterError(`Cannot assign value to key '${key}'`);
+    }
+  }
+
   private assignValue(keys, value, object = this.result) {
     const [first, ...rest] = keys;
     if (rest.length > 0) {
-      object[first] = object[first] || {};
+      this.tryCreatingObject(first, object);
       this.assignValue(rest, value, object[first]);
     } else {
       this.assignPrimitiveValue(first, value, object);
