@@ -132,3 +132,11 @@ it('should support three adjacent apostrophes in basic strings', () => {
 
   expect(result).toEqual({apos15: "Here are fifteen apostrophes: '''''''''''''''"});
 });
+
+it('should support apostrophes inside multi-line literal strings', () => {
+  const input = `# 'That,' she said, 'is still pointless.'
+str = ''''That,' she said, 'is still pointless.''''`;
+  const result = load(input);
+
+  expect(result).toEqual({str: "'That,' she said, 'is still pointless.'"});
+});

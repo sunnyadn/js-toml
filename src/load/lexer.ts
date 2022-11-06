@@ -62,10 +62,10 @@ const multiLineLiteralStringDelimiter = XRegExp.build("{{apostrophe}}{3}", {apos
 const multiLineLiteralChar = XRegExp.build("\t|[\x20-\x26]|[\\x28-\x7E]|{{nonAscii}}", {nonAscii});
 const multiLineLiteralQuotes = XRegExp.build("{{apostrophe}}{1,2}", {apostrophe});
 const multiLineLiteralContent = XRegExp.build("{{multiLineLiteralChar}}|{{newline}}", {multiLineLiteralChar, newline});
-const multiLineLiteralBody = XRegExp.build("{{multiLineLiteralContent}}*({{multiLineLiteralQuotes}}{{multiLineLiteralContent}}+)*", {
+const multiLineLiteralBody = XRegExp.build("{{multiLineLiteralContent}}*({{multiLineLiteralQuotes}}{{multiLineLiteralContent}}+)*{{multiLineLiteralQuotes}}?", {
   multiLineLiteralContent,
   multiLineLiteralQuotes
-}); // OR [mll-quotes]
+});
 
 export const WhiteSpace = createToken({
   name: "WhiteSpace",
