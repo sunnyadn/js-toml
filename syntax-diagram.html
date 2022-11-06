@@ -342,7 +342,7 @@
                 "name": "MultiLineLiteralString",
                 "label": "'''MultiLineLiteralString'''",
                 "idx": 0,
-                "pattern": "(?:(?:'){3})(?:\\r\\n|\\n)?(?:(?:(?:\t|[ -&]|[\\x28-~]|(?:[\\x80-\\uD7FF]|[\\uE000-\\uFFFF]))|(?:\\r\\n|\\n))*((?:(?:'){1,2})(?:(?:\t|[ -&]|[\\x28-~]|(?:[\\x80-\\uD7FF]|[\\uE000-\\uFFFF]))|(?:\\r\\n|\\n))+)*)(?:(?:'){3})"
+                "pattern": "(?:(?:'){3})(?:\\r\\n|\\n)?(?:(?:(?:\t|[ -&]|[\\x28-~]|(?:[\\x80-\\uD7FF]|[\\uE000-\\uFFFF]))|(?:\\r\\n|\\n))*((?:(?:'){1,2})(?:(?:\t|[ -&]|[\\x28-~]|(?:[\\x80-\\uD7FF]|[\\uE000-\\uFFFF]))|(?:\\r\\n|\\n))+)*(?:(?:'){1,2})?)(?:(?:'){3})"
               }
             ]
           },
@@ -393,6 +393,42 @@
     "name": "decimalInteger",
     "orgText": "",
     "definition": [
+      {
+        "type": "Option",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Alternation",
+            "idx": 0,
+            "definition": [
+              {
+                "type": "Alternative",
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "Minus",
+                    "label": "-",
+                    "idx": 0,
+                    "pattern": "-"
+                  }
+                ]
+              },
+              {
+                "type": "Alternative",
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "Plus",
+                    "label": "+",
+                    "idx": 0,
+                    "pattern": "\\+"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
       {
         "type": "Terminal",
         "name": "UnsignedDecimalInteger",

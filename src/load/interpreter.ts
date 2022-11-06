@@ -85,7 +85,8 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   decimalInteger(ctx) {
-    return parseInt(ctx.UnsignedDecimalInteger[0].image);
+    const integer = parseInt(ctx.UnsignedDecimalInteger[0].image);
+    return ctx.Minus ? -integer : +integer;
   }
 
   private assignPrimitiveValue(key, value, object, rawKey) {

@@ -4,8 +4,8 @@ import {
   BasicString,
   DotSeparator,
   KeyValueSeparator,
-  LiteralString, MultiLineBasicString, MultiLineLiteralString,
-  Newline,
+  LiteralString, Minus, MultiLineBasicString, MultiLineLiteralString,
+  Newline, Plus,
   True,
   UnquotedKey, UnsignedDecimalInteger
 } from "./lexer";
@@ -100,7 +100,10 @@ export class Parser extends CstParser {
   });
 
   private decimalInteger = this.RULE("decimalInteger", () => {
-    // OR +/-
+    this.OPTION(() => this.OR([
+      {ALT: () => this.CONSUME(Minus)},
+      {ALT: () => this.CONSUME(Plus)},
+    ]));
     this.CONSUME(UnsignedDecimalInteger);
   });
 }

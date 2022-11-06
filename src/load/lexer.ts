@@ -124,8 +124,11 @@ export const DotSeparator = createToken({name: "DotSeparator", pattern: /\./, la
 
 export const True = createToken({name: "True", pattern: /true/, label: "true", longer_alt: UnquotedKey});
 
+export const Minus = createToken({name: "Minus", pattern: /-/, label: "-"});
+export const Plus = createToken({name: "Plus", pattern: /\+/, label: "+"});
+
 export const UnsignedDecimalInteger = createToken({name: "UnsignedDecimalInteger", pattern: unsignedDecimalInteger});
 
-export const allTokens = [WhiteSpace, Newline, MultiLineBasicString, MultiLineLiteralString, BasicString, LiteralString, True, UnsignedDecimalInteger, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
+export const allTokens = [WhiteSpace, Newline, MultiLineBasicString, MultiLineLiteralString, BasicString, LiteralString, True, Minus, Plus, UnsignedDecimalInteger, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
 
 export const lexer = new Lexer(allTokens);
