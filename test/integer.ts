@@ -1,4 +1,4 @@
-import {load} from "../src";
+import {load, SyntaxParseError} from "../src";
 
 it('should support decimal integers', () => {
   const input = `int1 = +99
@@ -18,4 +18,10 @@ int8 = 1_2_3_4_5  # VALID but discouraged`;
   const result = load(input);
 
   expect(result).toEqual({int5: 1000, int6: 5349221, int7: 5349221, int8: 12345});
+});
+
+it('should throw error if leading zeros are used', () => {
+  expect(() => load("int = 042")).toThrow(SyntaxParseError);
+  expect(() => load("int = +042")).toThrow(SyntaxParseError);
+  expect(() => load("int = -042")).toThrow(SyntaxParseError);
 });
