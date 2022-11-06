@@ -5,7 +5,7 @@ import {
   DotSeparator,
   KeyValueSeparator,
   LiteralString, Minus, MultiLineBasicString, MultiLineLiteralString,
-  Newline, Plus,
+  Newline, NonDecimalInteger, Plus,
   True,
   UnquotedKey, UnsignedDecimalInteger
 } from "./lexer";
@@ -23,6 +23,7 @@ export class Parser extends CstParser {
       this.AT_LEAST_ONE(() => this.CONSUME1(Newline));
       this.SUBRULE1(this.expression);
     });
+    this.MANY1(() => this.CONSUME2(Newline));
   });
 
   private expression = this.RULE("expression", () => {
@@ -93,10 +94,11 @@ export class Parser extends CstParser {
   });
 
   private integer = this.RULE("integer", () => {
-    this.SUBRULE(this.decimalInteger);
-    // OR HEX INTEGER
-    // OR OCT INTEGER
-    // OR BIN INTEGER
+    this.OR([
+      {ALT: () => this.SUBRULE(this.decimalInteger)},
+      {ALT: () => this.SUBRULE(this.nonDecimalInteger)}
+    ]);
+
   });
 
   private decimalInteger = this.RULE("decimalInteger", () => {
@@ -105,5 +107,9 @@ export class Parser extends CstParser {
       {ALT: () => this.CONSUME(Plus)},
     ]));
     this.CONSUME(UnsignedDecimalInteger);
+  });
+
+  private nonDecimalInteger = this.RULE("nonDecimalInteger", () => {
+    this.CONSUME(NonDecimalInteger);
   });
 }

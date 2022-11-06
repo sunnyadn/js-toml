@@ -4,10 +4,32 @@ import {envs} from "../common/environment";
 
 const digit = /[0-9]/;
 const alpha = /[a-zA-Z]/;
-const hexDigit = XRegExp.build("{{digit}}|[A-F]", {digit});
+const hexDigit = XRegExp.build("{{digit}}|[A-Fa-f]", {digit});
 
 const underscore = /_/;
 const digit1_9 = /[1-9]/;
+const digit0_7 = /[0-7]/;
+const digit0_1 = /[01]/;
+
+const hexPrefix = /0x/;
+const octPrefix = /0o/;
+const binPrefix = /0b/;
+
+const hexInteger = XRegExp.build("{{hexPrefix}}{{hexDigit}}({{hexDigit}}|{{underscore}}{{hexDigit}})*", {
+  hexPrefix,
+  hexDigit,
+  underscore
+});
+const octalInteger = XRegExp.build("{{octPrefix}}{{digit0_7}}({{digit0_7}}|{{underscore}}{{digit0_7}})*", {
+  octPrefix,
+  digit0_7,
+  underscore
+});
+const binaryInteger = XRegExp.build("{{binPrefix}}{{digit0_1}}({{digit0_1}}|{{underscore}}{{digit0_1}})*", {
+  binPrefix,
+  digit0_1,
+  underscore
+});
 
 const whiteSpaceChar = /[ \t]/;
 const whiteSpace = XRegExp.build("{{whiteSpaceChar}}*", {whiteSpaceChar});
@@ -132,6 +154,11 @@ export const UnsignedDecimalInteger = createToken({
   pattern: XRegExp.build("{{digit1_9}}({{digit}}|{{underscore}}{{digit}})+|{{digit}}", {digit1_9, digit, underscore})
 });
 
-export const allTokens = [WhiteSpace, Newline, MultiLineBasicString, MultiLineLiteralString, BasicString, LiteralString, True, Minus, Plus, UnsignedDecimalInteger, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
+export const NonDecimalInteger = createToken({
+  name: "NonDecimalInteger",
+  pattern: XRegExp.build("{{hexInteger}}|{{octalInteger}}|{{binaryInteger}}", {hexInteger, octalInteger, binaryInteger})
+});
+
+export const allTokens = [WhiteSpace, Newline, MultiLineBasicString, MultiLineLiteralString, BasicString, LiteralString, True, Minus, Plus, NonDecimalInteger, UnsignedDecimalInteger, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
 
 export const lexer = new Lexer(allTokens, {ensureOptimizations: true, skipValidations: !envs.isDebug});

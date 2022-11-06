@@ -34,3 +34,20 @@ int14 = -0`;
 
   expect(result).toEqual({int12: 0, int13: 0, int14: 0});
 });
+
+it('should support hexadecimal octal and binary integers', () => {
+  const input = `# hexadecimal with prefix \`0x\`
+hex1 = 0xDEADBEEF
+hex2 = 0xdeadbeef
+hex3 = 0xdead_beef
+
+# octal with prefix \`0o\`
+oct1 = 0o01234567
+oct2 = 0o755 # useful for Unix file permissions
+
+# binary with prefix \`0b\`
+bin1 = 0b11010110`;
+  const result = load(input);
+
+  expect(result).toEqual({hex1: 3735928559, hex2: 3735928559, hex3: 3735928559, oct1: 342391, oct2: 493, bin1: 214});
+});

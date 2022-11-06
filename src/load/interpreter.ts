@@ -81,19 +81,25 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   integer(ctx) {
-    return this.visit(ctx.decimalInteger);
+    if (ctx.decimalInteger) {
+      return this.visit(ctx.decimalInteger);
+    } else if (ctx.nonDecimalInteger) {
+      return this.visit(ctx.nonDecimalInteger);
+    }
   }
 
   decimalInteger(ctx) {
-    const integerString = ctx.UnsignedDecimalInteger[0].image;
-    const underscoreRemoved = integerString.replace(/_/g, '');
-    const integer = parseInt(underscoreRemoved);
+    const integer = this.readInteger((ctx.UnsignedDecimalInteger)[0].image);
 
     if (integer === 0) {
       return 0;
     }
 
     return ctx.Minus ? -integer : +integer;
+  }
+
+  nonDecimalInteger(ctx) {
+    return this.readInteger(ctx.NonDecimalInteger[0].image);
   }
 
   private assignPrimitiveValue(key, value, object, rawKey) {
@@ -201,5 +207,16 @@ export class Interpreter extends BaseCstVisitor {
     }
 
     return result;
+  }
+
+  private readInteger(string) {
+    const underscoreRemoved = string.replace(/_/g, '');
+    if (underscoreRemoved.startsWith('0o')) {
+      return parseInt(underscoreRemoved.substring(2), 8);
+    } else if (underscoreRemoved.startsWith('0b')) {
+      return parseInt(underscoreRemoved.substring(2), 2);
+    }
+
+    return parseInt(underscoreRemoved);
   }
 }
