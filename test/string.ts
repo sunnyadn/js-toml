@@ -10,8 +10,18 @@ it('should support escaped characters', () => {
 it('should support multi-line basic strings', () => {
   const input = `str1 = """
 Roses are red
-Violets are blue"""`;
+Violets are blue"""
+
+# On a Unix system, the above multi-line string will most likely be the same as:
+str2 = "Roses are red\\nViolets are blue"
+
+# On a Windows system, it will most likely be equivalent to:
+str3 = "Roses are red\\r\\nViolets are blue"`;
   const result = load(input);
 
-  expect(result).toEqual({str1: "Roses are red\nViolets are blue"});
+  expect(result).toEqual({
+    str1: "Roses are red\nViolets are blue",
+    str2: "Roses are red\nViolets are blue",
+    str3: "Roses are red\r\nViolets are blue"
+  });
 });
