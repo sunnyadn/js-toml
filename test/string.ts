@@ -62,3 +62,14 @@ it('should throw error when there are three adjacent quotation marks in multi-li
   const input = `str5 = """Here are three quotation marks: """."""  # INVALID`;
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should support escaped quotation marks in multi-line basic strings', () => {
+  const input = `str5 = """Here are three quotation marks: ""\\"."""
+str6 = """Here are fifteen quotation marks: ""\\"""\\"""\\"""\\"""\\"."""`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    str5: 'Here are three quotation marks: """.',
+    str6: 'Here are fifteen quotation marks: """"""""""""""".'
+  });
+});
