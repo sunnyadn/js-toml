@@ -105,3 +105,22 @@ fruit.apple.smooth = true`;
 
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should support out-of-order dotted keys', () => {
+  const input = `# VALID BUT DISCOURAGED
+
+apple.type = "fruit"
+orange.type = "fruit"
+
+apple.skin = "thin"
+orange.skin = "thick"
+
+apple.color = "red"
+orange.color = "orange"`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    apple: {type: "fruit", skin: "thin", color: "red"},
+    orange: {type: "fruit", skin: "thick", color: "orange"}
+  });
+});
