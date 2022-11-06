@@ -88,6 +88,11 @@ export class Interpreter extends BaseCstVisitor {
     const integerString = ctx.UnsignedDecimalInteger[0].image;
     const underscoreRemoved = integerString.replace(/_/g, '');
     const integer = parseInt(underscoreRemoved);
+
+    if (integer === 0) {
+      return 0;
+    }
+
     return ctx.Minus ? -integer : +integer;
   }
 

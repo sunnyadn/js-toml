@@ -25,3 +25,12 @@ it('should throw error if leading zeros are used', () => {
   expect(() => load("int = +042")).toThrow(SyntaxParseError);
   expect(() => load("int = -042")).toThrow(SyntaxParseError);
 });
+
+it('should support zeroes in integers', () => {
+  const input = `int12 = 0
+int13 = +0
+int14 = -0`;
+  const result = load(input);
+
+  expect(result).toEqual({int12: 0, int13: 0, int14: 0});
+});
