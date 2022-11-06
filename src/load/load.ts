@@ -1,7 +1,7 @@
 import {Parser} from "./parser";
 import {lexer} from "./lexer";
 import {Interpreter} from "./interpreter";
-import {SyntaxParseError} from "./SyntaxParseError";
+import {ParserError} from "./exception";
 
 const parser = new Parser();
 const interpreter = new Interpreter();
@@ -12,7 +12,7 @@ export const load = (toml: string) => {
   const cst = parser.toml();
 
   if (parser.errors.length > 0) {
-    throw new SyntaxParseError(parser.errors);
+    throw new ParserError(parser.errors);
   }
 
   return interpreter.visit(cst);

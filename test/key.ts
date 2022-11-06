@@ -65,3 +65,11 @@ fruit . flavor = "banana"   # same as fruit.flavor`;
 
   expect(result).toEqual({fruit: {name: "banana", color: "yellow", flavor: "banana"}});
 });
+
+it('should throw error if a key is duplicated', () => {
+  const input = `# DO NOT DO THIS
+name = "Tom"
+name = "Pradyun"`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});

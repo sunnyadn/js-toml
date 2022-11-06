@@ -1,4 +1,5 @@
 import {Parser} from "./parser";
+import {InterpreterError} from "./exception";
 
 const parser = new Parser();
 
@@ -22,24 +23,10 @@ export class Interpreter extends BaseCstVisitor {
     this.visit(ctx.keyValue);
   }
 
-  private assignValue(key, value, object = this.result) {
-    if (typeof key === 'string') {
-      object[key] = value;
-    } else {
-      const [first, ...rest] = key;
-      if (rest.length > 0) {
-        object[first] = object[first] || {};
-        this.assignValue(rest, value, object[first]);
-      } else {
-        object[first] = value;
-      }
-    }
-  }
-
   keyValue(ctx) {
-    const key = this.visit(ctx.key);
+    const keys = this.visit(ctx.key);
     const value = this.visit(ctx.value);
-    this.assignValue(key, value);
+    this.assignValue(keys, value);
   }
 
   key(ctx) {
@@ -51,11 +38,14 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   simpleKey(ctx) {
+    let key;
     if (ctx.quotedKey) {
-      return this.visit(ctx.quotedKey);
+      key = this.visit(ctx.quotedKey);
     } else if (ctx.UnquotedKey) {
-      return ctx.UnquotedKey[0].image;
+      key = ctx.UnquotedKey[0].image;
     }
+
+    return [key];
   }
 
   dottedKey(ctx) {
@@ -80,6 +70,24 @@ export class Interpreter extends BaseCstVisitor {
 
   boolean(ctx) {
     return !!ctx.True;
+  }
+
+  private assignPrimitiveValue(key, value, object) {
+    const realKey = typeof key === 'string' ? key : key[0];
+    if (object[realKey]) {
+      throw new InterpreterError(`Duplicate key detect: '${realKey}'`);
+    }
+    object[key] = value;
+  }
+
+  private assignValue(keys, value, object = this.result) {
+    const [first, ...rest] = keys;
+    if (rest.length > 0) {
+      object[first] = object[first] || {};
+      this.assignValue(rest, value, object[first]);
+    } else {
+      this.assignPrimitiveValue(first, value, object);
+    }
   }
 
   private readSingleLineString(ctx) {
