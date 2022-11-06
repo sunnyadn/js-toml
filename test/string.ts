@@ -14,6 +14,12 @@ it('should support unicode escape sequences', () => {
   expect(result).toEqual({str: "José 👻"});
 });
 
+it('should throw error if unsupported escape sequence is used', () => {
+  const input = `str = "I'm a string. \\z"`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});
+
 it('should support multi-line basic strings', () => {
   const input = `str1 = """
 Roses are red
