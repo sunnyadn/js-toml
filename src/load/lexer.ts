@@ -41,6 +41,7 @@ const multiLineBasicUnescaped = XRegExp.build("{{whiteSpaceChar}}|!|[\x23-\x5B]|
   nonAscii
 });
 const multiLineBasicChar = XRegExp.build("{{multiLineBasicUnescaped}}|{{escaped}}", {multiLineBasicUnescaped, escaped});
+const multiLineQuotes = XRegExp.build("{{quotationMark}}{1,2}", {quotationMark});
 const multiLineBasicEscapedNewline = XRegExp.build("{{escape}}{{whiteSpace}}{{newline}}({{whiteSpaceChar}}|{{newline}})*", {
   escape,
   whiteSpace,
@@ -52,7 +53,10 @@ const multiLineBasicContent = XRegExp.build("{{multiLineBasicChar}}|{{newline}}|
   newline,
   multiLineBasicEscapedNewline
 });
-const multiLineBasicBody = XRegExp.build("{{multiLineBasicContent}}*", {multiLineBasicContent}); // OR *(mlb-quotes 1*mlb-content) [mlb-quotes]
+const multiLineBasicBody = XRegExp.build("{{multiLineBasicContent}}*({{multiLineQuotes}}{{multiLineBasicContent}}+)*", {
+  multiLineBasicContent,
+  multiLineQuotes
+}); // OR [mlb-quotes]
 
 export const WhiteSpace = createToken({
   name: "WhiteSpace",

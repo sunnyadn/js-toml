@@ -50,3 +50,10 @@ str3 = """\\
     str3: "The quick brown fox jumps over the lazy dog."
   });
 });
+
+it('should support quotation marks in multi-line basic strings', () => {
+  const input = `str4 = """Here are two quotation marks: "". Simple enough."""`;
+  const result = load(input);
+
+  expect(result).toEqual({str4: 'Here are two quotation marks: "". Simple enough.',});
+});
