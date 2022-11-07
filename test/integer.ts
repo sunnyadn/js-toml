@@ -57,3 +57,12 @@ it('should throw error if leading + is used in hexadecimal octal and binary inte
   expect(() => load("int = +0o01234567")).toThrow(SyntaxParseError);
   expect(() => load("int = +0b11010110")).toThrow(SyntaxParseError);
 });
+
+it('should support leading zeros in hexadecimal octal and binary integers', () => {
+  const input = `hex4 = 0x000000DEADBEEF
+oct3 = 0o0001234567
+bin2 = 0b000000001`;
+  const result = load(input);
+
+  expect(result).toEqual({hex4: 3735928559, oct3: 342391, bin2: 1});
+});
