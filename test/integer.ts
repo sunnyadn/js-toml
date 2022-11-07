@@ -92,3 +92,9 @@ bin4 = 0b1101_0110`;
 
   expect(result).toEqual({hex8: 3735928559, oct5: 342391, bin4: 214});
 });
+
+it('should throw error if underscores are between prefix and digits', () => {
+  expect(() => load("int = 0x_123")).toThrow(SyntaxParseError);
+  expect(() => load("int = 0o_123")).toThrow(SyntaxParseError);
+  expect(() => load("int = 0b_101")).toThrow(SyntaxParseError);
+});
