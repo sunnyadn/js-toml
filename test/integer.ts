@@ -51,3 +51,9 @@ bin1 = 0b11010110`;
 
   expect(result).toEqual({hex1: 3735928559, hex2: 3735928559, hex3: 3735928559, oct1: 342391, oct2: 493, bin1: 214});
 });
+
+it('should throw error if leading + is used in hexadecimal octal and binary integers', () => {
+  expect(() => load("int = +0xDEADBEEF")).toThrow(SyntaxParseError);
+  expect(() => load("int = +0o01234567")).toThrow(SyntaxParseError);
+  expect(() => load("int = +0b11010110")).toThrow(SyntaxParseError);
+});
