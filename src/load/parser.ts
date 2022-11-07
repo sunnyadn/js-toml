@@ -49,6 +49,7 @@ export class Parser extends CstParser {
       {ALT: () => this.SUBRULE(this.quotedKey)},
       {ALT: () => this.CONSUME(UnquotedKey)},
       {ALT: () => this.CONSUME(UnsignedDecimalInteger)},
+      {ALT: () => this.CONSUME(UnsignedNonDecimalInteger)}
     ]);
   });
 

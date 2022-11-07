@@ -10,6 +10,16 @@ bare-key = "value"
   expect(result).toEqual({key: "value", bare_key: "value", "bare-key": "value", "1234": "value"});
 });
 
+it('should support integer keys', () => {
+  const input = `1234 = "value"
+0xDEADBEEF = "value"
+0o755 = "value"
+0b11010110 = "value"`;
+  const result = load(input);
+
+  expect(result).toEqual({"1234": "value", "0xDEADBEEF": "value", "0o755": "value", "0b11010110": "value"});
+});
+
 it('should support quoted keys', () => {
   const input = `"127.0.0.1" = "value"
 "character encoding" = "value"

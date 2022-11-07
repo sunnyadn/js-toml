@@ -46,6 +46,8 @@ export class Interpreter extends BaseCstVisitor {
       key = ctx.UnquotedKey[0].image;
     } else if (ctx.UnsignedDecimalInteger) {
       key = ctx.UnsignedDecimalInteger[0].image;
+    } else if (ctx.UnsignedNonDecimalInteger) {
+      key = ctx.UnsignedNonDecimalInteger[0].image;
     }
 
     return [key];
