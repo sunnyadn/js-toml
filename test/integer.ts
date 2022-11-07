@@ -66,3 +66,12 @@ bin2 = 0b000000001`;
 
   expect(result).toEqual({hex4: 3735928559, oct3: 342391, bin2: 1});
 });
+
+it('should support leading - in hexadecimal octal and binary integers', () => {
+  const input = `hex5 = -0xDEADBEEF
+oct4 = -0o01234567
+bin3 = -0b11010110`;
+  const result = load(input);
+
+  expect(result).toEqual({hex5: -3735928559, oct4: -342391, bin3: -214});
+});

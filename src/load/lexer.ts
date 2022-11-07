@@ -154,11 +154,11 @@ export const UnsignedDecimalInteger = createToken({
   pattern: XRegExp.build("{{digit1_9}}({{digit}}|{{underscore}}{{digit}})+|{{digit}}", {digit1_9, digit, underscore})
 });
 
-export const NonDecimalInteger = createToken({
-  name: "NonDecimalInteger",
+export const UnsignedNonDecimalInteger = createToken({
+  name: "UnsignedNonDecimalInteger",
   pattern: XRegExp.build("{{hexInteger}}|{{octalInteger}}|{{binaryInteger}}", {hexInteger, octalInteger, binaryInteger})
 });
 
-export const allTokens = [WhiteSpace, Newline, MultiLineBasicString, MultiLineLiteralString, BasicString, LiteralString, True, Minus, Plus, NonDecimalInteger, UnsignedDecimalInteger, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
+export const allTokens = [WhiteSpace, Newline, MultiLineBasicString, MultiLineLiteralString, BasicString, LiteralString, True, Minus, Plus, UnsignedNonDecimalInteger, UnsignedDecimalInteger, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
 
 export const lexer = new Lexer(allTokens, {ensureOptimizations: true, skipValidations: !envs.isDebug});

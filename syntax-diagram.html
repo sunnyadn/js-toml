@@ -478,9 +478,22 @@
     "orgText": "",
     "definition": [
       {
+        "type": "Option",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "Minus",
+            "label": "-",
+            "idx": 0,
+            "pattern": "-"
+          }
+        ]
+      },
+      {
         "type": "Terminal",
-        "name": "NonDecimalInteger",
-        "label": "NonDecimalInteger",
+        "name": "UnsignedNonDecimalInteger",
+        "label": "UnsignedNonDecimalInteger",
         "idx": 0,
         "pattern": "(?:(?:0x)(?:(?:[0-9])|[A-Fa-f])((?:(?:[0-9])|[A-Fa-f])|(?:_)(?:(?:[0-9])|[A-Fa-f]))*)|(?:(?:0o)(?:[0-7])((?:[0-7])|(?:_)(?:[0-7]))*)|(?:(?:0b)(?:[01])((?:[01])|(?:_)(?:[01]))*)"
       }

@@ -89,17 +89,11 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   decimalInteger(ctx) {
-    const integer = this.readInteger((ctx.UnsignedDecimalInteger)[0].image);
-
-    if (integer === 0) {
-      return 0;
-    }
-
-    return ctx.Minus ? -integer : +integer;
+    return this.readInteger(ctx.UnsignedDecimalInteger[0].image, !!ctx.Minus);
   }
 
   nonDecimalInteger(ctx) {
-    return this.readInteger(ctx.NonDecimalInteger[0].image);
+    return this.readInteger(ctx.UnsignedNonDecimalInteger[0].image, !!ctx.Minus);
   }
 
   private assignPrimitiveValue(key, value, object, rawKey) {
@@ -209,14 +203,21 @@ export class Interpreter extends BaseCstVisitor {
     return result;
   }
 
-  private readInteger(string) {
+  private readInteger(string, negative = false) {
     const underscoreRemoved = string.replace(/_/g, '');
+    let unsigned: number;
     if (underscoreRemoved.startsWith('0o')) {
-      return parseInt(underscoreRemoved.substring(2), 8);
+      unsigned = parseInt(underscoreRemoved.substring(2), 8);
     } else if (underscoreRemoved.startsWith('0b')) {
-      return parseInt(underscoreRemoved.substring(2), 2);
+      unsigned = parseInt(underscoreRemoved.substring(2), 2);
+    } else {
+      unsigned = parseInt(underscoreRemoved);
     }
 
-    return parseInt(underscoreRemoved);
+    if (unsigned === 0) {
+      return 0;
+    }
+
+    return negative ? -unsigned : +unsigned;
   }
 }

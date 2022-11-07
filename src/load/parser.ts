@@ -5,7 +5,7 @@ import {
   DotSeparator,
   KeyValueSeparator,
   LiteralString, Minus, MultiLineBasicString, MultiLineLiteralString,
-  Newline, NonDecimalInteger, Plus,
+  Newline, UnsignedNonDecimalInteger, Plus,
   True,
   UnquotedKey, UnsignedDecimalInteger
 } from "./lexer";
@@ -110,6 +110,7 @@ export class Parser extends CstParser {
   });
 
   private nonDecimalInteger = this.RULE("nonDecimalInteger", () => {
-    this.CONSUME(NonDecimalInteger);
+    this.OPTION(() => this.CONSUME(Minus));
+    this.CONSUME(UnsignedNonDecimalInteger);
   });
 }
