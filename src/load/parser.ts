@@ -47,9 +47,7 @@ export class Parser extends CstParser {
   private simpleKey = this.RULE("simpleKey", () => {
     this.OR([
       {ALT: () => this.SUBRULE(this.quotedKey)},
-      {ALT: () => this.CONSUME(UnquotedKey)},
-      {ALT: () => this.CONSUME(UnsignedDecimalInteger)},
-      {ALT: () => this.CONSUME(UnsignedNonDecimalInteger)}
+      {ALT: () => this.SUBRULE(this.unquotedKey)},
     ]);
   });
 
@@ -66,6 +64,10 @@ export class Parser extends CstParser {
       {ALT: () => this.CONSUME(BasicString)},
       {ALT: () => this.CONSUME(LiteralString)}
     ]);
+  });
+
+  private unquotedKey = this.RULE("unquotedKey", () => {
+    this.CONSUME(UnquotedKey);
   });
 
   private value = this.RULE("value", () => {

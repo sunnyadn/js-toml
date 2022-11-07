@@ -42,12 +42,8 @@ export class Interpreter extends BaseCstVisitor {
     let key;
     if (ctx.quotedKey) {
       key = this.visit(ctx.quotedKey);
-    } else if (ctx.UnquotedKey) {
-      key = ctx.UnquotedKey[0].image;
-    } else if (ctx.UnsignedDecimalInteger) {
-      key = ctx.UnsignedDecimalInteger[0].image;
-    } else if (ctx.UnsignedNonDecimalInteger) {
-      key = ctx.UnsignedNonDecimalInteger[0].image;
+    } else if (ctx.unquotedKey) {
+      key = this.visit(ctx.unquotedKey);
     }
 
     return [key];
@@ -59,6 +55,12 @@ export class Interpreter extends BaseCstVisitor {
 
   quotedKey(ctx) {
     return this.readSingleLineString(ctx);
+  }
+
+  unquotedKey(ctx) {
+    if (ctx.UnquotedKey) {
+      return ctx.UnquotedKey[0].image;
+    }
   }
 
   value(ctx) {

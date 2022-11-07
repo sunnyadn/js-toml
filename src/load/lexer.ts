@@ -1,4 +1,10 @@
-import {createToken, Lexer} from "chevrotain";
+import {
+  createToken,
+  CustomPatternMatcherReturn, ICustomPattern,
+  IToken,
+  Lexer,
+  tokenMatcher
+} from "chevrotain";
 import XRegExp = require("xregexp");
 import {envs} from "../common/environment";
 
@@ -15,6 +21,8 @@ const hexPrefix = /0x/;
 const octPrefix = /0o/;
 const binPrefix = /0b/;
 
+const minus = /-/;
+
 const hexInteger = XRegExp.build("{{hexPrefix}}{{hexDigit}}({{hexDigit}}|{{underscore}}{{hexDigit}})*", {
   hexPrefix,
   hexDigit,
@@ -29,6 +37,17 @@ const binaryInteger = XRegExp.build("{{binPrefix}}{{digit0_1}}({{digit0_1}}|{{un
   binPrefix,
   digit0_1,
   underscore
+});
+
+const unsignedDecimalInteger = XRegExp.build("{{digit1_9}}({{digit}}|{{underscore}}{{digit}})+|{{digit}}", {
+  digit1_9,
+  digit,
+  underscore
+});
+const unsignedNonDecimalInteger = XRegExp.build("{{hexInteger}}|{{octalInteger}}|{{binaryInteger}}", {
+  hexInteger,
+  octalInteger,
+  binaryInteger
 });
 
 const whiteSpaceChar = /[ \t]/;
@@ -89,6 +108,33 @@ const multiLineLiteralBody = XRegExp.build("{{multiLineLiteralContent}}*({{multi
   multiLineLiteralQuotes
 });
 
+const unquotedKey = XRegExp.build('({{alpha}}|{{digit}}|-|_)+', {alpha, digit});
+
+const isAfterEqual = (matchedTokens: IToken[]): boolean => {
+  for (let i = matchedTokens.length - 1; i >= 0; i--) {
+    const token = matchedTokens[i];
+    if (tokenMatcher(token, Newline)) {
+      return false;
+    } else if (tokenMatcher(token, KeyValueSeparator)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+const generateValuePattern = (regex: RegExp): ICustomPattern => {
+  return {
+    exec: (text: string, offset: number, matchedTokens: IToken[]): CustomPatternMatcherReturn => {
+      if (!isAfterEqual(matchedTokens)) {
+        return null;
+      }
+      const match = XRegExp.match(text.substring(offset), regex);
+      return match ? [match as string] : null;
+    }
+  }
+}
+
 export const WhiteSpace = createToken({
   name: "WhiteSpace",
   pattern: XRegExp.build('{{whiteSpaceChar}}+', {whiteSpaceChar}),
@@ -135,10 +181,7 @@ export const MultiLineLiteralString = createToken({
   label: "'''MultiLineLiteralString'''"
 });
 
-export const UnquotedKey = createToken({
-  name: "UnquotedKey",
-  pattern: XRegExp.build('({{alpha}}|{{digit}}|-|_)+', {alpha, digit})
-});
+export const UnquotedKey = createToken({name: "UnquotedKey", pattern: unquotedKey});
 
 export const KeyValueSeparator = createToken({name: "KeyValueSeparator", pattern: /=/, label: "="});
 
@@ -146,17 +189,27 @@ export const DotSeparator = createToken({name: "DotSeparator", pattern: /\./, la
 
 export const True = createToken({name: "True", pattern: /true/, label: "true", longer_alt: UnquotedKey});
 
-export const Minus = createToken({name: "Minus", pattern: /-/, label: "-"});
+export const Minus = createToken({
+  name: "Minus",
+  pattern: generateValuePattern(minus),
+  label: "-",
+  start_chars_hint: ["-"],
+  line_breaks: false
+});
 export const Plus = createToken({name: "Plus", pattern: /\+/, label: "+"});
 
 export const UnsignedDecimalInteger = createToken({
   name: "UnsignedDecimalInteger",
-  pattern: XRegExp.build("{{digit1_9}}({{digit}}|{{underscore}}{{digit}})+|{{digit}}", {digit1_9, digit, underscore})
+  pattern: generateValuePattern(unsignedDecimalInteger),
+  start_chars_hint: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+  line_breaks: false
 });
 
 export const UnsignedNonDecimalInteger = createToken({
   name: "UnsignedNonDecimalInteger",
-  pattern: XRegExp.build("{{hexInteger}}|{{octalInteger}}|{{binaryInteger}}", {hexInteger, octalInteger, binaryInteger})
+  pattern: generateValuePattern(unsignedNonDecimalInteger),
+  start_chars_hint: ["0"],
+  line_breaks: false
 });
 
 export const allTokens = [WhiteSpace, Newline, MultiLineBasicString, MultiLineLiteralString, BasicString, LiteralString, True, Minus, Plus, UnsignedNonDecimalInteger, UnsignedDecimalInteger, UnquotedKey, KeyValueSeparator, DotSeparator, Comment];
