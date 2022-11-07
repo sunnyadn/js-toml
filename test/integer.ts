@@ -83,3 +83,12 @@ hex7 = 0xDEaD_beef`;
 
   expect(result).toEqual({hex6: 3735928559, hex7: 3735928559});
 });
+
+it('should support underscores in all types of integers', () => {
+  const input = `hex8 = 0xDEaD_beef
+oct5 = 0o0123_4567
+bin4 = 0b1101_0110`;
+  const result = load(input);
+
+  expect(result).toEqual({hex8: 3735928559, oct5: 342391, bin4: 214});
+});
