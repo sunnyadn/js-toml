@@ -1,7 +1,7 @@
-import {Parser} from "./parser";
-import {lexer} from "./lexer";
-import {Interpreter} from "./interpreter";
-import {LexerError, ParserError} from "./exception";
+import { Parser } from './parser';
+import { lexer } from './lexer';
+import { Interpreter } from './interpreter';
+import { LexerError, ParserError } from './exception';
 
 const parser = new Parser();
 const interpreter = new Interpreter();

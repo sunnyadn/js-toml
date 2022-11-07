@@ -1,2 +1,2 @@
-export {load} from './load';
-export {SyntaxParseError} from './exception';
+export { load } from './load';
+export { SyntaxParseError } from './exception';

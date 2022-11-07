@@ -1,5 +1,5 @@
 class Environment {
-  private debug: boolean = false;
+  private debug = false;
 
   public enableDebug() {
     this.debug = true;

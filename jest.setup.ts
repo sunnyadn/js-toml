@@ -1,3 +1,3 @@
-import {envs} from "./src/common/environment";
+import { envs } from './src/common/environment';
 
 envs.enableDebug();

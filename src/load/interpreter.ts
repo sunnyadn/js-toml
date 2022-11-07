@@ -1,5 +1,5 @@
-import {Parser} from "./parser";
-import {InterpreterError} from "./exception";
+import { Parser } from './parser';
+import { InterpreterError } from './exception';
 
 const parser = new Parser();
 
@@ -97,7 +97,10 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   nonDecimalInteger(ctx) {
-    return this.readInteger(ctx.UnsignedNonDecimalInteger[0].image, !!ctx.Minus);
+    return this.readInteger(
+      ctx.UnsignedNonDecimalInteger[0].image,
+      !!ctx.Minus
+    );
   }
 
   private assignPrimitiveValue(key, value, object, rawKey) {
@@ -130,7 +133,8 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   private readMultiLineString(ctx) {
-    const string = (ctx.MultiLineBasicString || ctx.MultiLineLiteralString)[0].image;
+    const string = (ctx.MultiLineBasicString || ctx.MultiLineLiteralString)[0]
+      .image;
     let raw = string.substring(3, string.length - 3);
     raw = this.removeFirstLeadingNewline(raw);
     if (ctx.MultiLineBasicString) {
@@ -189,15 +193,21 @@ export class Interpreter extends BaseCstVisitor {
             result += '\\';
             break;
           case 'u':
-            result += String.fromCharCode(parseInt(string.substring(i + 1, i + 5), 16));
+            result += String.fromCharCode(
+              parseInt(string.substring(i + 1, i + 5), 16)
+            );
             i += 4;
             break;
           case 'U':
-            result += String.fromCodePoint(parseInt(string.substring(i + 1, i + 9), 16));
+            result += String.fromCodePoint(
+              parseInt(string.substring(i + 1, i + 9), 16)
+            );
             i += 8;
             break;
           default:
-            throw new InterpreterError(`Invalid escape sequence: \\${string[i]}`);
+            throw new InterpreterError(
+              `Invalid escape sequence: \\${string[i]}`
+            );
         }
       } else {
         result += char;

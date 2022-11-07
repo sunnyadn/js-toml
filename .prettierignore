@@ -1,0 +1,6 @@
+coverage/
+dist/
+
+pnpm-lock.yaml
+
+syntax-diagram.html
