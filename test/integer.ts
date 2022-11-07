@@ -75,3 +75,11 @@ bin3 = -0b11010110`;
 
   expect(result).toEqual({hex5: -3735928559, oct4: -342391, bin3: -214});
 });
+
+it('should support hexadecimal consisting both cases of letters', () => {
+  const input = `hex6 = 0xDEaDBEEF
+hex7 = 0xDEaD_beef`;
+  const result = load(input);
+
+  expect(result).toEqual({hex6: 3735928559, hex7: 3735928559});
+});
