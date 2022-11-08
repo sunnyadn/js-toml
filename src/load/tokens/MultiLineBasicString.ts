@@ -7,6 +7,8 @@ import {
   quotationMark,
   whiteSpaceChar,
 } from './patterns';
+import { registerTokenInterpreter } from './tokenInterpreters';
+import { getMultiLineContent, unescapeString } from './utils';
 import XRegExp = require('xregexp');
 
 const multiLineBasicStringDelimiter = XRegExp.build('{{quotationMark}}{3}', {
@@ -70,4 +72,13 @@ export const MultiLineBasicString = createToken({
     }
   ),
   label: '"""MultiLineBasicString"""',
+});
+
+const skipWhitespaceIfFindBackslash = (string) =>
+  string.replace(/\\[ \t]*(\r\n|\n)+[ \t]*/g, '');
+
+registerTokenInterpreter(MultiLineBasicString, (raw) => {
+  const content = getMultiLineContent(raw);
+  const result = skipWhitespaceIfFindBackslash(content);
+  return unescapeString(result);
 });

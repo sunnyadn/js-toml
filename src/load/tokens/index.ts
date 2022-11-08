@@ -13,3 +13,5 @@ export { UnquotedKey } from './UnquotedKey';
 export { UnsignedDecimalInteger } from './UnsignedDecimalInteger';
 export { UnsignedNonDecimalInteger } from './UnsignedNonDecimalInteger';
 export { WhiteSpace } from './WhiteSpace';
+
+export { allTokens } from './allTokens';

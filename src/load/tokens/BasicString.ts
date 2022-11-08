@@ -1,5 +1,7 @@
 import { createToken } from 'chevrotain';
 import { escaped, nonAscii, quotationMark, whiteSpaceChar } from './patterns';
+import { registerTokenInterpreter } from './tokenInterpreters';
+import { unescapeString } from './utils';
 import XRegExp = require('xregexp');
 
 const basicUnescaped = XRegExp.build(
@@ -22,4 +24,9 @@ export const BasicString = createToken({
     basicChar,
   }),
   label: '"BasicString"',
+});
+
+registerTokenInterpreter(BasicString, (raw) => {
+  const value = raw.slice(1, -1);
+  return unescapeString(value);
 });

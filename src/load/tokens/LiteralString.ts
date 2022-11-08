@@ -1,5 +1,6 @@
 import { createToken } from 'chevrotain';
 import { apostrophe, nonAscii } from './patterns';
+import { registerTokenInterpreter } from './tokenInterpreters';
 import XRegExp = require('xregexp');
 
 const literalChar = XRegExp.build('\t|[\x20-\x26]|[\\x28-\x7E]|{{nonAscii}}', {
@@ -14,3 +15,5 @@ export const LiteralString = createToken({
   }),
   label: "'LiteralString'",
 });
+
+registerTokenInterpreter(LiteralString, (raw) => raw.slice(1, -1));

@@ -1,6 +1,6 @@
 import { CstParser } from 'chevrotain';
-import { allTokens } from './lexer';
 import {
+  allTokens,
   BasicString,
   DotSeparator,
   KeyValueSeparator,
@@ -16,7 +16,7 @@ import {
   UnsignedNonDecimalInteger,
 } from './tokens';
 
-export class Parser extends CstParser {
+class Parser extends CstParser {
   private quotedKey = this.RULE('quotedKey', () => {
     this.OR([
       { ALT: () => this.CONSUME(BasicString) },
@@ -111,3 +111,5 @@ export class Parser extends CstParser {
     this.performSelfAnalysis();
   }
 }
+
+export const parser = new Parser();

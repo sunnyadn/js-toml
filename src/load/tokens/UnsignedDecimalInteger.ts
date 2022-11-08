@@ -1,6 +1,7 @@
 import { createToken } from 'chevrotain';
-import { generateValuePattern } from './generate';
+import { generateValuePattern } from './utils';
 import { digit, underscore } from './patterns';
+import { registerTokenInterpreter } from './tokenInterpreters';
 import XRegExp = require('xregexp');
 
 const digit1_9 = /[1-9]/;
@@ -20,3 +21,7 @@ export const UnsignedDecimalInteger = createToken({
   start_chars_hint: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
   line_breaks: false,
 });
+
+registerTokenInterpreter(UnsignedDecimalInteger, (raw: string) =>
+  parseInt(raw.replace(/_/g, ''))
+);

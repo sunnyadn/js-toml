@@ -1,6 +1,7 @@
 import { createToken } from 'chevrotain';
-import { generateValuePattern } from './generate';
+import { generateValuePattern } from './utils';
 import { hexDigit, underscore } from './patterns';
+import { registerTokenInterpreter } from './tokenInterpreters';
 import XRegExp = require('xregexp');
 
 const hexPrefix = /0x/;
@@ -49,4 +50,15 @@ export const UnsignedNonDecimalInteger = createToken({
   pattern: generateValuePattern(unsignedNonDecimalInteger),
   start_chars_hint: ['0'],
   line_breaks: false,
+});
+
+registerTokenInterpreter(UnsignedNonDecimalInteger, (raw: string) => {
+  const intString = raw.replace(/_/g, '');
+  if (intString.startsWith('0x')) {
+    return parseInt(intString.substring(2), 16);
+  } else if (intString.startsWith('0o')) {
+    return parseInt(intString.substring(2), 8);
+  } else if (intString.startsWith('0b')) {
+    return parseInt(intString.substring(2), 2);
+  }
 });

@@ -1,17 +1,28 @@
-import { Parser } from './parser';
+import { parser } from './parser';
 import { InterpreterError } from './exception';
-
-const parser = new Parser();
+import { TokenType } from 'chevrotain';
+import { tokenInterpreters } from './tokens/tokenInterpreters';
+import {
+  BasicString,
+  LiteralString,
+  Minus,
+  MultiLineBasicString,
+  MultiLineLiteralString,
+  True,
+  UnquotedKey,
+  UnsignedDecimalInteger,
+  UnsignedNonDecimalInteger,
+} from './tokens';
 
 const BaseCstVisitor = parser.getBaseCstVisitorConstructor();
 
 export class Interpreter extends BaseCstVisitor {
+  private result: object;
+
   constructor() {
     super();
     this.validateVisitor();
   }
-
-  private result: object;
 
   toml(ctx) {
     this.result = {};
@@ -54,13 +65,11 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   quotedKey(ctx) {
-    return this.readSingleLineString(ctx);
+    return this.interpret(ctx, BasicString, LiteralString);
   }
 
   unquotedKey(ctx) {
-    if (ctx.UnquotedKey) {
-      return ctx.UnquotedKey[0].image;
-    }
+    return this.interpret(ctx, UnquotedKey);
   }
 
   value(ctx) {
@@ -74,14 +83,17 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   string(ctx) {
-    if (ctx.MultiLineBasicString || ctx.MultiLineLiteralString) {
-      return this.readMultiLineString(ctx);
-    }
-    return this.readSingleLineString(ctx);
+    return this.interpret(
+      ctx,
+      MultiLineBasicString,
+      MultiLineLiteralString,
+      BasicString,
+      LiteralString
+    );
   }
 
   boolean(ctx) {
-    return !!ctx.True;
+    return this.interpret(ctx, True);
   }
 
   integer(ctx) {
@@ -93,14 +105,24 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   decimalInteger(ctx) {
-    return this.readInteger(ctx.UnsignedDecimalInteger[0].image, !!ctx.Minus);
+    const negative = this.interpret(ctx, Minus);
+    const unsigned = this.interpret(ctx, UnsignedDecimalInteger);
+    return this.readInteger(unsigned, negative);
   }
 
   nonDecimalInteger(ctx) {
-    return this.readInteger(
-      ctx.UnsignedNonDecimalInteger[0].image,
-      !!ctx.Minus
-    );
+    const negative = this.interpret(ctx, Minus);
+    const unsigned = this.interpret(ctx, UnsignedNonDecimalInteger);
+    return this.readInteger(unsigned, negative);
+  }
+
+  private interpret(ctx, ...candidates: TokenType[]) {
+    for (const token of candidates) {
+      if (ctx[token.name]) {
+        return tokenInterpreters[token.name](ctx[token.name][0].image);
+      }
+    }
+    return null;
   }
 
   private assignPrimitiveValue(key, value, object, rawKey) {
@@ -128,106 +150,7 @@ export class Interpreter extends BaseCstVisitor {
     }
   }
 
-  private removeFirstLeadingNewline(string) {
-    return string.replace(/^(\r\n|\n)/, '');
-  }
-
-  private readMultiLineString(ctx) {
-    const string = (ctx.MultiLineBasicString || ctx.MultiLineLiteralString)[0]
-      .image;
-    let raw = string.substring(3, string.length - 3);
-    raw = this.removeFirstLeadingNewline(raw);
-    if (ctx.MultiLineBasicString) {
-      return this.readMultiLineBasicString(raw);
-    } else if (ctx.MultiLineLiteralString) {
-      return raw;
-    }
-  }
-
-  private readMultiLineBasicString(raw) {
-    const result = this.skipWhitespaceIfFindBackslash(raw);
-    return this.unescapeString(result);
-  }
-
-  private skipWhitespaceIfFindBackslash(string) {
-    return string.replace(/\\[ \t]*(\r\n|\n)+[ \t]*/g, '');
-  }
-
-  private readSingleLineString(ctx) {
-    const string = (ctx.BasicString || ctx.LiteralString)[0].image;
-    const raw = string.substring(1, string.length - 1);
-
-    if (ctx.BasicString) {
-      return this.unescapeString(raw);
-    } else if (ctx.LiteralString) {
-      return raw;
-    }
-  }
-
-  private unescapeString(string) {
-    let result = '';
-    for (let i = 0; i < string.length; i++) {
-      const char = string[i];
-      if (char === '\\') {
-        i++;
-        switch (string[i]) {
-          case 'b':
-            result += '\b';
-            break;
-          case 't':
-            result += '\t';
-            break;
-          case 'n':
-            result += '\n';
-            break;
-          case 'f':
-            result += '\f';
-            break;
-          case 'r':
-            result += '\r';
-            break;
-          case '"':
-            result += '"';
-            break;
-          case '\\':
-            result += '\\';
-            break;
-          case 'u':
-            result += String.fromCharCode(
-              parseInt(string.substring(i + 1, i + 5), 16)
-            );
-            i += 4;
-            break;
-          case 'U':
-            result += String.fromCodePoint(
-              parseInt(string.substring(i + 1, i + 9), 16)
-            );
-            i += 8;
-            break;
-          default:
-            throw new InterpreterError(
-              `Invalid escape sequence: \\${string[i]}`
-            );
-        }
-      } else {
-        result += char;
-      }
-    }
-
-    return result;
-  }
-
-  private readInteger(string, negative = false) {
-    const underscoreRemoved = string.replace(/_/g, '');
-    let unsigned: number;
-    if (underscoreRemoved.startsWith('0o')) {
-      unsigned = parseInt(underscoreRemoved.substring(2), 8);
-    } else if (underscoreRemoved.startsWith('0b')) {
-      unsigned = parseInt(underscoreRemoved.substring(2), 2);
-    } else {
-      unsigned = parseInt(underscoreRemoved);
-    }
-
+  private readInteger(unsigned: number, negative: boolean) {
     if (unsigned === 0) {
       return 0;
     }
@@ -235,3 +158,5 @@ export class Interpreter extends BaseCstVisitor {
     return negative ? -unsigned : +unsigned;
   }
 }
+
+export const interpreter = new Interpreter();

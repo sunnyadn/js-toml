@@ -1,5 +1,6 @@
 import { createToken } from 'chevrotain';
 import { UnquotedKey } from './UnquotedKey';
+import { registerTokenInterpreter } from './tokenInterpreters';
 
 export const True = createToken({
   name: 'True',
@@ -7,3 +8,5 @@ export const True = createToken({
   label: 'true',
   longer_alt: UnquotedKey,
 });
+
+registerTokenInterpreter(True, () => true);

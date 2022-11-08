@@ -1,5 +1,6 @@
 import { createToken } from 'chevrotain';
-import { generateValuePattern } from './generate';
+import { generateValuePattern } from './utils';
+import { registerTokenInterpreter } from './tokenInterpreters';
 
 export const Minus = createToken({
   name: 'Minus',
@@ -8,3 +9,5 @@ export const Minus = createToken({
   start_chars_hint: ['-'],
   line_breaks: false,
 });
+
+registerTokenInterpreter(Minus, () => true);
