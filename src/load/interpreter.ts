@@ -150,12 +150,12 @@ export class Interpreter extends BaseCstVisitor {
     }
   }
 
-  private readInteger(unsigned: number, negative: boolean) {
+  private readInteger(unsigned: number | bigint, negative: boolean) {
     if (unsigned === 0) {
       return 0;
     }
 
-    return negative ? -unsigned : +unsigned;
+    return negative ? -unsigned : unsigned;
   }
 }
 

@@ -110,3 +110,26 @@ it('should throw error if underscores are between prefix and digits', () => {
   expect(() => load('int = 0o_123')).toThrow(SyntaxParseError);
   expect(() => load('int = 0b_101')).toThrow(SyntaxParseError);
 });
+
+it('should support 64-bit signed integers', () => {
+  const input = `int15 = 9223372036854775807
+int16 = -9223372036854775808
+int17 = 0x7FFFFFFFFFFFFFFF
+int18 = -0x8000000000000000
+int19 = 0o777777777777777777777
+int20 = -0o1000000000000000000000
+int21 = 0b0111111111111111111111111111111111111111111111111111111111111111
+int22 = -0b1000000000000000000000000000000000000000000000000000000000000000`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    int15: BigInt('9223372036854775807'),
+    int16: BigInt('-9223372036854775808'),
+    int17: BigInt('9223372036854775807'),
+    int18: BigInt('-9223372036854775808'),
+    int19: BigInt('9223372036854775807'),
+    int20: BigInt('-9223372036854775808'),
+    int21: BigInt('9223372036854775807'),
+    int22: BigInt('-9223372036854775808'),
+  });
+});

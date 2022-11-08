@@ -22,6 +22,11 @@ export const UnsignedDecimalInteger = createToken({
   line_breaks: false,
 });
 
-registerTokenInterpreter(UnsignedDecimalInteger, (raw: string) =>
-  parseInt(raw.replace(/_/g, ''))
-);
+registerTokenInterpreter(UnsignedDecimalInteger, (raw: string) => {
+  const intString = raw.replace(/_/g, '');
+  const int = parseInt(intString);
+  if (Number.isSafeInteger(int)) {
+    return int;
+  }
+  return BigInt(intString);
+});
