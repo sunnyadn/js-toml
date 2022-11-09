@@ -22,111 +22,7 @@
     window.serializedGrammar = [
   {
     "type": "Rule",
-    "name": "toml",
-    "orgText": "",
-    "definition": [
-      {
-        "type": "Option",
-        "idx": 0,
-        "definition": [
-          {
-            "type": "Terminal",
-            "name": "Newline",
-            "label": "Newline",
-            "idx": 0,
-            "pattern": "\\r\\n|\\n"
-          }
-        ]
-      },
-      {
-        "type": "Option",
-        "idx": 1,
-        "definition": [
-          {
-            "type": "NonTerminal",
-            "name": "expression",
-            "idx": 0
-          }
-        ]
-      },
-      {
-        "type": "Repetition",
-        "idx": 0,
-        "definition": [
-          {
-            "type": "RepetitionMandatory",
-            "idx": 0,
-            "definition": [
-              {
-                "type": "Terminal",
-                "name": "Newline",
-                "label": "Newline",
-                "idx": 1,
-                "pattern": "\\r\\n|\\n"
-              }
-            ]
-          },
-          {
-            "type": "NonTerminal",
-            "name": "expression",
-            "idx": 1
-          }
-        ]
-      },
-      {
-        "type": "Repetition",
-        "idx": 1,
-        "definition": [
-          {
-            "type": "Terminal",
-            "name": "Newline",
-            "label": "Newline",
-            "idx": 2,
-            "pattern": "\\r\\n|\\n"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "expression",
-    "orgText": "",
-    "definition": [
-      {
-        "type": "NonTerminal",
-        "name": "keyValue",
-        "idx": 0
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "keyValue",
-    "orgText": "",
-    "definition": [
-      {
-        "type": "NonTerminal",
-        "name": "key",
-        "idx": 0
-      },
-      {
-        "type": "Terminal",
-        "name": "KeyValueSeparator",
-        "label": "=",
-        "idx": 0,
-        "pattern": "="
-      },
-      {
-        "type": "NonTerminal",
-        "name": "value",
-        "idx": 0
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "key",
+    "name": "quotedKey",
     "orgText": "",
     "definition": [
       {
@@ -137,9 +33,11 @@
             "type": "Alternative",
             "definition": [
               {
-                "type": "NonTerminal",
-                "name": "dottedKey",
-                "idx": 0
+                "type": "Terminal",
+                "name": "BasicString",
+                "label": "\"BasicString\"",
+                "idx": 0,
+                "pattern": "(?:\")(?:(?:(?:[ \\t])|!|[#-\\x5B]|[\\x5D-~]|(?:[\\x80-\\uD7FF]|[\\uE000-\\uFFFF]))|(?:(?:\\\\)(?:[\"\\\\bfnrt]|u(?:(?:[0-9])|[A-Fa-f]){4}|U(?:(?:[0-9])|[A-Fa-f]){8})))*(?:\")"
               }
             ]
           },
@@ -147,13 +45,29 @@
             "type": "Alternative",
             "definition": [
               {
-                "type": "NonTerminal",
-                "name": "simpleKey",
-                "idx": 0
+                "type": "Terminal",
+                "name": "LiteralString",
+                "label": "'LiteralString'",
+                "idx": 0,
+                "pattern": "(?:')(?:\t|[ -&]|[\\x28-~]|(?:[\\x80-\\uD7FF]|[\\uE000-\\uFFFF]))*(?:')"
               }
             ]
           }
         ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "unquotedKey",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "UnquotedKey",
+        "label": "UnquotedKey",
+        "idx": 0,
+        "pattern": "((?:[a-zA-Z])|(?:[0-9])|-|_)+"
       }
     ]
   },
@@ -222,58 +136,7 @@
   },
   {
     "type": "Rule",
-    "name": "quotedKey",
-    "orgText": "",
-    "definition": [
-      {
-        "type": "Alternation",
-        "idx": 0,
-        "definition": [
-          {
-            "type": "Alternative",
-            "definition": [
-              {
-                "type": "Terminal",
-                "name": "BasicString",
-                "label": "\"BasicString\"",
-                "idx": 0,
-                "pattern": "(?:\")(?:(?:(?:[ \\t])|!|[#-\\x5B]|[\\x5D-~]|(?:[\\x80-\\uD7FF]|[\\uE000-\\uFFFF]))|(?:(?:\\\\)(?:[\"\\\\bfnrt]|u(?:(?:[0-9])|[A-Fa-f]){4}|U(?:(?:[0-9])|[A-Fa-f]){8})))*(?:\")"
-              }
-            ]
-          },
-          {
-            "type": "Alternative",
-            "definition": [
-              {
-                "type": "Terminal",
-                "name": "LiteralString",
-                "label": "'LiteralString'",
-                "idx": 0,
-                "pattern": "(?:')(?:\t|[ -&]|[\\x28-~]|(?:[\\x80-\\uD7FF]|[\\uE000-\\uFFFF]))*(?:')"
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "unquotedKey",
-    "orgText": "",
-    "definition": [
-      {
-        "type": "Terminal",
-        "name": "UnquotedKey",
-        "label": "UnquotedKey",
-        "idx": 0,
-        "pattern": "((?:[a-zA-Z])|(?:[0-9])|-|_)+"
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "value",
+    "name": "key",
     "orgText": "",
     "definition": [
       {
@@ -285,7 +148,7 @@
             "definition": [
               {
                 "type": "NonTerminal",
-                "name": "string",
+                "name": "dottedKey",
                 "idx": 0
               }
             ]
@@ -295,17 +158,7 @@
             "definition": [
               {
                 "type": "NonTerminal",
-                "name": "boolean",
-                "idx": 0
-              }
-            ]
-          },
-          {
-            "type": "Alternative",
-            "definition": [
-              {
-                "type": "NonTerminal",
-                "name": "integer",
+                "name": "simpleKey",
                 "idx": 0
               }
             ]
@@ -402,8 +255,45 @@
             "type": "Alternative",
             "definition": [
               {
+                "type": "Terminal",
+                "name": "DecimalInteger",
+                "label": "DecimalInteger",
+                "idx": 0,
+                "pattern": {}
+              }
+            ]
+          },
+          {
+            "type": "Alternative",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "NonDecimalInteger",
+                "label": "NonDecimalInteger",
+                "idx": 0,
+                "pattern": {}
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "value",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "Alternation",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Alternative",
+            "definition": [
+              {
                 "type": "NonTerminal",
-                "name": "decimalInteger",
+                "name": "string",
                 "idx": 0
               }
             ]
@@ -413,7 +303,17 @@
             "definition": [
               {
                 "type": "NonTerminal",
-                "name": "nonDecimalInteger",
+                "name": "boolean",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Alternative",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "integer",
                 "idx": 0
               }
             ]
@@ -424,57 +324,43 @@
   },
   {
     "type": "Rule",
-    "name": "decimalInteger",
+    "name": "keyValue",
     "orgText": "",
     "definition": [
       {
-        "type": "Option",
-        "idx": 0,
-        "definition": [
-          {
-            "type": "Alternation",
-            "idx": 0,
-            "definition": [
-              {
-                "type": "Alternative",
-                "definition": [
-                  {
-                    "type": "Terminal",
-                    "name": "Minus",
-                    "label": "-",
-                    "idx": 0,
-                    "pattern": {}
-                  }
-                ]
-              },
-              {
-                "type": "Alternative",
-                "definition": [
-                  {
-                    "type": "Terminal",
-                    "name": "Plus",
-                    "label": "+",
-                    "idx": 0,
-                    "pattern": "\\+"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
+        "type": "NonTerminal",
+        "name": "key",
+        "idx": 0
       },
       {
         "type": "Terminal",
-        "name": "UnsignedDecimalInteger",
-        "label": "UnsignedDecimalInteger",
+        "name": "KeyValueSeparator",
+        "label": "=",
         "idx": 0,
-        "pattern": {}
+        "pattern": "="
+      },
+      {
+        "type": "NonTerminal",
+        "name": "value",
+        "idx": 0
       }
     ]
   },
   {
     "type": "Rule",
-    "name": "nonDecimalInteger",
+    "name": "expression",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "keyValue",
+        "idx": 0
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "toml",
     "orgText": "",
     "definition": [
       {
@@ -483,19 +369,60 @@
         "definition": [
           {
             "type": "Terminal",
-            "name": "Minus",
-            "label": "-",
+            "name": "Newline",
+            "label": "Newline",
             "idx": 0,
-            "pattern": {}
+            "pattern": "\\r\\n|\\n"
           }
         ]
       },
       {
-        "type": "Terminal",
-        "name": "UnsignedNonDecimalInteger",
-        "label": "UnsignedNonDecimalInteger",
+        "type": "Option",
+        "idx": 1,
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "expression",
+            "idx": 0
+          }
+        ]
+      },
+      {
+        "type": "Repetition",
         "idx": 0,
-        "pattern": {}
+        "definition": [
+          {
+            "type": "RepetitionMandatory",
+            "idx": 0,
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Newline",
+                "label": "Newline",
+                "idx": 1,
+                "pattern": "\\r\\n|\\n"
+              }
+            ]
+          },
+          {
+            "type": "NonTerminal",
+            "name": "expression",
+            "idx": 1
+          }
+        ]
+      },
+      {
+        "type": "Repetition",
+        "idx": 1,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "Newline",
+            "label": "Newline",
+            "idx": 2,
+            "pattern": "\\r\\n|\\n"
+          }
+        ]
       }
     ]
   }

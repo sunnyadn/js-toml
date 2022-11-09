@@ -1,8 +1,6 @@
 import { createSyntaxDiagramsCode } from 'chevrotain';
 import { writeFileSync } from 'fs';
-import { Parser } from '../src/load/parser';
-
-const parser = new Parser();
+import { parser } from '../src/load/parser';
 
 const outputDiagram = () => {
   const serializedGrammar = parser.getSerializedGastProductions();
