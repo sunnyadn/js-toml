@@ -59,20 +59,6 @@
   },
   {
     "type": "Rule",
-    "name": "unquotedKey",
-    "orgText": "",
-    "definition": [
-      {
-        "type": "Terminal",
-        "name": "UnquotedKey",
-        "label": "UnquotedKey",
-        "idx": 0,
-        "pattern": "((?:[a-zA-Z])|(?:[0-9])|-|_)+"
-      }
-    ]
-  },
-  {
-    "type": "Rule",
     "name": "simpleKey",
     "orgText": "",
     "definition": [
@@ -94,9 +80,11 @@
             "type": "Alternative",
             "definition": [
               {
-                "type": "NonTerminal",
-                "name": "unquotedKey",
-                "idx": 0
+                "type": "Terminal",
+                "name": "UnquotedKey",
+                "label": "UnquotedKey",
+                "idx": 0,
+                "pattern": "((?:[a-zA-Z])|(?:[0-9])|-|_)+"
               }
             ]
           }

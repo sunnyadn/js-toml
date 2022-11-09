@@ -53,8 +53,8 @@ export class Interpreter extends BaseCstVisitor {
     let key;
     if (ctx.quotedKey) {
       key = this.visit(ctx.quotedKey);
-    } else if (ctx.unquotedKey) {
-      key = this.visit(ctx.unquotedKey);
+    } else {
+      key = this.interpret(ctx, UnquotedKey);
     }
 
     return [key];
@@ -66,10 +66,6 @@ export class Interpreter extends BaseCstVisitor {
 
   quotedKey(ctx) {
     return this.interpret(ctx, BasicString, LiteralString);
-  }
-
-  unquotedKey(ctx) {
-    return this.interpret(ctx, UnquotedKey);
   }
 
   value(ctx) {

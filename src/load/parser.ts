@@ -22,13 +22,10 @@ class Parser extends CstParser {
       { ALT: () => this.CONSUME(LiteralString) },
     ]);
   });
-  private unquotedKey = this.RULE('unquotedKey', () => {
-    this.CONSUME(UnquotedKey);
-  });
   private simpleKey = this.RULE('simpleKey', () => {
     this.OR([
       { ALT: () => this.SUBRULE(this.quotedKey) },
-      { ALT: () => this.SUBRULE(this.unquotedKey) },
+      { ALT: () => this.CONSUME(UnquotedKey) },
     ]);
   });
   private dottedKey = this.RULE('dottedKey', () => {
