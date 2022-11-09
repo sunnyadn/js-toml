@@ -13,3 +13,10 @@ odt3 = 1979-05-27T00:32:00.999999-07:00`;
     odt3: new Date('1979-05-27T00:32:00.999999-07:00'),
   });
 });
+
+it('should support replacing T with space in offset date-times', () => {
+  const input = 'odt4 = 1979-05-27 07:32:00Z';
+  const result = load(input);
+
+  expect(result).toEqual({ odt4: new Date('1979-05-27T07:32:00Z') });
+});
