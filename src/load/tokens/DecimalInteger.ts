@@ -1,24 +1,7 @@
 import { createToken } from 'chevrotain';
 import { generateValuePattern } from './utils';
-import { digit, minus, plus, underscore } from './patterns';
 import { registerTokenInterpreter } from './tokenInterpreters';
-import XRegExp = require('xregexp');
-
-const digit1_9 = /[1-9]/;
-
-const unsignedDecimalInteger = XRegExp.build(
-  '{{digit1_9}}({{digit}}|{{underscore}}{{digit}})+|{{digit}}',
-  {
-    digit1_9,
-    digit,
-    underscore,
-  }
-);
-
-const decimalInteger = XRegExp.build(
-  '({{minus}}|{{plus}})?{{unsignedDecimalInteger}}',
-  { minus, plus, unsignedDecimalInteger }
-);
+import { decimalInteger } from './patterns';
 
 export const DecimalInteger = createToken({
   name: 'DecimalInteger',

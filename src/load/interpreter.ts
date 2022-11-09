@@ -12,6 +12,7 @@ import {
   True,
   UnquotedKey,
 } from './tokens';
+import { Float } from './tokens/Float';
 
 const BaseCstVisitor = parser.getBaseCstVisitorConstructor();
 
@@ -79,6 +80,8 @@ export class Interpreter extends BaseCstVisitor {
     } else if (ctx.integer) {
       return this.visit(ctx.integer);
     }
+
+    return this.interpret(ctx, Float);
   }
 
   string(ctx) {

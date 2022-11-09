@@ -11,6 +11,7 @@ import { UnquotedKey } from './UnquotedKey';
 import { KeyValueSeparator } from './KeyValueSeparator';
 import { DotSeparator } from './DotSeparator';
 import { Comment } from './Comment';
+import { Float } from './Float';
 
 export const allTokens = [
   WhiteSpace,
@@ -20,6 +21,7 @@ export const allTokens = [
   BasicString,
   LiteralString,
   True,
+  Float,
   NonDecimalInteger,
   DecimalInteger,
   UnquotedKey,
