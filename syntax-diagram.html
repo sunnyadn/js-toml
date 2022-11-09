@@ -218,20 +218,6 @@
   },
   {
     "type": "Rule",
-    "name": "boolean",
-    "orgText": "",
-    "definition": [
-      {
-        "type": "Terminal",
-        "name": "True",
-        "label": "true",
-        "idx": 0,
-        "pattern": "true"
-      }
-    ]
-  },
-  {
-    "type": "Rule",
     "name": "integer",
     "orgText": "",
     "definition": [
@@ -290,9 +276,11 @@
             "type": "Alternative",
             "definition": [
               {
-                "type": "NonTerminal",
-                "name": "boolean",
-                "idx": 0
+                "type": "Terminal",
+                "name": "Boolean",
+                "label": "Boolean",
+                "idx": 0,
+                "pattern": "(?:true)|(?:false)"
               }
             ]
           },

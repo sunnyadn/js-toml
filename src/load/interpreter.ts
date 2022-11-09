@@ -4,12 +4,12 @@ import { TokenType } from 'chevrotain';
 import { tokenInterpreters } from './tokens/tokenInterpreters';
 import {
   BasicString,
+  Boolean,
   DecimalInteger,
   LiteralString,
   MultiLineBasicString,
   MultiLineLiteralString,
   NonDecimalInteger,
-  True,
   UnquotedKey,
 } from './tokens';
 import { Float } from './tokens/Float';
@@ -71,13 +71,11 @@ export class Interpreter extends BaseCstVisitor {
   value(ctx) {
     if (ctx.string) {
       return this.visit(ctx.string);
-    } else if (ctx.boolean) {
-      return this.visit(ctx.boolean);
     } else if (ctx.integer) {
       return this.visit(ctx.integer);
     }
 
-    return this.interpret(ctx, Float);
+    return this.interpret(ctx, Float, Boolean);
   }
 
   string(ctx) {
@@ -88,10 +86,6 @@ export class Interpreter extends BaseCstVisitor {
       BasicString,
       LiteralString
     );
-  }
-
-  boolean(ctx) {
-    return this.interpret(ctx, True);
   }
 
   integer(ctx) {

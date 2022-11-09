@@ -6,7 +6,7 @@ export { LiteralString } from './LiteralString';
 export { MultiLineBasicString } from './MultiLineBasicString';
 export { MultiLineLiteralString } from './MultiLineLiteralString';
 export { Newline } from './Newline';
-export { True } from './True';
+export { Boolean } from './Boolean';
 export { UnquotedKey } from './UnquotedKey';
 export { DecimalInteger } from './DecimalInteger';
 export { NonDecimalInteger } from './NonDecimalInteger';

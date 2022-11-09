@@ -4,7 +4,7 @@ import { MultiLineBasicString } from './MultiLineBasicString';
 import { MultiLineLiteralString } from './MultiLineLiteralString';
 import { BasicString } from './BasicString';
 import { LiteralString } from './LiteralString';
-import { True } from './True';
+import { Boolean } from './Boolean';
 import { NonDecimalInteger } from './NonDecimalInteger';
 import { DecimalInteger } from './DecimalInteger';
 import { UnquotedKey } from './UnquotedKey';
@@ -20,7 +20,7 @@ export const allTokens = [
   MultiLineLiteralString,
   BasicString,
   LiteralString,
-  True,
+  Boolean,
   Float,
   NonDecimalInteger,
   DecimalInteger,

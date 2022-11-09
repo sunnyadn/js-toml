@@ -2,6 +2,7 @@ import { CstParser } from 'chevrotain';
 import {
   allTokens,
   BasicString,
+  Boolean,
   DecimalInteger,
   DotSeparator,
   KeyValueSeparator,
@@ -10,7 +11,6 @@ import {
   MultiLineLiteralString,
   Newline,
   NonDecimalInteger,
-  True,
   UnquotedKey,
 } from './tokens';
 import { Float } from './tokens/Float';
@@ -49,10 +49,6 @@ class Parser extends CstParser {
       { ALT: () => this.CONSUME(LiteralString) },
     ]);
   });
-  private boolean = this.RULE('boolean', () => {
-    this.CONSUME(True);
-    // OR FALSE
-  });
   private integer = this.RULE('integer', () => {
     this.OR([
       { ALT: () => this.CONSUME(DecimalInteger) },
@@ -62,7 +58,7 @@ class Parser extends CstParser {
   private value = this.RULE('value', () => {
     this.OR([
       { ALT: () => this.SUBRULE(this.string) },
-      { ALT: () => this.SUBRULE(this.boolean) },
+      { ALT: () => this.CONSUME(Boolean) },
       // OR ARRAY
       // OR INLINE TABLE
       // OR DATE TIME
