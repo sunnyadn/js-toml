@@ -3,7 +3,7 @@ import { LexerError, ParserError } from './exception';
 import { parser } from './parser';
 import { interpreter } from './interpreter';
 
-export const load = (toml: string) => {
+export const load = (toml: string): object => {
   const lexingResult = lexer.tokenize(toml);
 
   if (lexingResult.errors.length > 0) {
