@@ -25,11 +25,20 @@ const frac = XRegExp.build('{{decimalPoint}}{{zeroPrefixableInt}}', {
   zeroPrefixableInt,
 });
 
-const float = XRegExp.build('{{floatIntPart}}({{exp}}|{{frac}}{{exp}}?)', {
-  floatIntPart,
-  exp,
-  frac,
-}); // OR SpecialFloat
+const specialFloat = XRegExp.build('({{minus}}|{{plus}})?(inf|nan)', {
+  minus,
+  plus,
+});
+
+const float = XRegExp.build(
+  '{{floatIntPart}}({{exp}}|{{frac}}{{exp}}?)|{{specialFloat}}',
+  {
+    floatIntPart,
+    exp,
+    frac,
+    specialFloat,
+  }
+);
 
 export const Float = createToken({
   name: 'Float',
@@ -47,11 +56,31 @@ export const Float = createToken({
     '9',
     '-',
     '+',
+    'i',
+    'n',
   ],
   line_breaks: false,
 });
 
+const attemptSpecialFloat = (value: string) => {
+  if (value === 'inf' || value === '+inf') {
+    return Infinity;
+  }
+  if (value === '-inf') {
+    return -Infinity;
+  }
+  if (value === 'nan' || value === '+nan' || value === '-nan') {
+    return NaN;
+  }
+  return null;
+};
+
 registerTokenInterpreter(Float, (raw: string) => {
+  const value = attemptSpecialFloat(raw);
+  if (value !== null) {
+    return value;
+  }
+
   const floatString = raw.replace(/_/g, '');
   return parseFloat(floatString);
 });

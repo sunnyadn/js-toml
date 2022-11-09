@@ -47,3 +47,26 @@ flt10 = +0.0`;
 
   expect(result).toEqual({ flt9: -0.0, flt10: 0.0 });
 });
+
+it('should support infinity and NaN', () => {
+  const input = `# infinity
+sf1 = inf  # positive infinity
+sf2 = +inf # positive infinity
+sf3 = -inf # negative infinity
+
+# not a number
+sf4 = nan  # actual sNaN/qNaN encoding is implementation-specific
+sf5 = +nan # same as \`nan\`
+sf6 = -nan # valid, actual encoding is implementation-specific`;
+
+  const result = load(input);
+
+  expect(result).toEqual({
+    sf1: Infinity,
+    sf2: Infinity,
+    sf3: -Infinity,
+    sf4: NaN,
+    sf5: NaN,
+    sf6: NaN,
+  });
+});
