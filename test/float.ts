@@ -39,3 +39,11 @@ it('should support underscores in floats', () => {
 
   expect(result).toEqual({ flt8: 224617.445991228 });
 });
+
+it('should support -0.0 and +0.0', () => {
+  const input = `flt9 = -0.0
+flt10 = +0.0`;
+  const result = load(input);
+
+  expect(result).toEqual({ flt9: -0.0, flt10: 0.0 });
+});
