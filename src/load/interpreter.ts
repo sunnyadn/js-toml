@@ -13,6 +13,7 @@ import {
   UnquotedKey,
 } from './tokens';
 import { Float } from './tokens/Float';
+import { DateTime } from './tokens/DateTime';
 
 const BaseCstVisitor = parser.getBaseCstVisitorConstructor();
 
@@ -75,7 +76,7 @@ export class Interpreter extends BaseCstVisitor {
       return this.visit(ctx.integer);
     }
 
-    return this.interpret(ctx, Float, Boolean);
+    return this.interpret(ctx, Float, Boolean, DateTime);
   }
 
   string(ctx) {

@@ -12,6 +12,7 @@ import { KeyValueSeparator } from './KeyValueSeparator';
 import { DotSeparator } from './DotSeparator';
 import { Comment } from './Comment';
 import { Float } from './Float';
+import { DateTime } from './DateTime';
 
 export const allTokens = [
   WhiteSpace,
@@ -22,6 +23,7 @@ export const allTokens = [
   LiteralString,
   Boolean,
   Float,
+  DateTime,
   NonDecimalInteger,
   DecimalInteger,
   UnquotedKey,

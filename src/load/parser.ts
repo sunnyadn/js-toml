@@ -14,6 +14,7 @@ import {
   UnquotedKey,
 } from './tokens';
 import { Float } from './tokens/Float';
+import { DateTime } from './tokens/DateTime';
 
 class Parser extends CstParser {
   private quotedKey = this.RULE('quotedKey', () => {
@@ -61,7 +62,7 @@ class Parser extends CstParser {
       { ALT: () => this.CONSUME(Boolean) },
       // OR ARRAY
       // OR INLINE TABLE
-      // OR DATE TIME
+      { ALT: () => this.CONSUME(DateTime) },
       { ALT: () => this.CONSUME(Float) },
       { ALT: () => this.SUBRULE(this.integer) },
     ]);

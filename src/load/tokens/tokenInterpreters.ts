@@ -1,6 +1,8 @@
 import { TokenType } from 'chevrotain';
 
-type InterpreterFunc = (raw: string) => string | boolean | number | bigint;
+type InterpreterFunc = (
+  raw: string
+) => string | boolean | number | bigint | Date;
 export const tokenInterpreters = new Map<string, InterpreterFunc>();
 
 export const registerTokenInterpreter = (
