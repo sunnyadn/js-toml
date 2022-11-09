@@ -25,9 +25,14 @@ const frac = XRegExp.build('{{decimalPoint}}{{zeroPrefixableInt}}', {
   zeroPrefixableInt,
 });
 
-const specialFloat = XRegExp.build('({{minus}}|{{plus}})?(inf|nan)', {
+const inf = /inf/;
+const nan = /nan/;
+
+const specialFloat = XRegExp.build('({{minus}}|{{plus}})?({{inf}}|{{nan}})', {
   minus,
   plus,
+  inf,
+  nan,
 });
 
 const float = XRegExp.build(
