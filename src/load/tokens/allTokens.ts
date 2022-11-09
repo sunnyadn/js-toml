@@ -5,10 +5,8 @@ import { MultiLineLiteralString } from './MultiLineLiteralString';
 import { BasicString } from './BasicString';
 import { LiteralString } from './LiteralString';
 import { True } from './True';
-import { Minus } from './Minus';
-import { Plus } from './Plus';
-import { UnsignedNonDecimalInteger } from './UnsignedNonDecimalInteger';
-import { UnsignedDecimalInteger } from './UnsignedDecimalInteger';
+import { NonDecimalInteger } from './NonDecimalInteger';
+import { DecimalInteger } from './DecimalInteger';
 import { UnquotedKey } from './UnquotedKey';
 import { KeyValueSeparator } from './KeyValueSeparator';
 import { DotSeparator } from './DotSeparator';
@@ -22,10 +20,8 @@ export const allTokens = [
   BasicString,
   LiteralString,
   True,
-  Minus,
-  Plus,
-  UnsignedNonDecimalInteger,
-  UnsignedDecimalInteger,
+  NonDecimalInteger,
+  DecimalInteger,
   UnquotedKey,
   KeyValueSeparator,
   DotSeparator,

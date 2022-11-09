@@ -27,3 +27,7 @@ export const escaped = XRegExp.build('{{escape}}{{escapeSeqChar}}', {
 export const apostrophe = /'/;
 
 export const underscore = /_/;
+
+export const minus = /-/;
+
+export const plus = /\+/;

@@ -4,14 +4,13 @@ import { TokenType } from 'chevrotain';
 import { tokenInterpreters } from './tokens/tokenInterpreters';
 import {
   BasicString,
+  DecimalInteger,
   LiteralString,
-  Minus,
   MultiLineBasicString,
   MultiLineLiteralString,
+  NonDecimalInteger,
   True,
   UnquotedKey,
-  UnsignedDecimalInteger,
-  UnsignedNonDecimalInteger,
 } from './tokens';
 
 const BaseCstVisitor = parser.getBaseCstVisitorConstructor();
@@ -97,23 +96,7 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   integer(ctx) {
-    if (ctx.decimalInteger) {
-      return this.visit(ctx.decimalInteger);
-    } else if (ctx.nonDecimalInteger) {
-      return this.visit(ctx.nonDecimalInteger);
-    }
-  }
-
-  decimalInteger(ctx) {
-    const negative = this.interpret(ctx, Minus);
-    const unsigned = this.interpret(ctx, UnsignedDecimalInteger);
-    return this.readInteger(unsigned, negative);
-  }
-
-  nonDecimalInteger(ctx) {
-    const negative = this.interpret(ctx, Minus);
-    const unsigned = this.interpret(ctx, UnsignedNonDecimalInteger);
-    return this.readInteger(unsigned, negative);
+    return this.interpret(ctx, DecimalInteger, NonDecimalInteger);
   }
 
   private interpret(ctx, ...candidates: TokenType[]) {
@@ -148,14 +131,6 @@ export class Interpreter extends BaseCstVisitor {
     } else {
       this.assignPrimitiveValue(first, value, object, rawKey);
     }
-  }
-
-  private readInteger(unsigned: number | bigint, negative: boolean) {
-    if (unsigned === 0) {
-      return 0;
-    }
-
-    return negative ? -unsigned : unsigned;
   }
 }
 

@@ -32,8 +32,8 @@ export const generateValuePattern = (regex: RegExp): ICustomPattern => {
       if (!isAfterEqual(matchedTokens)) {
         return null;
       }
-      const match = XRegExp.match(text.substring(offset), regex);
-      return match ? [match as string] : null;
+      const match = XRegExp.exec(text, regex, offset, true);
+      return match ? [match[0]] : null;
     },
   };
 };

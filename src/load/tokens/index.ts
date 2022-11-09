@@ -10,8 +10,8 @@ export { Newline } from './Newline';
 export { Plus } from './Plus';
 export { True } from './True';
 export { UnquotedKey } from './UnquotedKey';
-export { UnsignedDecimalInteger } from './UnsignedDecimalInteger';
-export { UnsignedNonDecimalInteger } from './UnsignedNonDecimalInteger';
+export { DecimalInteger } from './DecimalInteger';
+export { NonDecimalInteger } from './NonDecimalInteger';
 export { WhiteSpace } from './WhiteSpace';
 
 export { allTokens } from './allTokens';

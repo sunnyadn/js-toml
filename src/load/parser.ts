@@ -2,18 +2,16 @@ import { CstParser } from 'chevrotain';
 import {
   allTokens,
   BasicString,
+  DecimalInteger,
   DotSeparator,
   KeyValueSeparator,
   LiteralString,
-  Minus,
   MultiLineBasicString,
   MultiLineLiteralString,
   Newline,
-  Plus,
+  NonDecimalInteger,
   True,
   UnquotedKey,
-  UnsignedDecimalInteger,
-  UnsignedNonDecimalInteger,
 } from './tokens';
 
 class Parser extends CstParser {
@@ -57,23 +55,10 @@ class Parser extends CstParser {
     this.CONSUME(True);
     // OR FALSE
   });
-  private decimalInteger = this.RULE('decimalInteger', () => {
-    this.OPTION(() =>
-      this.OR([
-        { ALT: () => this.CONSUME(Minus) },
-        { ALT: () => this.CONSUME(Plus) },
-      ])
-    );
-    this.CONSUME(UnsignedDecimalInteger);
-  });
-  private nonDecimalInteger = this.RULE('nonDecimalInteger', () => {
-    this.OPTION(() => this.CONSUME(Minus));
-    this.CONSUME(UnsignedNonDecimalInteger);
-  });
   private integer = this.RULE('integer', () => {
     this.OR([
-      { ALT: () => this.SUBRULE(this.decimalInteger) },
-      { ALT: () => this.SUBRULE(this.nonDecimalInteger) },
+      { ALT: () => this.CONSUME(DecimalInteger) },
+      { ALT: () => this.CONSUME(NonDecimalInteger) },
     ]);
   });
   private value = this.RULE('value', () => {
