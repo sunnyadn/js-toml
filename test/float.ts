@@ -1,4 +1,4 @@
-import { load } from '../src';
+import { load, SyntaxParseError } from '../src';
 
 it('should support floats', () => {
   const input = `# fractional
@@ -25,4 +25,10 @@ flt7 = 6.626e-34
     flt6: -2e-2,
     flt7: 6.626e-34,
   });
+});
+
+it('should throw error if decimal point is not surrounded by digits', () => {
+  expect(() => load('invalid_float_1 = .7')).toThrowError(SyntaxParseError);
+  expect(() => load('invalid_float_2 = 7.')).toThrowError(SyntaxParseError);
+  expect(() => load('invalid_float_3 = 3.e+20')).toThrowError(SyntaxParseError);
 });
