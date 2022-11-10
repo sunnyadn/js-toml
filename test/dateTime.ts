@@ -20,3 +20,10 @@ it('should support replacing T with space in offset date-times', () => {
 
   expect(result).toEqual({ odt4: new Date('1979-05-27T07:32:00Z') });
 });
+
+it('should support millisecond precision in offset date-times', () => {
+  const input = 'odt5 = 1979-05-27T07:32:00.999999Z';
+  const result = load(input);
+
+  expect(result).toEqual({ odt5: new Date('1979-05-27T07:32:00.999Z') });
+});
