@@ -42,8 +42,15 @@ const offsetDateTime = XRegExp.build('{{fullDate}}{{timeDelim}}{{fullTime}}', {
   fullTime,
 });
 
-const dateTime = XRegExp.build('{{offsetDateTime}}', { offsetDateTime });
-// OR localDateTime
+const localDateTime = XRegExp.build(
+  '{{fullDate}}{{timeDelim}}{{partialTime}}',
+  { fullDate, timeDelim, partialTime }
+);
+
+const dateTime = XRegExp.build('{{offsetDateTime}}|{{localDateTime}}', {
+  offsetDateTime,
+  localDateTime,
+});
 // OR localDate
 // OR localTime
 

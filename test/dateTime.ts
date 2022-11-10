@@ -27,3 +27,14 @@ it('should support millisecond precision in offset date-times', () => {
 
   expect(result).toEqual({ odt5: new Date('1979-05-27T07:32:00.999Z') });
 });
+
+it('should support local date-times', () => {
+  const input = `ldt1 = 1979-05-27T07:32:00
+ldt2 = 1979-05-27T00:32:00.999999`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    ldt1: new Date('1979-05-27T07:32:00'),
+    ldt2: new Date('1979-05-27T00:32:00.999'),
+  });
+});
