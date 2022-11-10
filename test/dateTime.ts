@@ -43,3 +43,10 @@ ldt2 = 1979-05-27T00:32:00.999`;
   });
   timezoneMock.unregister();
 });
+
+it('should support local date', () => {
+  const input = 'ld1 = 1979-05-27';
+  const result = load(input);
+
+  expect(result).toEqual({ ld1: new Date(Date.UTC(1979, 4, 27)) });
+});

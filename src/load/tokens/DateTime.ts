@@ -47,11 +47,16 @@ const localDateTime = XRegExp.build(
   { fullDate, timeDelim, partialTime }
 );
 
-const dateTime = XRegExp.build('{{offsetDateTime}}|{{localDateTime}}', {
-  offsetDateTime,
-  localDateTime,
-});
-// OR localDate
+const localDate = fullDate;
+
+const dateTime = XRegExp.build(
+  '{{offsetDateTime}}|{{localDateTime}}|{{localDate}}',
+  {
+    offsetDateTime,
+    localDateTime,
+    localDate,
+  }
+);
 // OR localTime
 
 export const DateTime = createToken({
