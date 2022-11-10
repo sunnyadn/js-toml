@@ -15,6 +15,9 @@ import {
 } from './tokens';
 import { Float } from './tokens/Float';
 import { DateTime } from './tokens/DateTime';
+import { ArrayOpen } from './tokens/ArrayOpen';
+import { ArrayClose } from './tokens/ArrayClose';
+import { ArraySeparator } from './tokens/ArraySeparator';
 
 class Parser extends CstParser {
   private quotedKey = this.RULE('quotedKey', () => {
@@ -60,12 +63,35 @@ class Parser extends CstParser {
     this.OR([
       { ALT: () => this.SUBRULE(this.string) },
       { ALT: () => this.CONSUME(Boolean) },
-      // OR ARRAY
+      { ALT: () => this.SUBRULE(this.array) },
       // OR INLINE TABLE
       { ALT: () => this.CONSUME(DateTime) },
       { ALT: () => this.CONSUME(Float) },
       { ALT: () => this.SUBRULE(this.integer) },
     ]);
+  });
+  private arrayValues = this.RULE('arrayValues', () => {
+    this.MANY(() => this.CONSUME(Newline));
+    this.SUBRULE(this.value);
+    let havingMore = true;
+    this.MANY1({
+      GATE: () => havingMore,
+      DEF: () => {
+        this.MANY2(() => this.CONSUME1(Newline));
+        this.CONSUME(ArraySeparator);
+        this.MANY3(() => this.CONSUME2(Newline));
+        const found = this.OPTION(() => this.SUBRULE1(this.value));
+        if (!found) {
+          havingMore = false;
+        }
+      },
+    });
+  });
+  private array = this.RULE('array', () => {
+    this.CONSUME(ArrayOpen);
+    this.OPTION(() => this.SUBRULE(this.arrayValues));
+    this.MANY(() => this.CONSUME(Newline));
+    this.CONSUME(ArrayClose);
   });
   private keyValue = this.RULE('keyValue', () => {
     this.SUBRULE(this.key);

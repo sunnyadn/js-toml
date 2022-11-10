@@ -72,6 +72,8 @@ export class Interpreter extends BaseCstVisitor {
   value(ctx) {
     if (ctx.string) {
       return this.visit(ctx.string);
+    } else if (ctx.array) {
+      return this.visit(ctx.array);
     } else if (ctx.integer) {
       return this.visit(ctx.integer);
     }
@@ -87,6 +89,14 @@ export class Interpreter extends BaseCstVisitor {
       BasicString,
       LiteralString
     );
+  }
+
+  arrayValues(ctx) {
+    return ctx.value.map((value) => this.visit(value));
+  }
+
+  array(ctx) {
+    return this.visit(ctx.arrayValues);
   }
 
   integer(ctx) {

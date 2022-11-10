@@ -13,6 +13,9 @@ import { DotSeparator } from './DotSeparator';
 import { Comment } from './Comment';
 import { Float } from './Float';
 import { DateTime } from './DateTime';
+import { ArrayOpen } from './ArrayOpen';
+import { ArraySeparator } from './ArraySeparator';
+import { ArrayClose } from './ArrayClose';
 
 export const allTokens = [
   WhiteSpace,
@@ -29,5 +32,8 @@ export const allTokens = [
   UnquotedKey,
   KeyValueSeparator,
   DotSeparator,
+  ArrayOpen,
+  ArraySeparator,
+  ArrayClose,
   Comment,
 ];

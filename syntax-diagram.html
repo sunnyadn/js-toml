@@ -288,6 +288,28 @@
             "type": "Alternative",
             "definition": [
               {
+                "type": "NonTerminal",
+                "name": "array",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Alternative",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "DateTime",
+                "label": "DateTime",
+                "idx": 0,
+                "pattern": "(?:(?:(?:(?:[0-9]){4})-(?:(?:[0-9]){2})-(?:(?:[0-9]){2}))(?:[Tt ])(?:(?:(?:(?:[0-9]){2}):(?:(?:[0-9]){2}):(?:(?:[0-9]){2})(?:\\.(?:[0-9])+)?)(?:[Zz]|(?:[+-](?:(?:[0-9]){2}):(?:(?:[0-9]){2})))))|(?:(?:(?:(?:[0-9]){4})-(?:(?:[0-9]){2})-(?:(?:[0-9]){2}))(?:[Tt ])(?:(?:(?:[0-9]){2}):(?:(?:[0-9]){2}):(?:(?:[0-9]){2})(?:\\.(?:[0-9])+)?))|(?:(?:(?:[0-9]){4})-(?:(?:[0-9]){2})-(?:(?:[0-9]){2}))|(?:(?:(?:[0-9]){2}):(?:(?:[0-9]){2}):(?:(?:[0-9]){2})(?:\\.(?:[0-9])+)?)"
+              }
+            ]
+          },
+          {
+            "type": "Alternative",
+            "definition": [
+              {
                 "type": "Terminal",
                 "name": "Float",
                 "label": "Float",
@@ -307,6 +329,126 @@
             ]
           }
         ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "arrayValues",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "Repetition",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "Newline",
+            "label": "Newline",
+            "idx": 0,
+            "pattern": "\\r\\n|\\n"
+          }
+        ]
+      },
+      {
+        "type": "NonTerminal",
+        "name": "value",
+        "idx": 0
+      },
+      {
+        "type": "Repetition",
+        "idx": 1,
+        "definition": [
+          {
+            "type": "Repetition",
+            "idx": 2,
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Newline",
+                "label": "Newline",
+                "idx": 1,
+                "pattern": "\\r\\n|\\n"
+              }
+            ]
+          },
+          {
+            "type": "Terminal",
+            "name": "ArraySeparator",
+            "label": ",",
+            "idx": 0,
+            "pattern": ","
+          },
+          {
+            "type": "Repetition",
+            "idx": 3,
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Newline",
+                "label": "Newline",
+                "idx": 2,
+                "pattern": "\\r\\n|\\n"
+              }
+            ]
+          },
+          {
+            "type": "Option",
+            "idx": 0,
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "value",
+                "idx": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "array",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "ArrayOpen",
+        "label": "[",
+        "idx": 0,
+        "pattern": "\\["
+      },
+      {
+        "type": "Option",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "arrayValues",
+            "idx": 0
+          }
+        ]
+      },
+      {
+        "type": "Repetition",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "Newline",
+            "label": "Newline",
+            "idx": 0,
+            "pattern": "\\r\\n|\\n"
+          }
+        ]
+      },
+      {
+        "type": "Terminal",
+        "name": "ArrayClose",
+        "label": "]",
+        "idx": 0,
+        "pattern": "]"
       }
     ]
   },
