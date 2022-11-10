@@ -50,3 +50,11 @@ it('should support local date', () => {
 
   expect(result).toEqual({ ld1: new Date(Date.UTC(1979, 4, 27)) });
 });
+
+it('should support local time', () => {
+  const input = `lt1 = 07:32:00
+lt2 = 00:32:00.999999`;
+  const result = load(input);
+
+  expect(result).toEqual({ lt1: '07:32:00', lt2: '00:32:00.999999' });
+});

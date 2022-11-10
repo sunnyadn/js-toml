@@ -49,19 +49,28 @@ const localDateTime = XRegExp.build(
 
 const localDate = fullDate;
 
+const localTime = partialTime;
+
 const dateTime = XRegExp.build(
-  '{{offsetDateTime}}|{{localDateTime}}|{{localDate}}',
+  '{{offsetDateTime}}|{{localDateTime}}|{{localDate}}|{{localTime}}',
   {
     offsetDateTime,
     localDateTime,
     localDate,
+    localTime,
   }
 );
-// OR localTime
 
 export const DateTime = createToken({
   name: 'DateTime',
   pattern: dateTime,
 });
 
-registerTokenInterpreter(DateTime, (raw) => new Date(raw));
+registerTokenInterpreter(DateTime, (raw) => {
+  const onlyTime = raw.match(localTime)?.index === 0;
+  if (onlyTime) {
+    return raw;
+  }
+
+  return new Date(raw);
+});
