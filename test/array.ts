@@ -11,6 +11,7 @@ string_array = [ "all", 'strings', """are the same""", '''type''' ]
 numbers = [ 0.1, 0.2, 0.5, 1, 2, 5 ]
 contributors = [
   "Foo Bar <foo@example.com>",
+  { name = "Baz Qux", email = "bazqux@example.com", url = "https://example.com/bazqux" }
 ]`;
   const result = load(input);
 
@@ -27,6 +28,13 @@ contributors = [
     ],
     string_array: ['all', 'strings', 'are the same', 'type'],
     numbers: [0.1, 0.2, 0.5, 1, 2, 5],
-    contributors: ['Foo Bar <foo@example.com>'],
+    contributors: [
+      'Foo Bar <foo@example.com>',
+      {
+        name: 'Baz Qux',
+        email: 'bazqux@example.com',
+        url: 'https://example.com/bazqux',
+      },
+    ],
   });
 });

@@ -35,11 +35,11 @@ export class Interpreter extends BaseCstVisitor {
     this.visit(ctx.keyValue);
   }
 
-  keyValue(ctx) {
+  keyValue(ctx, object) {
     const keys = this.visit(ctx.key);
     const value = this.visit(ctx.value);
     const rawKey = keys.join('.');
-    this.assignValue(rawKey, keys, value);
+    this.assignValue(rawKey, keys, value, object);
   }
 
   key(ctx) {
@@ -69,11 +69,26 @@ export class Interpreter extends BaseCstVisitor {
     return this.interpret(ctx, BasicString, LiteralString);
   }
 
+  inlineTableKeyValues(ctx, object) {
+    ctx.keyValue.forEach((keyValue) => this.visit(keyValue, object));
+  }
+
+  inlineTable(ctx) {
+    const result = {};
+    if (ctx.inlineTableKeyValues) {
+      this.visit(ctx.inlineTableKeyValues, result);
+    }
+
+    return result;
+  }
+
   value(ctx) {
     if (ctx.string) {
       return this.visit(ctx.string);
     } else if (ctx.array) {
       return this.visit(ctx.array);
+    } else if (ctx.inlineTable) {
+      return this.visit(ctx.inlineTable);
     } else if (ctx.integer) {
       return this.visit(ctx.integer);
     }
@@ -83,11 +98,11 @@ export class Interpreter extends BaseCstVisitor {
 
   string(ctx) {
     return this.interpret(
-      ctx,
-      MultiLineBasicString,
-      MultiLineLiteralString,
-      BasicString,
-      LiteralString
+        ctx,
+        MultiLineBasicString,
+        MultiLineLiteralString,
+        BasicString,
+        LiteralString
     );
   }
 

@@ -17,7 +17,9 @@ import { Float } from './tokens/Float';
 import { DateTime } from './tokens/DateTime';
 import { ArrayOpen } from './tokens/ArrayOpen';
 import { ArrayClose } from './tokens/ArrayClose';
-import { ArraySeparator } from './tokens/ArraySeparator';
+import { Comma } from './tokens/Comma';
+import { InlineTableOpen } from './tokens/InlineTableOpen';
+import { InlineTableClose } from './tokens/InlineTableClose';
 
 class Parser extends CstParser {
   private quotedKey = this.RULE('quotedKey', () => {
@@ -59,44 +61,56 @@ class Parser extends CstParser {
       { ALT: () => this.CONSUME(NonDecimalInteger) },
     ]);
   });
-  private value = this.RULE('value', () => {
-    this.OR([
-      { ALT: () => this.SUBRULE(this.string) },
-      { ALT: () => this.CONSUME(Boolean) },
-      { ALT: () => this.SUBRULE(this.array) },
-      // OR INLINE TABLE
-      { ALT: () => this.CONSUME(DateTime) },
-      { ALT: () => this.CONSUME(Float) },
-      { ALT: () => this.SUBRULE(this.integer) },
-    ]);
+  private inlineTable = this.RULE('inlineTable', () => {
+    this.CONSUME(InlineTableOpen);
+    this.OPTION(() => this.SUBRULE(this.inlineTableKeyValues));
+    this.CONSUME(InlineTableClose);
+  });
+  private keyValue = this.RULE('keyValue', () => {
+    this.SUBRULE(this.key);
+    this.CONSUME(KeyValueSeparator);
+    this.SUBRULE(this.value);
+  });
+  private inlineTableKeyValues = this.RULE('inlineTableKeyValues', () => {
+    this.MANY_SEP({
+      SEP: Comma,
+      DEF: () => this.SUBRULE(this.keyValue),
+    });
   });
   private arrayValues = this.RULE('arrayValues', () => {
-    this.MANY(() => this.CONSUME(Newline));
     this.SUBRULE(this.value);
+    this.MANY(() => this.CONSUME(Newline));
     let havingMore = true;
     this.MANY1({
       GATE: () => havingMore,
       DEF: () => {
+        this.CONSUME(Comma);
         this.MANY2(() => this.CONSUME1(Newline));
-        this.CONSUME(ArraySeparator);
-        this.MANY3(() => this.CONSUME2(Newline));
         const found = this.OPTION(() => this.SUBRULE1(this.value));
         if (!found) {
           havingMore = false;
+        } else {
+          this.MANY3(() => this.CONSUME2(Newline));
         }
       },
     });
   });
   private array = this.RULE('array', () => {
     this.CONSUME(ArrayOpen);
-    this.OPTION(() => this.SUBRULE(this.arrayValues));
     this.MANY(() => this.CONSUME(Newline));
+    this.OPTION(() => this.SUBRULE(this.arrayValues));
     this.CONSUME(ArrayClose);
   });
-  private keyValue = this.RULE('keyValue', () => {
-    this.SUBRULE(this.key);
-    this.CONSUME(KeyValueSeparator);
-    this.SUBRULE(this.value);
+  private value = this.RULE('value', () => {
+    this.OR([
+      { ALT: () => this.SUBRULE(this.string) },
+      { ALT: () => this.CONSUME(Boolean) },
+      { ALT: () => this.SUBRULE(this.array) },
+      { ALT: () => this.SUBRULE(this.inlineTable) },
+      { ALT: () => this.CONSUME(DateTime) },
+      { ALT: () => this.CONSUME(Float) },
+      { ALT: () => this.SUBRULE(this.integer) },
+    ]);
   });
   private expression = this.RULE('expression', () => {
     this.SUBRULE(this.keyValue);

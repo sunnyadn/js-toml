@@ -14,8 +14,10 @@ import { Comment } from './Comment';
 import { Float } from './Float';
 import { DateTime } from './DateTime';
 import { ArrayOpen } from './ArrayOpen';
-import { ArraySeparator } from './ArraySeparator';
+import { Comma } from './Comma';
 import { ArrayClose } from './ArrayClose';
+import { InlineTableOpen } from './InlineTableOpen';
+import { InlineTableClose } from './InlineTableClose';
 
 export const allTokens = [
   WhiteSpace,
@@ -33,7 +35,9 @@ export const allTokens = [
   KeyValueSeparator,
   DotSeparator,
   ArrayOpen,
-  ArraySeparator,
+  InlineTableOpen,
+  Comma,
   ArrayClose,
+  InlineTableClose,
   Comment,
 ];
