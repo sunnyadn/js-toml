@@ -15,6 +15,8 @@ import {
 import { Float } from './tokens/Float';
 import { DateTime } from './tokens/DateTime';
 
+class DuplicateKeyError extends Error {}
+
 const BaseCstVisitor = parser.getBaseCstVisitorConstructor();
 
 export class Interpreter extends BaseCstVisitor {
@@ -37,7 +39,14 @@ export class Interpreter extends BaseCstVisitor {
     const keys = this.visit(ctx.key);
     const value = this.visit(ctx.value);
     const rawKey = keys.join('.');
-    this.assignValue(rawKey, keys, value, object);
+    try {
+      this.assignValue(keys, value, object);
+    } catch (e) {
+      if (e instanceof DuplicateKeyError) {
+        throw new InterpreterError(`Cannot assign value to key '${rawKey}'`);
+      }
+      throw e;
+    }
   }
 
   key(ctx) {
@@ -125,28 +134,28 @@ export class Interpreter extends BaseCstVisitor {
     return null;
   }
 
-  private assignPrimitiveValue(key, value, object, rawKey) {
+  private assignPrimitiveValue(key, value, object) {
     const realKey = typeof key === 'string' ? key : key[0];
     if (object[realKey]) {
-      throw new InterpreterError(`Duplicate key detect: '${rawKey}'`);
+      throw new DuplicateKeyError();
     }
     object[key] = value;
   }
 
-  private tryCreatingObject(key, object, rawKey) {
+  private tryCreatingObject(key, object) {
     object[key] = object[key] || {};
     if (typeof object[key] !== 'object') {
-      throw new InterpreterError(`Cannot assign value to key '${rawKey}'`);
+      throw new DuplicateKeyError();
     }
   }
 
-  private assignValue(rawKey, keys, value, object) {
+  private assignValue(keys, value, object) {
     const [first, ...rest] = keys;
     if (rest.length > 0) {
-      this.tryCreatingObject(first, object, rawKey);
-      this.assignValue(rawKey, rest, value, object[first]);
+      this.tryCreatingObject(first, object);
+      this.assignValue(rest, value, object[first]);
     } else {
-      this.assignPrimitiveValue(first, value, object, rawKey);
+      this.assignPrimitiveValue(first, value, object);
     }
   }
 }
