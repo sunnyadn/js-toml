@@ -18,21 +18,19 @@ import { DateTime } from './tokens/DateTime';
 const BaseCstVisitor = parser.getBaseCstVisitorConstructor();
 
 export class Interpreter extends BaseCstVisitor {
-  private result: object;
-
   constructor() {
     super();
     this.validateVisitor();
   }
 
   toml(ctx) {
-    this.result = {};
-    ctx.expression?.forEach((expression) => this.visit(expression));
-    return this.result;
+    const result = {};
+    ctx.expression?.forEach((expression) => this.visit(expression, result));
+    return result;
   }
 
-  expression(ctx) {
-    this.visit(ctx.keyValue);
+  expression(ctx, root) {
+    this.visit(ctx.keyValue, root);
   }
 
   keyValue(ctx, object) {
@@ -98,11 +96,11 @@ export class Interpreter extends BaseCstVisitor {
 
   string(ctx) {
     return this.interpret(
-        ctx,
-        MultiLineBasicString,
-        MultiLineLiteralString,
-        BasicString,
-        LiteralString
+      ctx,
+      MultiLineBasicString,
+      MultiLineLiteralString,
+      BasicString,
+      LiteralString
     );
   }
 
@@ -142,7 +140,7 @@ export class Interpreter extends BaseCstVisitor {
     }
   }
 
-  private assignValue(rawKey, keys, value, object = this.result) {
+  private assignValue(rawKey, keys, value, object) {
     const [first, ...rest] = keys;
     if (rest.length > 0) {
       this.tryCreatingObject(first, object, rawKey);
