@@ -38,3 +38,14 @@ contributors = [
     ],
   });
 });
+
+it('should support empty arrays', () => {
+  const input = `empty_array = []
+empty_nested_array = [ [] ]`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    empty_array: [],
+    empty_nested_array: [[]],
+  });
+});

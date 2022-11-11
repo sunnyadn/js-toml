@@ -105,11 +105,11 @@ export class Interpreter extends BaseCstVisitor {
 
   string(ctx) {
     return this.interpret(
-      ctx,
-      MultiLineBasicString,
-      MultiLineLiteralString,
-      BasicString,
-      LiteralString
+        ctx,
+        MultiLineBasicString,
+        MultiLineLiteralString,
+        BasicString,
+        LiteralString
     );
   }
 
@@ -118,7 +118,11 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   array(ctx) {
-    return this.visit(ctx.arrayValues);
+    if (ctx.arrayValues) {
+      return this.visit(ctx.arrayValues);
+    }
+
+    return [];
   }
 
   integer(ctx) {
