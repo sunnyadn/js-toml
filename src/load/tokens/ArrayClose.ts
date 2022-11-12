@@ -6,4 +6,5 @@ export const ArrayClose = createToken({
   name: 'ArrayClose',
   pattern: arrayClose,
   label: ']',
+  pop_mode: true,
 });

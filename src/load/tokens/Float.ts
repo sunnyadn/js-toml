@@ -1,7 +1,6 @@
 import { decimalInteger, digit, minus, plus, underscore } from './patterns';
 import { createToken } from 'chevrotain';
 import { registerTokenInterpreter } from './tokenInterpreters';
-import { generateValuePattern } from './utils';
 import XRegExp = require('xregexp');
 
 const floatIntPart = decimalInteger;
@@ -47,24 +46,7 @@ const float = XRegExp.build(
 
 export const Float = createToken({
   name: 'Float',
-  pattern: generateValuePattern(float),
-  start_chars_hint: [
-    '0',
-    '1',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-    '9',
-    '-',
-    '+',
-    'i',
-    'n',
-  ],
-  line_breaks: false,
+  pattern: float,
 });
 
 const attemptSpecialFloat = (value: string) => {

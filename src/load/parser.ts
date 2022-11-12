@@ -10,12 +10,13 @@ import { Float } from './tokens/Float';
 import { DateTime } from './tokens/DateTime';
 import { ArrayOpen } from './tokens/ArrayOpen';
 import { ArrayClose } from './tokens/ArrayClose';
-import { Comma } from './tokens/Comma';
+import { ArraySep } from './tokens/ArraySep';
 import { InlineTableOpen } from './tokens/InlineTableOpen';
 import { InlineTableClose } from './tokens/InlineTableClose';
 import { SimpleKey } from './tokens/SimpleKey';
 import { TomlString } from './tokens/TomlString';
 import { Integer } from './tokens/Integer';
+import { InlineTableSep } from './tokens/InlineTableSep';
 
 class Parser extends CstParser {
   private dottedKey = this.RULE('dottedKey', () => {
@@ -31,9 +32,14 @@ class Parser extends CstParser {
       { ALT: () => this.CONSUME(SimpleKey) },
     ]);
   });
+  private keyValue = this.RULE('keyValue', () => {
+    this.SUBRULE(this.key);
+    this.CONSUME(KeyValueSeparator);
+    this.SUBRULE(this.value);
+  });
   private inlineTableKeyValues = this.RULE('inlineTableKeyValues', () => {
     this.MANY_SEP({
-      SEP: Comma,
+      SEP: InlineTableSep,
       DEF: () => this.SUBRULE(this.keyValue),
     });
   });
@@ -41,6 +47,24 @@ class Parser extends CstParser {
     this.CONSUME(InlineTableOpen);
     this.OPTION(() => this.SUBRULE(this.inlineTableKeyValues));
     this.CONSUME(InlineTableClose);
+  });
+  private arrayValues = this.RULE('arrayValues', () => {
+    this.SUBRULE(this.value);
+    this.MANY(() => this.CONSUME(Newline));
+    let havingMore = true;
+    this.MANY1({
+      GATE: () => havingMore,
+      DEF: () => {
+        this.CONSUME(ArraySep);
+        this.MANY2(() => this.CONSUME1(Newline));
+        const found = this.OPTION(() => this.SUBRULE1(this.value));
+        if (!found) {
+          havingMore = false;
+        } else {
+          this.MANY3(() => this.CONSUME2(Newline));
+        }
+      },
+    });
   });
   private array = this.RULE('array', () => {
     this.CONSUME(ArrayOpen);
@@ -58,29 +82,6 @@ class Parser extends CstParser {
       { ALT: () => this.CONSUME(Float) },
       { ALT: () => this.CONSUME(Integer) },
     ]);
-  });
-  private keyValue = this.RULE('keyValue', () => {
-    this.SUBRULE(this.key);
-    this.CONSUME(KeyValueSeparator);
-    this.SUBRULE(this.value);
-  });
-  private arrayValues = this.RULE('arrayValues', () => {
-    this.SUBRULE(this.value);
-    this.MANY(() => this.CONSUME(Newline));
-    let havingMore = true;
-    this.MANY1({
-      GATE: () => havingMore,
-      DEF: () => {
-        this.CONSUME(Comma);
-        this.MANY2(() => this.CONSUME1(Newline));
-        const found = this.OPTION(() => this.SUBRULE1(this.value));
-        if (!found) {
-          havingMore = false;
-        } else {
-          this.MANY3(() => this.CONSUME2(Newline));
-        }
-      },
-    });
   });
   private expression = this.RULE('expression', () => {
     this.SUBRULE(this.keyValue);

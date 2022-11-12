@@ -6,4 +6,5 @@ export const InlineTableClose = createToken({
   name: 'InlineTableClose',
   pattern: inlineTableClose,
   label: '}',
+  pop_mode: true,
 });

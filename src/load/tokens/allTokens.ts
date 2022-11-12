@@ -13,17 +13,28 @@ import { Comment } from './Comment';
 import { Float } from './Float';
 import { DateTime } from './DateTime';
 import { ArrayOpen } from './ArrayOpen';
-import { Comma } from './Comma';
-import { ArrayClose } from './ArrayClose';
+import { ArraySep } from './ArraySep';
 import { InlineTableOpen } from './InlineTableOpen';
 import { InlineTableClose } from './InlineTableClose';
 import { DecIntWithOptionalMinus } from './DecIntWithOptionalMinus';
 import { True } from './True';
 import { False } from './False';
+import { Mode } from './modes';
+import { ArrayClose } from './ArrayClose';
+import { IgnoredNewline } from './IgnoredNewline';
+import { InlineTableSep } from './InlineTableSep';
 
-export const allTokens = [
+const keyTokens = [
   WhiteSpace,
-  Newline,
+  BasicString,
+  LiteralString,
+  UnquotedKey,
+  KeyValueSeparator,
+  DotSeparator,
+];
+
+const valueTokens = [
+  WhiteSpace,
   MultiLineBasicString,
   MultiLineLiteralString,
   BasicString,
@@ -35,13 +46,18 @@ export const allTokens = [
   NonDecimalInteger,
   DecIntWithOptionalMinus,
   DecimalInteger,
-  UnquotedKey,
-  KeyValueSeparator,
-  DotSeparator,
   ArrayOpen,
   InlineTableOpen,
-  Comma,
-  ArrayClose,
-  InlineTableClose,
   Comment,
 ];
+
+export const allTokens = {
+  modes: {
+    [Mode.Key]: [Comment, IgnoredNewline, ...keyTokens],
+    [Mode.Value]: [...valueTokens, Newline, InlineTableSep, InlineTableClose],
+    [Mode.Array]: [...valueTokens, IgnoredNewline, ArraySep, ArrayClose],
+    [Mode.InlineTable]: [...keyTokens, Newline],
+  },
+
+  defaultMode: Mode.Key,
+};

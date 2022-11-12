@@ -58,8 +58,19 @@ it('should support arrays spanning multiple lines', () => {
 integers3 = [
   1,
   2, # this is ok
-]`;
+]
+
+floats = [
+  0.1,
+  0.2, # this is ok
+  0.5,
+  1,
+ ]`;
   const result = load(input);
 
-  expect(result).toEqual({ integers2: [1, 2, 3], integers3: [1, 2] });
+  expect(result).toEqual({
+    integers2: [1, 2, 3],
+    integers3: [1, 2],
+    floats: [0.1, 0.2, 0.5, 1],
+  });
 });

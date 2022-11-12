@@ -11,7 +11,6 @@ export const True = createToken({
   pattern: truePattern,
   label: 'true',
   categories: [Boolean, UnquotedKey],
-  longer_alt: UnquotedKey,
 });
 
 registerTokenInterpreter(True, (raw, token, category) => {
