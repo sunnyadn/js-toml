@@ -16,13 +16,13 @@ import { ArrayOpen } from './ArrayOpen';
 import { ArraySep } from './ArraySep';
 import { InlineTableOpen } from './InlineTableOpen';
 import { InlineTableClose } from './InlineTableClose';
-import { DecIntWithOptionalMinus } from './DecIntWithOptionalMinus';
 import { True } from './True';
 import { False } from './False';
 import { Mode } from './modes';
 import { ArrayClose } from './ArrayClose';
 import { IgnoredNewline } from './IgnoredNewline';
 import { InlineTableSep } from './InlineTableSep';
+import { SimpleKey } from './SimpleKey';
 
 const keyTokens = [
   WhiteSpace,
@@ -31,6 +31,7 @@ const keyTokens = [
   UnquotedKey,
   KeyValueSeparator,
   DotSeparator,
+  SimpleKey,
 ];
 
 const valueTokens = [
@@ -44,7 +45,6 @@ const valueTokens = [
   DateTime,
   Float,
   NonDecimalInteger,
-  DecIntWithOptionalMinus,
   DecimalInteger,
   ArrayOpen,
   InlineTableOpen,

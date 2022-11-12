@@ -88,13 +88,12 @@ class Parser extends CstParser {
     // OR TABLE
   });
   toml = this.RULE('toml', () => {
-    this.OPTION(() => this.CONSUME(Newline));
-    this.OPTION1(() => this.SUBRULE(this.expression));
+    this.OPTION(() => this.SUBRULE(this.expression));
     this.MANY(() => {
       this.AT_LEAST_ONE(() => this.CONSUME1(Newline));
       this.SUBRULE1(this.expression);
     });
-    this.MANY1(() => this.CONSUME2(Newline));
+    this.OPTION1(() => this.CONSUME2(Newline));
   });
 
   constructor() {

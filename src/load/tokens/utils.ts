@@ -1,42 +1,4 @@
-import {
-  CustomPatternMatcherReturn,
-  ICustomPattern,
-  IToken,
-  tokenMatcher,
-} from 'chevrotain';
-import { Newline } from './Newline';
-import { KeyValueSeparator } from './KeyValueSeparator';
 import { InterpreterError } from '../exception';
-import XRegExp = require('xregexp');
-
-const isAfterEqual = (matchedTokens: IToken[]): boolean => {
-  for (let i = matchedTokens.length - 1; i >= 0; i--) {
-    const token = matchedTokens[i];
-    if (tokenMatcher(token, Newline)) {
-      return false;
-    } else if (tokenMatcher(token, KeyValueSeparator)) {
-      return true;
-    }
-  }
-
-  return false;
-};
-
-export const generateValuePattern = (regex: RegExp): ICustomPattern => {
-  return {
-    exec: (
-      text: string,
-      offset: number,
-      matchedTokens: IToken[]
-    ): CustomPatternMatcherReturn => {
-      if (!isAfterEqual(matchedTokens)) {
-        return null;
-      }
-      const match = XRegExp.exec(text, regex, offset, true);
-      return match ? [match[0]] : null;
-    },
-  };
-};
 
 export const unescapeString = (string) => {
   let result = '';

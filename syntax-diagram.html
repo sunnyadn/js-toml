@@ -91,6 +91,30 @@
   },
   {
     "type": "Rule",
+    "name": "keyValue",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "key",
+        "idx": 0
+      },
+      {
+        "type": "Terminal",
+        "name": "KeyValueSeparator",
+        "label": "=",
+        "idx": 0,
+        "pattern": "="
+      },
+      {
+        "type": "NonTerminal",
+        "name": "value",
+        "idx": 0
+      }
+    ]
+  },
+  {
+    "type": "Rule",
     "name": "inlineTableKeyValues",
     "orgText": "",
     "definition": [
@@ -99,7 +123,7 @@
         "idx": 0,
         "separator": {
           "type": "Terminal",
-          "name": "Comma",
+          "name": "InlineTableSep",
           "label": ",",
           "idx": 1,
           "pattern": ","
@@ -143,6 +167,81 @@
         "label": "}",
         "idx": 0,
         "pattern": "}"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "arrayValues",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "value",
+        "idx": 0
+      },
+      {
+        "type": "Repetition",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "Newline",
+            "label": "Newline",
+            "idx": 0,
+            "pattern": "\\r\\n|\\n"
+          }
+        ]
+      },
+      {
+        "type": "Repetition",
+        "idx": 1,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "Comma",
+            "label": ",",
+            "idx": 0,
+            "pattern": ","
+          },
+          {
+            "type": "Repetition",
+            "idx": 2,
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Newline",
+                "label": "Newline",
+                "idx": 1,
+                "pattern": "\\r\\n|\\n"
+              }
+            ]
+          },
+          {
+            "type": "Option",
+            "idx": 0,
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "value",
+                "idx": 1
+              }
+            ]
+          },
+          {
+            "type": "Repetition",
+            "idx": 3,
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Newline",
+                "label": "Newline",
+                "idx": 2,
+                "pattern": "\\r\\n|\\n"
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -264,7 +363,7 @@
                 "name": "Float",
                 "label": "Float",
                 "idx": 0,
-                "pattern": {}
+                "pattern": "(?:((?:-)|(?:\\+))?(?:(?:[1-9])((?:[0-9])|(?:_)(?:[0-9]))+|(?:[0-9])))((?:[Ee](?:((?:-)|(?:\\+))?(?:(?:[0-9])((?:[0-9])|(?:_)(?:[0-9]))*)))|(?:(?:\\.)(?:(?:[0-9])((?:[0-9])|(?:_)(?:[0-9]))*))(?:[Ee](?:((?:-)|(?:\\+))?(?:(?:[0-9])((?:[0-9])|(?:_)(?:[0-9]))*)))?)|(?:((?:-)|(?:\\+))?((?:inf)|(?:nan)))"
               }
             ]
           },
@@ -277,105 +376,6 @@
                 "label": "Integer",
                 "idx": 0,
                 "pattern": "NOT_APPLICABLE"
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "keyValue",
-    "orgText": "",
-    "definition": [
-      {
-        "type": "NonTerminal",
-        "name": "key",
-        "idx": 0
-      },
-      {
-        "type": "Terminal",
-        "name": "KeyValueSeparator",
-        "label": "=",
-        "idx": 0,
-        "pattern": "="
-      },
-      {
-        "type": "NonTerminal",
-        "name": "value",
-        "idx": 0
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "arrayValues",
-    "orgText": "",
-    "definition": [
-      {
-        "type": "NonTerminal",
-        "name": "value",
-        "idx": 0
-      },
-      {
-        "type": "Repetition",
-        "idx": 0,
-        "definition": [
-          {
-            "type": "Terminal",
-            "name": "Newline",
-            "label": "Newline",
-            "idx": 0,
-            "pattern": "\\r\\n|\\n"
-          }
-        ]
-      },
-      {
-        "type": "Repetition",
-        "idx": 1,
-        "definition": [
-          {
-            "type": "Terminal",
-            "name": "Comma",
-            "label": ",",
-            "idx": 0,
-            "pattern": ","
-          },
-          {
-            "type": "Repetition",
-            "idx": 2,
-            "definition": [
-              {
-                "type": "Terminal",
-                "name": "Newline",
-                "label": "Newline",
-                "idx": 1,
-                "pattern": "\\r\\n|\\n"
-              }
-            ]
-          },
-          {
-            "type": "Option",
-            "idx": 0,
-            "definition": [
-              {
-                "type": "NonTerminal",
-                "name": "value",
-                "idx": 1
-              }
-            ]
-          },
-          {
-            "type": "Repetition",
-            "idx": 3,
-            "definition": [
-              {
-                "type": "Terminal",
-                "name": "Newline",
-                "label": "Newline",
-                "idx": 2,
-                "pattern": "\\r\\n|\\n"
               }
             ]
           }
@@ -403,19 +403,6 @@
       {
         "type": "Option",
         "idx": 0,
-        "definition": [
-          {
-            "type": "Terminal",
-            "name": "Newline",
-            "label": "Newline",
-            "idx": 0,
-            "pattern": "\\r\\n|\\n"
-          }
-        ]
-      },
-      {
-        "type": "Option",
-        "idx": 1,
         "definition": [
           {
             "type": "NonTerminal",
@@ -449,7 +436,7 @@
         ]
       },
       {
-        "type": "Repetition",
+        "type": "Option",
         "idx": 1,
         "definition": [
           {
