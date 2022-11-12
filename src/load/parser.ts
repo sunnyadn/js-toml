@@ -50,25 +50,20 @@ class Parser extends CstParser {
   });
   private arrayValues = this.RULE('arrayValues', () => {
     this.SUBRULE(this.value);
-    this.MANY(() => this.CONSUME(Newline));
     let havingMore = true;
-    this.MANY1({
+    this.MANY({
       GATE: () => havingMore,
       DEF: () => {
         this.CONSUME(ArraySep);
-        this.MANY2(() => this.CONSUME1(Newline));
         const found = this.OPTION(() => this.SUBRULE1(this.value));
         if (!found) {
           havingMore = false;
-        } else {
-          this.MANY3(() => this.CONSUME2(Newline));
         }
       },
     });
   });
   private array = this.RULE('array', () => {
     this.CONSUME(ArrayOpen);
-    this.MANY(() => this.CONSUME(Newline));
     this.OPTION(() => this.SUBRULE(this.arrayValues));
     this.CONSUME(ArrayClose);
   });
@@ -90,10 +85,10 @@ class Parser extends CstParser {
   toml = this.RULE('toml', () => {
     this.OPTION(() => this.SUBRULE(this.expression));
     this.MANY(() => {
-      this.AT_LEAST_ONE(() => this.CONSUME1(Newline));
+      this.CONSUME(Newline);
       this.SUBRULE1(this.expression);
     });
-    this.OPTION1(() => this.CONSUME2(Newline));
+    this.OPTION1(() => this.CONSUME1(Newline));
   });
 
   constructor() {

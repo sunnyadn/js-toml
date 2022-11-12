@@ -186,36 +186,10 @@
         "definition": [
           {
             "type": "Terminal",
-            "name": "Newline",
-            "label": "Newline",
-            "idx": 0,
-            "pattern": "\\r\\n|\\n"
-          }
-        ]
-      },
-      {
-        "type": "Repetition",
-        "idx": 1,
-        "definition": [
-          {
-            "type": "Terminal",
             "name": "Comma",
             "label": ",",
             "idx": 0,
             "pattern": ","
-          },
-          {
-            "type": "Repetition",
-            "idx": 2,
-            "definition": [
-              {
-                "type": "Terminal",
-                "name": "Newline",
-                "label": "Newline",
-                "idx": 1,
-                "pattern": "\\r\\n|\\n"
-              }
-            ]
           },
           {
             "type": "Option",
@@ -225,19 +199,6 @@
                 "type": "NonTerminal",
                 "name": "value",
                 "idx": 1
-              }
-            ]
-          },
-          {
-            "type": "Repetition",
-            "idx": 3,
-            "definition": [
-              {
-                "type": "Terminal",
-                "name": "Newline",
-                "label": "Newline",
-                "idx": 2,
-                "pattern": "\\r\\n|\\n"
               }
             ]
           }
@@ -256,19 +217,6 @@
         "label": "[",
         "idx": 0,
         "pattern": "\\["
-      },
-      {
-        "type": "Repetition",
-        "idx": 0,
-        "definition": [
-          {
-            "type": "Terminal",
-            "name": "Newline",
-            "label": "Newline",
-            "idx": 0,
-            "pattern": "\\r\\n|\\n"
-          }
-        ]
       },
       {
         "type": "Option",
@@ -416,17 +364,11 @@
         "idx": 0,
         "definition": [
           {
-            "type": "RepetitionMandatory",
+            "type": "Terminal",
+            "name": "Newline",
+            "label": "Newline",
             "idx": 0,
-            "definition": [
-              {
-                "type": "Terminal",
-                "name": "Newline",
-                "label": "Newline",
-                "idx": 1,
-                "pattern": "\\r\\n|\\n"
-              }
-            ]
+            "pattern": "\\r\\n|\\n"
           },
           {
             "type": "NonTerminal",
@@ -443,7 +385,7 @@
             "type": "Terminal",
             "name": "Newline",
             "label": "Newline",
-            "idx": 2,
+            "idx": 1,
             "pattern": "\\r\\n|\\n"
           }
         ]

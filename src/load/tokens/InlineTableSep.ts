@@ -1,4 +1,5 @@
 import { createToken } from 'chevrotain';
+import { Mode } from './modes';
 
 const inlineTableSep = /,/;
 
@@ -7,4 +8,5 @@ export const InlineTableSep = createToken({
   pattern: inlineTableSep,
   label: ',',
   pop_mode: true,
+  push_mode: Mode.InlineTable,
 });

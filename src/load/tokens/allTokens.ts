@@ -23,13 +23,13 @@ import { ArrayClose } from './ArrayClose';
 import { IgnoredNewline } from './IgnoredNewline';
 import { InlineTableSep } from './InlineTableSep';
 import { SimpleKey } from './SimpleKey';
+import { InlineTableKeyValSep } from './InlineTableKeyValSep';
 
 const keyTokens = [
   WhiteSpace,
   BasicString,
   LiteralString,
   UnquotedKey,
-  KeyValueSeparator,
   DotSeparator,
   SimpleKey,
 ];
@@ -53,10 +53,10 @@ const valueTokens = [
 
 export const allTokens = {
   modes: {
-    [Mode.Key]: [Comment, IgnoredNewline, ...keyTokens],
+    [Mode.Key]: [Comment, IgnoredNewline, KeyValueSeparator, ...keyTokens],
     [Mode.Value]: [...valueTokens, Newline, InlineTableSep, InlineTableClose],
     [Mode.Array]: [...valueTokens, IgnoredNewline, ArraySep, ArrayClose],
-    [Mode.InlineTable]: [...keyTokens, Newline],
+    [Mode.InlineTable]: [...keyTokens, InlineTableKeyValSep],
   },
 
   defaultMode: Mode.Key,
