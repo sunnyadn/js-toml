@@ -74,3 +74,23 @@ floats = [
     floats: [0.1, 0.2, 0.5, 1],
   });
 });
+
+it('should support any number of newlines between array elements', () => {
+  const input = `integers4 = [
+  # this is ok
+  
+                      1,
+
+  2,
+
+  3
+  
+  
+  
+]`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    integers4: [1, 2, 3],
+  });
+});
