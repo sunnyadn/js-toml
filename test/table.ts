@@ -30,3 +30,18 @@ type.name = "pug"`;
 
   expect(result).toEqual({ dog: { 'tater.man': { type: { name: 'pug' } } } });
 });
+
+it('should support whitespaces around table keys', () => {
+  const input = `[a.b.c]            # this is best practice
+[ d.e.f ]          # same as [d.e.f]
+[ g .  h  . i ]    # same as [g.h.i]
+[ j . "ʞ" . 'l' ]  # same as [j."ʞ".'l']`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    a: { b: { c: {} } },
+    d: { e: { f: {} } },
+    g: { h: { i: {} } },
+    j: { ʞ: { l: {} } },
+  });
+});
