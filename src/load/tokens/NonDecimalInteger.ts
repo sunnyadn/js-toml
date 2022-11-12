@@ -1,8 +1,9 @@
 import { createToken } from 'chevrotain';
-import { generateValuePattern } from './utils';
 import { hexDigit, underscore } from './patterns';
 import { registerTokenInterpreter } from './tokenInterpreters';
 import { Integer } from './Integer';
+import { UnquotedKey } from './UnquotedKey';
+import { SimpleKey } from './SimpleKey';
 import XRegExp = require('xregexp');
 
 const hexPrefix = /0x/;
@@ -13,45 +14,43 @@ const digit0_7 = /[0-7]/;
 const digit0_1 = /[01]/;
 
 const hexInteger = XRegExp.build(
-  '{{hexPrefix}}{{hexDigit}}({{hexDigit}}|{{underscore}}{{hexDigit}})*',
-  {
-    hexPrefix,
-    hexDigit,
-    underscore,
-  }
+    '{{hexPrefix}}{{hexDigit}}({{hexDigit}}|{{underscore}}{{hexDigit}})*',
+    {
+      hexPrefix,
+      hexDigit,
+      underscore,
+    }
 );
 const octalInteger = XRegExp.build(
-  '{{octPrefix}}{{digit0_7}}({{digit0_7}}|{{underscore}}{{digit0_7}})*',
-  {
-    octPrefix,
-    digit0_7,
-    underscore,
-  }
+    '{{octPrefix}}{{digit0_7}}({{digit0_7}}|{{underscore}}{{digit0_7}})*',
+    {
+      octPrefix,
+      digit0_7,
+      underscore,
+    }
 );
 const binaryInteger = XRegExp.build(
-  '{{binPrefix}}{{digit0_1}}({{digit0_1}}|{{underscore}}{{digit0_1}})*',
-  {
-    binPrefix,
-    digit0_1,
-    underscore,
-  }
+    '{{binPrefix}}{{digit0_1}}({{digit0_1}}|{{underscore}}{{digit0_1}})*',
+    {
+      binPrefix,
+      digit0_1,
+      underscore,
+    }
 );
 
 const nonDecimalInteger = XRegExp.build(
-  '{{hexInteger}}|{{octalInteger}}|{{binaryInteger}}',
-  {
-    hexInteger,
-    octalInteger,
-    binaryInteger,
-  }
+    '{{hexInteger}}|{{octalInteger}}|{{binaryInteger}}',
+    {
+      hexInteger,
+      octalInteger,
+      binaryInteger,
+    }
 );
 
 export const NonDecimalInteger = createToken({
   name: 'NonDecimalInteger',
-  pattern: generateValuePattern(nonDecimalInteger),
-  start_chars_hint: ['0'],
-  line_breaks: false,
-  categories: [Integer],
+  pattern: nonDecimalInteger,
+  categories: [Integer, UnquotedKey],
 });
 
 const parseBigInt = (string: string, radix: number): bigint => {
@@ -77,7 +76,11 @@ const getRadix = (raw: string): number => {
   return 10;
 };
 
-registerTokenInterpreter(NonDecimalInteger, (raw: string) => {
+registerTokenInterpreter(NonDecimalInteger, (raw: string, token, category) => {
+  if (category === SimpleKey.name) {
+    return raw;
+  }
+
   const intString = raw.replace(/_/g, '');
   const digits = intString.slice(2);
   const radix = getRadix(raw);

@@ -18,6 +18,7 @@ export const DecIntWithOptionalMinus = createToken({
   name: 'DecIntWithOptionalMinus',
   pattern: decIntWithOptionalMinus,
   categories: [DecimalInteger, UnquotedKey],
+  longer_alt: UnquotedKey,
 });
 
 registerTokenInterpreter(DecIntWithOptionalMinus, (raw, token, category) => {

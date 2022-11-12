@@ -17,25 +17,33 @@ bare-key = "value"
 
 it('should support integer keys', () => {
   const input = `1234 = "value"
--1234 = "value"
-_12_34_ = "value"`;
+0xDEADBEEF = "value"
+0o755 = "value"
+0b11010110 = "value"`;
   const result = load(input);
 
   expect(result).toEqual({
     '1234': 'value',
-    '-1234': 'value',
-    _12_34_: 'value',
+    '0xDEADBEEF': 'value',
+    '0o755': 'value',
+    '0b11010110': 'value',
   });
 });
 
 it('should support integer keys with leading underscores or dashes', () => {
   const input = `_1234 = "value"
--1234 = "value"`;
+-1234 = "value"
+-0xDEADBEEF = "value"
+--0o755 = "value"
+--0b110-10110 = "value"`;
   const result = load(input);
 
   expect(result).toEqual({
     _1234: 'value',
     '-1234': 'value',
+    '-0xDEADBEEF': 'value',
+    '--0o755': 'value',
+    '--0b110-10110': 'value',
   });
 });
 

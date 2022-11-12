@@ -1,28 +1,14 @@
 import { createToken } from 'chevrotain';
-import { generateValuePattern } from './utils';
 import { registerTokenInterpreter } from './tokenInterpreters';
 import { decimalInteger } from './patterns';
 import { Integer } from './Integer';
+import { Float } from './Float';
 
 export const DecimalInteger = createToken({
   name: 'DecimalInteger',
-  pattern: generateValuePattern(decimalInteger),
-  start_chars_hint: [
-    '-',
-    '+',
-    '0',
-    '1',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-    '9',
-  ],
-  line_breaks: false,
+  pattern: decimalInteger,
   categories: [Integer],
+  longer_alt: Float,
 });
 
 registerTokenInterpreter(DecimalInteger, (raw: string) => {

@@ -1,7 +1,7 @@
 import { decimalInteger, digit, minus, plus, underscore } from './patterns';
 import { createToken } from 'chevrotain';
-import { generateValuePattern } from './utils';
 import { registerTokenInterpreter } from './tokenInterpreters';
+import { generateValuePattern } from './utils';
 import XRegExp = require('xregexp');
 
 const floatIntPart = decimalInteger;
