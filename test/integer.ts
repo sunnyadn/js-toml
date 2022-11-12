@@ -79,15 +79,6 @@ bin2 = 0b000000001`;
   expect(result).toEqual({ hex4: 3735928559, oct3: 342391, bin2: 1 });
 });
 
-it('should support leading - in hexadecimal octal and binary integers', () => {
-  const input = `hex5 = -0xDEADBEEF
-oct4 = -0o01234567
-bin3 = -0b11010110`;
-  const result = load(input);
-
-  expect(result).toEqual({ hex5: -3735928559, oct4: -342391, bin3: -214 });
-});
-
 it('should support hexadecimal consisting both cases of letters', () => {
   const input = `hex6 = 0xDEaDBEEF
 hex7 = 0xDEaD_beef`;
@@ -115,21 +106,21 @@ it('should support 64-bit signed integers', () => {
   const input = `int15 = 9223372036854775807
 int16 = -9223372036854775808
 int17 = 0x7FFFFFFFFFFFFFFF
-int18 = -0x8000000000000000
+int18 = 0x8000000000000000
 int19 = 0o777777777777777777777
-int20 = -0o1000000000000000000000
+int20 = 0o1000000000000000000000
 int21 = 0b0111111111111111111111111111111111111111111111111111111111111111
-int22 = -0b1000000000000000000000000000000000000000000000000000000000000000`;
+int22 = 0b1000000000000000000000000000000000000000000000000000000000000000`;
   const result = load(input);
 
   expect(result).toEqual({
     int15: BigInt('9223372036854775807'),
     int16: BigInt('-9223372036854775808'),
     int17: BigInt('9223372036854775807'),
-    int18: BigInt('-9223372036854775808'),
+    int18: BigInt('9223372036854775808'),
     int19: BigInt('9223372036854775807'),
-    int20: BigInt('-9223372036854775808'),
+    int20: BigInt('9223372036854775808'),
     int21: BigInt('9223372036854775807'),
-    int22: BigInt('-9223372036854775808'),
+    int22: BigInt('9223372036854775808'),
   });
 });

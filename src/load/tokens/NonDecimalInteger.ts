@@ -1,6 +1,6 @@
 import { createToken } from 'chevrotain';
 import { generateValuePattern } from './utils';
-import { hexDigit, minus, underscore } from './patterns';
+import { hexDigit, underscore } from './patterns';
 import { registerTokenInterpreter } from './tokenInterpreters';
 import { Integer } from './Integer';
 import XRegExp = require('xregexp');
@@ -37,7 +37,7 @@ const binaryInteger = XRegExp.build(
   }
 );
 
-const unsignedNonDecimalInteger = XRegExp.build(
+const nonDecimalInteger = XRegExp.build(
   '{{hexInteger}}|{{octalInteger}}|{{binaryInteger}}',
   {
     hexInteger,
@@ -46,69 +46,46 @@ const unsignedNonDecimalInteger = XRegExp.build(
   }
 );
 
-const nonDecimalInteger = XRegExp.build(
-  '{{minus}}?{{unsignedNonDecimalInteger}}',
-  { minus, unsignedNonDecimalInteger }
-);
-
 export const NonDecimalInteger = createToken({
   name: 'NonDecimalInteger',
   pattern: generateValuePattern(nonDecimalInteger),
-  start_chars_hint: ['0', '-'],
+  start_chars_hint: ['0'],
   line_breaks: false,
   categories: [Integer],
 });
 
 const parseBigInt = (string: string, radix: number): bigint => {
-  const negative = string[0] === '-';
-  const digits = negative ? string.slice(1) : string;
   let result = BigInt(0);
-  for (let i = 0; i < digits.length; i++) {
-    const char = digits[i];
+  for (let i = 0; i < string.length; i++) {
+    const char = string[i];
     const digit = parseInt(char, radix);
     result = result * BigInt(radix) + BigInt(digit);
   }
 
-  return negative ? -result : result;
+  return result;
 };
 
-const getPrefixAndDigits = (raw: string): [string, string] => {
-  let prefix, digits;
-
-  const negative = raw[0] === '-';
-  if (negative) {
-    prefix = raw.slice(1, 3);
-    digits = '-' + raw.slice(3);
-  } else {
-    prefix = raw.slice(0, 2);
-    digits = raw.slice(2);
+const getRadix = (raw: string): number => {
+  if (raw.startsWith('0x')) {
+    return 16;
+  } else if (raw.startsWith('0o')) {
+    return 8;
+  } else if (raw.startsWith('0b')) {
+    return 2;
   }
 
-  return [prefix, digits];
-};
-
-const getRadix = (prefix: string): number => {
-  let radix = 0;
-  if (prefix === '0x') {
-    radix = 16;
-  } else if (prefix === '0o') {
-    radix = 8;
-  } else if (prefix === '0b') {
-    radix = 2;
-  }
-
-  return radix;
+  return 10;
 };
 
 registerTokenInterpreter(NonDecimalInteger, (raw: string) => {
   const intString = raw.replace(/_/g, '');
-  const [prefix, digits] = getPrefixAndDigits(intString);
-  const radix = getRadix(prefix);
+  const digits = intString.slice(2);
+  const radix = getRadix(raw);
 
   const int = parseInt(digits, radix);
 
   if (Number.isSafeInteger(int)) {
-    return int || 0;
+    return int;
   }
 
   return parseBigInt(digits, radix);
