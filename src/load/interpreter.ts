@@ -107,10 +107,7 @@ export class Interpreter extends BaseCstVisitor {
 
   stdTable(ctx, root) {
     const keys = this.visit(ctx.key);
-    const table = {};
-    this.assignValue(keys, table, root);
-
-    return table;
+    return this.assignValue(keys, null, root);
   }
 
   private interpret(ctx, ...candidates: TokenType[]) {
@@ -127,11 +124,11 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   private assignPrimitiveValue(key, value, object) {
-    const realKey = typeof key === 'string' ? key : key[0];
-    if (object[realKey]) {
+    if (object[key]) {
       throw new DuplicateKeyError();
     }
     object[key] = value;
+    return object;
   }
 
   private tryCreatingObject(key, object) {
@@ -139,16 +136,20 @@ export class Interpreter extends BaseCstVisitor {
     if (typeof object[key] !== 'object') {
       throw new DuplicateKeyError();
     }
+
+    return object[key];
   }
 
   private assignValue(keys, value, object) {
     const [first, ...rest] = keys;
     if (rest.length > 0) {
       this.tryCreatingObject(first, object);
-      this.assignValue(rest, value, object[first]);
-    } else {
-      this.assignPrimitiveValue(first, value, object);
+      return this.assignValue(rest, value, object[first]);
+    } else if (value === null) {
+      return this.tryCreatingObject(first, object);
     }
+
+    return this.assignPrimitiveValue(first, value, object);
   }
 }
 
