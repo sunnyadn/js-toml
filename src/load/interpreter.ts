@@ -2,18 +2,12 @@ import { parser } from './parser';
 import { InterpreterError } from './exception';
 import { TokenType } from 'chevrotain';
 import { tokenInterpreters } from './tokens/tokenInterpreters';
-import {
-  BasicString,
-  Boolean,
-  DecimalInteger,
-  LiteralString,
-  MultiLineBasicString,
-  MultiLineLiteralString,
-  NonDecimalInteger,
-  UnquotedKey,
-} from './tokens';
+import { Boolean } from './tokens';
 import { Float } from './tokens/Float';
 import { DateTime } from './tokens/DateTime';
+import { SimpleKey } from './tokens/SimpleKey';
+import { TomlString } from './tokens/TomlString';
+import { Integer } from './tokens/Integer';
 
 class DuplicateKeyError extends Error {}
 
@@ -38,11 +32,12 @@ export class Interpreter extends BaseCstVisitor {
   keyValue(ctx, object) {
     const keys = this.visit(ctx.key);
     const value = this.visit(ctx.value);
-    const rawKey = keys.join('.');
+
     try {
       this.assignValue(keys, value, object);
     } catch (e) {
       if (e instanceof DuplicateKeyError) {
+        const rawKey = keys.join('.');
         throw new InterpreterError(`Cannot assign value to key '${rawKey}'`);
       }
       throw e;
@@ -53,27 +48,12 @@ export class Interpreter extends BaseCstVisitor {
     if (ctx.dottedKey) {
       return this.visit(ctx.dottedKey);
     } else {
-      return this.visit(ctx.simpleKey);
+      return [this.interpret(ctx, SimpleKey)];
     }
-  }
-
-  simpleKey(ctx) {
-    let key;
-    if (ctx.quotedKey) {
-      key = this.visit(ctx.quotedKey);
-    } else {
-      key = this.interpret(ctx, UnquotedKey);
-    }
-
-    return [key];
   }
 
   dottedKey(ctx) {
-    return ctx.simpleKey.map((simpleKey) => this.visit(simpleKey));
-  }
-
-  quotedKey(ctx) {
-    return this.interpret(ctx, BasicString, LiteralString);
+    return this.interpret(ctx, SimpleKey);
   }
 
   inlineTableKeyValues(ctx, object) {
@@ -90,27 +70,13 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   value(ctx) {
-    if (ctx.string) {
-      return this.visit(ctx.string);
-    } else if (ctx.array) {
+    if (ctx.array) {
       return this.visit(ctx.array);
     } else if (ctx.inlineTable) {
       return this.visit(ctx.inlineTable);
-    } else if (ctx.integer) {
-      return this.visit(ctx.integer);
     }
 
-    return this.interpret(ctx, Float, Boolean, DateTime);
-  }
-
-  string(ctx) {
-    return this.interpret(
-        ctx,
-        MultiLineBasicString,
-        MultiLineLiteralString,
-        BasicString,
-        LiteralString
-    );
+    return this.interpret(ctx, TomlString, Float, Boolean, DateTime, Integer);
   }
 
   arrayValues(ctx) {
@@ -125,14 +91,14 @@ export class Interpreter extends BaseCstVisitor {
     return [];
   }
 
-  integer(ctx) {
-    return this.interpret(ctx, DecimalInteger, NonDecimalInteger);
-  }
-
   private interpret(ctx, ...candidates: TokenType[]) {
-    for (const token of candidates) {
-      if (ctx[token.name]) {
-        return tokenInterpreters[token.name](ctx[token.name][0].image);
+    for (const type of candidates) {
+      if (ctx[type.name]) {
+        const result = ctx[type.name].map((token) =>
+          tokenInterpreters[type.name](token.image, token, type.name)
+        );
+
+        return result.length === 1 ? result[0] : result;
       }
     }
     return null;

@@ -2,6 +2,7 @@ import { createToken } from 'chevrotain';
 import { apostrophe, newline, nonAscii } from './patterns';
 import { registerTokenInterpreter } from './tokenInterpreters';
 import { getMultiLineContent } from './utils';
+import { TomlString } from './TomlString';
 import XRegExp = require('xregexp');
 
 const multiLineLiteralStringDelimiter = XRegExp.build('{{apostrophe}}{3}', {
@@ -41,6 +42,7 @@ export const MultiLineLiteralString = createToken({
     }
   ),
   label: "'''MultiLineLiteralString'''",
+  categories: [TomlString],
 });
 
 registerTokenInterpreter(MultiLineLiteralString, getMultiLineContent);

@@ -34,7 +34,7 @@ export const plus = /\+/;
 
 const digit1_9 = /[1-9]/;
 
-const unsignedDecimalInteger = XRegExp.build(
+export const unsignedDecimalInteger = XRegExp.build(
   '{{digit1_9}}({{digit}}|{{underscore}}{{digit}})+|{{digit}}',
   {
     digit1_9,

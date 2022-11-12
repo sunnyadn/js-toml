@@ -1,17 +1,10 @@
 import { CstParser } from 'chevrotain';
 import {
   allTokens,
-  BasicString,
   Boolean,
-  DecimalInteger,
   DotSeparator,
   KeyValueSeparator,
-  LiteralString,
-  MultiLineBasicString,
-  MultiLineLiteralString,
   Newline,
-  NonDecimalInteger,
-  UnquotedKey,
 } from './tokens';
 import { Float } from './tokens/Float';
 import { DateTime } from './tokens/DateTime';
@@ -20,62 +13,56 @@ import { ArrayClose } from './tokens/ArrayClose';
 import { Comma } from './tokens/Comma';
 import { InlineTableOpen } from './tokens/InlineTableOpen';
 import { InlineTableClose } from './tokens/InlineTableClose';
+import { SimpleKey } from './tokens/SimpleKey';
+import { TomlString } from './tokens/TomlString';
+import { Integer } from './tokens/Integer';
 
 class Parser extends CstParser {
-  private quotedKey = this.RULE('quotedKey', () => {
-    this.OR([
-      { ALT: () => this.CONSUME(BasicString) },
-      { ALT: () => this.CONSUME(LiteralString) },
-    ]);
-  });
-  private simpleKey = this.RULE('simpleKey', () => {
-    this.OR([
-      { ALT: () => this.SUBRULE(this.quotedKey) },
-      { ALT: () => this.CONSUME(UnquotedKey) },
-    ]);
-  });
   private dottedKey = this.RULE('dottedKey', () => {
-    this.SUBRULE(this.simpleKey);
+    this.CONSUME(SimpleKey);
     this.AT_LEAST_ONE(() => {
       this.CONSUME(DotSeparator);
-      this.SUBRULE1(this.simpleKey);
+      this.CONSUME1(SimpleKey);
     });
   });
   private key = this.RULE('key', () => {
     this.OR([
       { ALT: () => this.SUBRULE(this.dottedKey) },
-      { ALT: () => this.SUBRULE(this.simpleKey) },
+      { ALT: () => this.CONSUME(SimpleKey) },
     ]);
-  });
-  private string = this.RULE('string', () => {
-    this.OR([
-      { ALT: () => this.CONSUME(MultiLineBasicString) },
-      { ALT: () => this.CONSUME(BasicString) },
-      { ALT: () => this.CONSUME(MultiLineLiteralString) },
-      { ALT: () => this.CONSUME(LiteralString) },
-    ]);
-  });
-  private integer = this.RULE('integer', () => {
-    this.OR([
-      { ALT: () => this.CONSUME(DecimalInteger) },
-      { ALT: () => this.CONSUME(NonDecimalInteger) },
-    ]);
-  });
-  private inlineTable = this.RULE('inlineTable', () => {
-    this.CONSUME(InlineTableOpen);
-    this.OPTION(() => this.SUBRULE(this.inlineTableKeyValues));
-    this.CONSUME(InlineTableClose);
-  });
-  private keyValue = this.RULE('keyValue', () => {
-    this.SUBRULE(this.key);
-    this.CONSUME(KeyValueSeparator);
-    this.SUBRULE(this.value);
   });
   private inlineTableKeyValues = this.RULE('inlineTableKeyValues', () => {
     this.MANY_SEP({
       SEP: Comma,
       DEF: () => this.SUBRULE(this.keyValue),
     });
+  });
+  private inlineTable = this.RULE('inlineTable', () => {
+    this.CONSUME(InlineTableOpen);
+    this.OPTION(() => this.SUBRULE(this.inlineTableKeyValues));
+    this.CONSUME(InlineTableClose);
+  });
+  private array = this.RULE('array', () => {
+    this.CONSUME(ArrayOpen);
+    this.MANY(() => this.CONSUME(Newline));
+    this.OPTION(() => this.SUBRULE(this.arrayValues));
+    this.CONSUME(ArrayClose);
+  });
+  private value = this.RULE('value', () => {
+    this.OR([
+      { ALT: () => this.CONSUME(TomlString) },
+      { ALT: () => this.CONSUME(Boolean) },
+      { ALT: () => this.SUBRULE(this.array) },
+      { ALT: () => this.SUBRULE(this.inlineTable) },
+      { ALT: () => this.CONSUME(DateTime) },
+      { ALT: () => this.CONSUME(Float) },
+      { ALT: () => this.CONSUME(Integer) },
+    ]);
+  });
+  private keyValue = this.RULE('keyValue', () => {
+    this.SUBRULE(this.key);
+    this.CONSUME(KeyValueSeparator);
+    this.SUBRULE(this.value);
   });
   private arrayValues = this.RULE('arrayValues', () => {
     this.SUBRULE(this.value);
@@ -94,23 +81,6 @@ class Parser extends CstParser {
         }
       },
     });
-  });
-  private array = this.RULE('array', () => {
-    this.CONSUME(ArrayOpen);
-    this.MANY(() => this.CONSUME(Newline));
-    this.OPTION(() => this.SUBRULE(this.arrayValues));
-    this.CONSUME(ArrayClose);
-  });
-  private value = this.RULE('value', () => {
-    this.OR([
-      { ALT: () => this.SUBRULE(this.string) },
-      { ALT: () => this.CONSUME(Boolean) },
-      { ALT: () => this.SUBRULE(this.array) },
-      { ALT: () => this.SUBRULE(this.inlineTable) },
-      { ALT: () => this.CONSUME(DateTime) },
-      { ALT: () => this.CONSUME(Float) },
-      { ALT: () => this.SUBRULE(this.integer) },
-    ]);
   });
   private expression = this.RULE('expression', () => {
     this.SUBRULE(this.keyValue);

@@ -2,6 +2,7 @@ import { createToken } from 'chevrotain';
 import { generateValuePattern } from './utils';
 import { hexDigit, minus, underscore } from './patterns';
 import { registerTokenInterpreter } from './tokenInterpreters';
+import { Integer } from './Integer';
 import XRegExp = require('xregexp');
 
 const hexPrefix = /0x/;
@@ -55,6 +56,7 @@ export const NonDecimalInteger = createToken({
   pattern: generateValuePattern(nonDecimalInteger),
   start_chars_hint: ['0', '-'],
   line_breaks: false,
+  categories: [Integer],
 });
 
 const parseBigInt = (string: string, radix: number): bigint => {

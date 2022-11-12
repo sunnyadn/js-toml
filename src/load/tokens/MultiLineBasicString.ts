@@ -9,6 +9,7 @@ import {
 } from './patterns';
 import { registerTokenInterpreter } from './tokenInterpreters';
 import { getMultiLineContent, unescapeString } from './utils';
+import { TomlString } from './TomlString';
 import XRegExp = require('xregexp');
 
 const multiLineBasicStringDelimiter = XRegExp.build('{{quotationMark}}{3}', {
@@ -72,6 +73,7 @@ export const MultiLineBasicString = createToken({
     }
   ),
   label: '"""MultiLineBasicString"""',
+  categories: [TomlString],
 });
 
 const skipWhitespaceIfFindBackslash = (string) =>

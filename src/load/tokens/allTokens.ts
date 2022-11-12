@@ -18,6 +18,7 @@ import { Comma } from './Comma';
 import { ArrayClose } from './ArrayClose';
 import { InlineTableOpen } from './InlineTableOpen';
 import { InlineTableClose } from './InlineTableClose';
+import { DecIntWithOptionalMinus } from './DecIntWithOptionalMinus';
 
 export const allTokens = [
   WhiteSpace,
@@ -30,6 +31,7 @@ export const allTokens = [
   Float,
   DateTime,
   NonDecimalInteger,
+  DecIntWithOptionalMinus,
   DecimalInteger,
   UnquotedKey,
   KeyValueSeparator,

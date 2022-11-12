@@ -49,3 +49,17 @@ empty_nested_array = [ [] ]`;
     empty_nested_array: [[]],
   });
 });
+
+it('should support arrays spanning multiple lines', () => {
+  const input = `integers2 = [
+  1, 2, 3
+]
+
+integers3 = [
+  1,
+  2, # this is ok
+]`;
+  const result = load(input);
+
+  expect(result).toEqual({ integers2: [1, 2, 3], integers3: [1, 2] });
+});

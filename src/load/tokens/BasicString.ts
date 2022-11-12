@@ -2,6 +2,8 @@ import { createToken } from 'chevrotain';
 import { escaped, nonAscii, quotationMark, whiteSpaceChar } from './patterns';
 import { registerTokenInterpreter } from './tokenInterpreters';
 import { unescapeString } from './utils';
+import { QuotedKey } from './QuotedKey';
+import { TomlString } from './TomlString';
 import XRegExp = require('xregexp');
 
 const basicUnescaped = XRegExp.build(
@@ -24,6 +26,7 @@ export const BasicString = createToken({
     basicChar,
   }),
   label: '"BasicString"',
+  categories: [QuotedKey, TomlString],
 });
 
 registerTokenInterpreter(BasicString, (raw) => {

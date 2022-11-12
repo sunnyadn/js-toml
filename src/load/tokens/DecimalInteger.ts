@@ -2,6 +2,7 @@ import { createToken } from 'chevrotain';
 import { generateValuePattern } from './utils';
 import { registerTokenInterpreter } from './tokenInterpreters';
 import { decimalInteger } from './patterns';
+import { Integer } from './Integer';
 
 export const DecimalInteger = createToken({
   name: 'DecimalInteger',
@@ -21,6 +22,7 @@ export const DecimalInteger = createToken({
     '9',
   ],
   line_breaks: false,
+  categories: [Integer],
 });
 
 registerTokenInterpreter(DecimalInteger, (raw: string) => {
