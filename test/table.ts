@@ -45,3 +45,11 @@ it('should support whitespaces around table keys', () => {
     j: { ʞ: { l: {} } },
   });
 });
+
+it('should ignore indentation', () => {
+  const input = `  [a]
+  b = 1`;
+  const result = load(input);
+
+  expect(result).toEqual({ a: { b: 1 } });
+});
