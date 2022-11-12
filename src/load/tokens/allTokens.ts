@@ -4,7 +4,6 @@ import { MultiLineBasicString } from './MultiLineBasicString';
 import { MultiLineLiteralString } from './MultiLineLiteralString';
 import { BasicString } from './BasicString';
 import { LiteralString } from './LiteralString';
-import { Boolean } from './Boolean';
 import { NonDecimalInteger } from './NonDecimalInteger';
 import { DecimalInteger } from './DecimalInteger';
 import { UnquotedKey } from './UnquotedKey';
@@ -19,6 +18,8 @@ import { ArrayClose } from './ArrayClose';
 import { InlineTableOpen } from './InlineTableOpen';
 import { InlineTableClose } from './InlineTableClose';
 import { DecIntWithOptionalMinus } from './DecIntWithOptionalMinus';
+import { True } from './True';
+import { False } from './False';
 
 export const allTokens = [
   WhiteSpace,
@@ -27,7 +28,8 @@ export const allTokens = [
   MultiLineLiteralString,
   BasicString,
   LiteralString,
-  Boolean,
+  True,
+  False,
   DateTime,
   Float,
   NonDecimalInteger,

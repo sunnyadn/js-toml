@@ -1,20 +1,12 @@
-import { createToken } from 'chevrotain';
-import { UnquotedKey } from './UnquotedKey';
-import { registerTokenInterpreter } from './tokenInterpreters';
-import XRegExp = require('xregexp');
-
-const truePattern = /true/;
-const falsePattern = /false/;
-
-const boolean = XRegExp.build('{{truePattern}}|{{falsePattern}}', {
-  truePattern,
-  falsePattern,
-});
+import { createToken, Lexer } from 'chevrotain';
+import {
+  defaultFallbackInterpreter,
+  registerTokenInterpreter,
+} from './tokenInterpreters';
 
 export const Boolean = createToken({
   name: 'Boolean',
-  pattern: boolean,
-  longer_alt: UnquotedKey,
+  pattern: Lexer.NA,
 });
 
-registerTokenInterpreter(Boolean, (raw) => raw === 'true');
+registerTokenInterpreter(Boolean, defaultFallbackInterpreter);

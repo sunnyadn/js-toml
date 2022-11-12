@@ -192,3 +192,18 @@ it('should support dotted keys only containing digits', () => {
 
   expect(result).toEqual({ '3': { '14159': 'pi' } });
 });
+
+it('should support true and false as keys', () => {
+  const input = `true = "yes"
+false = "no"
+trueValue = true
+falseValue = false`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    true: 'yes',
+    false: 'no',
+    trueValue: true,
+    falseValue: false,
+  });
+});
