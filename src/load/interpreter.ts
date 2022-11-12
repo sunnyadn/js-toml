@@ -20,16 +20,20 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   toml(ctx) {
-    const result = {};
-    ctx.expression?.forEach((expression) => this.visit(expression, result));
-    return result;
+    const root = {};
+    let current = root;
+    ctx.expression?.forEach(
+      (expression) => (current = this.visit(expression, { current, root }))
+    );
+    return root;
   }
 
-  expression(ctx, root) {
+  expression(ctx, { current, root }) {
     if (ctx.keyValue) {
-      this.visit(ctx.keyValue, root);
+      this.visit(ctx.keyValue, current);
+      return current;
     } else if (ctx.table) {
-      this.visit(ctx.table, root);
+      return this.visit(ctx.table, root);
     }
   }
 
@@ -97,20 +101,23 @@ export class Interpreter extends BaseCstVisitor {
 
   table(ctx, root) {
     if (ctx.stdTable) {
-      this.visit(ctx.stdTable, root);
+      return this.visit(ctx.stdTable, root);
     }
   }
 
   stdTable(ctx, root) {
     const keys = this.visit(ctx.key);
-    this.assignValue(keys, {}, root);
+    const table = {};
+    this.assignValue(keys, table, root);
+
+    return table;
   }
 
   private interpret(ctx, ...candidates: TokenType[]) {
     for (const type of candidates) {
       if (ctx[type.name]) {
         const result = ctx[type.name].map((token) =>
-            tokenInterpreters[type.name](token.image, token, type.name)
+          tokenInterpreters[type.name](token.image, token, type.name)
         );
 
         return result.length === 1 ? result[0] : result;
