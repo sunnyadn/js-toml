@@ -22,3 +22,11 @@ key2 = 456`;
     'table-2': { key1: 'another string', key2: 456 },
   });
 });
+
+it('should support tables with dots and quotes in their names', () => {
+  const input = `[dog."tater.man"]
+type.name = "pug"`;
+  const result = load(input);
+
+  expect(result).toEqual({ dog: { 'tater.man': { type: { name: 'pug' } } } });
+});
