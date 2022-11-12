@@ -26,7 +26,11 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   expression(ctx, root) {
-    this.visit(ctx.keyValue, root);
+    if (ctx.keyValue) {
+      this.visit(ctx.keyValue, root);
+    } else if (ctx.table) {
+      this.visit(ctx.table, root);
+    }
   }
 
   keyValue(ctx, object) {
@@ -91,11 +95,22 @@ export class Interpreter extends BaseCstVisitor {
     return [];
   }
 
+  table(ctx, root) {
+    if (ctx.stdTable) {
+      this.visit(ctx.stdTable, root);
+    }
+  }
+
+  stdTable(ctx, root) {
+    const keys = this.visit(ctx.key);
+    this.assignValue(keys, {}, root);
+  }
+
   private interpret(ctx, ...candidates: TokenType[]) {
     for (const type of candidates) {
       if (ctx[type.name]) {
         const result = ctx[type.name].map((token) =>
-          tokenInterpreters[type.name](token.image, token, type.name)
+            tokenInterpreters[type.name](token.image, token, type.name)
         );
 
         return result.length === 1 ? result[0] : result;

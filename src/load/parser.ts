@@ -17,6 +17,8 @@ import { SimpleKey } from './tokens/SimpleKey';
 import { TomlString } from './tokens/TomlString';
 import { Integer } from './tokens/Integer';
 import { InlineTableSep } from './tokens/InlineTableSep';
+import { StdTableClose } from './tokens/StdTableClose';
+import { StdTableOpen } from './tokens/StdTableOpen';
 
 class Parser extends CstParser {
   private dottedKey = this.RULE('dottedKey', () => {
@@ -32,6 +34,22 @@ class Parser extends CstParser {
       { ALT: () => this.CONSUME(SimpleKey) },
     ]);
   });
+  private inlineTable = this.RULE('inlineTable', () => {
+    this.CONSUME(InlineTableOpen);
+    this.OPTION(() => this.SUBRULE(this.inlineTableKeyValues));
+    this.CONSUME(InlineTableClose);
+  });
+  private value = this.RULE('value', () => {
+    this.OR([
+      { ALT: () => this.CONSUME(TomlString) },
+      { ALT: () => this.CONSUME(Boolean) },
+      { ALT: () => this.SUBRULE(this.array) },
+      { ALT: () => this.SUBRULE(this.inlineTable) },
+      { ALT: () => this.CONSUME(DateTime) },
+      { ALT: () => this.CONSUME(Float) },
+      { ALT: () => this.CONSUME(Integer) },
+    ]);
+  });
   private keyValue = this.RULE('keyValue', () => {
     this.SUBRULE(this.key);
     this.CONSUME(KeyValueSeparator);
@@ -42,11 +60,6 @@ class Parser extends CstParser {
       SEP: InlineTableSep,
       DEF: () => this.SUBRULE(this.keyValue),
     });
-  });
-  private inlineTable = this.RULE('inlineTable', () => {
-    this.CONSUME(InlineTableOpen);
-    this.OPTION(() => this.SUBRULE(this.inlineTableKeyValues));
-    this.CONSUME(InlineTableClose);
   });
   private arrayValues = this.RULE('arrayValues', () => {
     this.SUBRULE(this.value);
@@ -67,20 +80,20 @@ class Parser extends CstParser {
     this.OPTION(() => this.SUBRULE(this.arrayValues));
     this.CONSUME(ArrayClose);
   });
-  private value = this.RULE('value', () => {
-    this.OR([
-      { ALT: () => this.CONSUME(TomlString) },
-      { ALT: () => this.CONSUME(Boolean) },
-      { ALT: () => this.SUBRULE(this.array) },
-      { ALT: () => this.SUBRULE(this.inlineTable) },
-      { ALT: () => this.CONSUME(DateTime) },
-      { ALT: () => this.CONSUME(Float) },
-      { ALT: () => this.CONSUME(Integer) },
-    ]);
+  private stdTable = this.RULE('stdTable', () => {
+    this.CONSUME(StdTableOpen);
+    this.SUBRULE(this.key);
+    this.CONSUME(StdTableClose);
+  });
+  private table = this.RULE('table', () => {
+    this.SUBRULE(this.stdTable);
+    // OR ArrayTable
   });
   private expression = this.RULE('expression', () => {
-    this.SUBRULE(this.keyValue);
-    // OR TABLE
+    this.OR([
+      { ALT: () => this.SUBRULE(this.keyValue) },
+      { ALT: () => this.SUBRULE(this.table) },
+    ]);
   });
   toml = this.RULE('toml', () => {
     this.OPTION(() => this.SUBRULE(this.expression));

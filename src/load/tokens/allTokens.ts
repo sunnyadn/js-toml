@@ -24,6 +24,8 @@ import { IgnoredNewline } from './IgnoredNewline';
 import { InlineTableSep } from './InlineTableSep';
 import { SimpleKey } from './SimpleKey';
 import { InlineTableKeyValSep } from './InlineTableKeyValSep';
+import { StdTableClose } from './StdTableClose';
+import { StdTableOpen } from './StdTableOpen';
 
 const keyTokens = [
   WhiteSpace,
@@ -53,7 +55,14 @@ const valueTokens = [
 
 export const allTokens = {
   modes: {
-    [Mode.Key]: [Comment, IgnoredNewline, KeyValueSeparator, ...keyTokens],
+    [Mode.Key]: [
+      Comment,
+      IgnoredNewline,
+      KeyValueSeparator,
+      StdTableOpen,
+      StdTableClose,
+      ...keyTokens,
+    ],
     [Mode.Value]: [...valueTokens, Newline, InlineTableSep, InlineTableClose],
     [Mode.Array]: [...valueTokens, IgnoredNewline, ArraySep, ArrayClose],
     [Mode.InlineTable]: [...keyTokens, InlineTableKeyValSep],
