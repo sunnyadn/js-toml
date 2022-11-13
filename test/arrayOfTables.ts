@@ -82,3 +82,18 @@ fruits = []
 
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should throw error if define a normal table with the same name as an array of tables', () => {
+  const input = `# INVALID TOML DOC
+[[fruits]]
+name = "apple"
+
+[[fruits.varieties]]
+name = "red delicious"
+
+# INVALID: This table conflicts with the previous array of tables
+[fruits.varieties]
+name = "granny smith"`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});
