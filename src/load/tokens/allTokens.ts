@@ -65,7 +65,7 @@ export const allTokens = {
     ],
     [Mode.Value]: [...valueTokens, Newline, InlineTableSep, InlineTableClose],
     [Mode.Array]: [...valueTokens, IgnoredNewline, ArraySep, ArrayClose],
-    [Mode.InlineTable]: [...keyTokens, InlineTableKeyValSep],
+    [Mode.InlineTable]: [...keyTokens, InlineTableKeyValSep, InlineTableClose],
   },
 
   defaultMode: Mode.Key,

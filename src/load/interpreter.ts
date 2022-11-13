@@ -68,7 +68,9 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   inlineTableKeyValues(ctx, object) {
-    ctx.keyValue.forEach((keyValue) => this.visit(keyValue, object));
+    if (ctx.keyValue) {
+      ctx.keyValue.forEach((keyValue) => this.visit(keyValue, object));
+    }
   }
 
   inlineTable(ctx) {
