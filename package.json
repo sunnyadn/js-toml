@@ -1,8 +1,33 @@
 {
   "name": "js-toml",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.1.0",
+  "description": "A TOML parser for JavaScript/TypeScript, targeting TOML 1.0.0 Spec",
+  "keywords": [
+    "toml",
+    "parser",
+    "javascript",
+    "typescript"
+  ],
+  "homepage": "https://github.com/sunnyadn/js-toml",
+  "bugs": {
+    "url": "https://github.com/sunnyadn/js-toml/issues",
+    "email": "sunnyadn@foxmail.com"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Sunny Yang",
+    "email": "sunnyadn@foxmail.com",
+    "url": "https://www.linkedin.com/in/sunnyadn/"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sunnyadn/js-toml.git"
+  },
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "test": "jest",
@@ -11,9 +36,6 @@
     "lint": "prettier --check . && eslint .",
     "lint:fix": "prettier --write . && eslint . --fix"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@types/jest": "^29.2.1",
     "@types/node": "^18.11.9",
