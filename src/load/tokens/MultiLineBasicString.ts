@@ -74,6 +74,7 @@ export const MultiLineBasicString = createToken({
   ),
   label: '"""MultiLineBasicString"""',
   categories: [TomlString],
+  line_breaks: true,
 });
 
 const skipWhitespaceIfFindBackslash = (string) =>

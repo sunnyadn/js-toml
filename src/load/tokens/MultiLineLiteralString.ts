@@ -43,6 +43,7 @@ export const MultiLineLiteralString = createToken({
   ),
   label: "'''MultiLineLiteralString'''",
   categories: [TomlString],
+  line_breaks: true,
 });
 
 registerTokenInterpreter(MultiLineLiteralString, getMultiLineContent);
