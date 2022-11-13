@@ -13,19 +13,18 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ ubuntu-latest, windows-latest ]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-        
+
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: pnpm/action-setup@v2
-    - name: Use Node.js on ${{ matrix.os }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: lts/*
-        cache: 'pnpm'
-    - run: npm ci
-    - run: pnpm install --frozen-lockfile
-    - run: pnpm test
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+      - name: Use Node.js on ${{ matrix.os }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
