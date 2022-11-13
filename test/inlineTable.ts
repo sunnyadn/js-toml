@@ -6,3 +6,19 @@ it('should support empty inline tables', () => {
 
   expect(result).toEqual({ a: {} });
 });
+
+it('should support all value types in inline tables', () => {
+  const input = `a = { b = 1, c = "2", d = true, e = 1979-05-27T07:32:00Z, f = [1, 2, 3], g = { h = 4 } }`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    a: {
+      b: 1,
+      c: '2',
+      d: true,
+      e: new Date(Date.UTC(1979, 4, 27, 7, 32, 0)),
+      f: [1, 2, 3],
+      g: { h: 4 },
+    },
+  });
+});
