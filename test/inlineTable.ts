@@ -56,3 +56,10 @@ string""" }`;
 
   expect(result).toEqual({ a: { b: 'multi\nline\nstring' } });
 });
+
+it('should throw error if adding keys outside the inline table', () => {
+  const input = `[product]
+type = { name = "Nail" }
+type.edible = false  # INVALID`;
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});

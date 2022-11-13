@@ -14,6 +14,7 @@ class DuplicateKeyError extends Error {}
 const BaseCstVisitor = parser.getBaseCstVisitorConstructor();
 
 const tableDeclared = Symbol('tableDeclared');
+const notEditable = Symbol('notEditable');
 
 export class Interpreter extends BaseCstVisitor {
   constructor() {
@@ -74,7 +75,7 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   inlineTable(ctx) {
-    const result = {};
+    const result = { [notEditable]: true };
     if (ctx.inlineTableKeyValues) {
       this.visit(ctx.inlineTableKeyValues, result);
     }
@@ -126,9 +127,7 @@ export class Interpreter extends BaseCstVisitor {
 
   private cleanInternalProperties(object) {
     for (const symbol of Object.getOwnPropertySymbols(object)) {
-      if (symbol === tableDeclared) {
-        delete object[symbol];
-      }
+      delete object[symbol];
     }
     for (const key in object) {
       if (typeof object[key] === 'object') {
@@ -166,7 +165,8 @@ export class Interpreter extends BaseCstVisitor {
     if (object[key]) {
       if (
         typeof object[key] !== 'object' ||
-        (!ignoreDeclared && object[key][tableDeclared])
+        (!ignoreDeclared && object[key][tableDeclared]) ||
+        object[key][notEditable]
       ) {
         throw new DuplicateKeyError();
       }
