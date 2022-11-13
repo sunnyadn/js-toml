@@ -91,30 +91,6 @@
   },
   {
     "type": "Rule",
-    "name": "keyValue",
-    "orgText": "",
-    "definition": [
-      {
-        "type": "NonTerminal",
-        "name": "key",
-        "idx": 0
-      },
-      {
-        "type": "Terminal",
-        "name": "KeyValueSeparator",
-        "label": "=",
-        "idx": 0,
-        "pattern": "="
-      },
-      {
-        "type": "NonTerminal",
-        "name": "value",
-        "idx": 0
-      }
-    ]
-  },
-  {
-    "type": "Rule",
     "name": "inlineTableKeyValues",
     "orgText": "",
     "definition": [
@@ -167,42 +143,6 @@
         "label": "}",
         "idx": 0,
         "pattern": "}"
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "arrayValues",
-    "orgText": "",
-    "definition": [
-      {
-        "type": "NonTerminal",
-        "name": "value",
-        "idx": 0
-      },
-      {
-        "type": "Repetition",
-        "idx": 0,
-        "definition": [
-          {
-            "type": "Terminal",
-            "name": "Comma",
-            "label": ",",
-            "idx": 0,
-            "pattern": ","
-          },
-          {
-            "type": "Option",
-            "idx": 0,
-            "definition": [
-              {
-                "type": "NonTerminal",
-                "name": "value",
-                "idx": 1
-              }
-            ]
-          }
-        ]
       }
     ]
   },
@@ -333,13 +273,179 @@
   },
   {
     "type": "Rule",
-    "name": "expression",
+    "name": "keyValue",
     "orgText": "",
     "definition": [
       {
         "type": "NonTerminal",
-        "name": "keyValue",
+        "name": "key",
         "idx": 0
+      },
+      {
+        "type": "Terminal",
+        "name": "KeyValueSeparator",
+        "label": "=",
+        "idx": 0,
+        "pattern": "="
+      },
+      {
+        "type": "NonTerminal",
+        "name": "value",
+        "idx": 0
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "arrayValues",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "value",
+        "idx": 0
+      },
+      {
+        "type": "Repetition",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "Comma",
+            "label": ",",
+            "idx": 0,
+            "pattern": ","
+          },
+          {
+            "type": "Option",
+            "idx": 0,
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "value",
+                "idx": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "stdTable",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "StdTableOpen",
+        "label": "[",
+        "idx": 0,
+        "pattern": "\\["
+      },
+      {
+        "type": "NonTerminal",
+        "name": "key",
+        "idx": 0
+      },
+      {
+        "type": "Terminal",
+        "name": "StdTableClose",
+        "label": "]",
+        "idx": 0,
+        "pattern": "]"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "arrayTable",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "ArrayTableOpen",
+        "label": "[[",
+        "idx": 0,
+        "pattern": "\\[\\["
+      },
+      {
+        "type": "NonTerminal",
+        "name": "key",
+        "idx": 0
+      },
+      {
+        "type": "Terminal",
+        "name": "ArrayTableClose",
+        "label": "]]",
+        "idx": 0,
+        "pattern": "]]"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "table",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "Alternation",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Alternative",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "stdTable",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Alternative",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "arrayTable",
+                "idx": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "expression",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "Alternation",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Alternative",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "keyValue",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Alternative",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "table",
+                "idx": 0
+              }
+            ]
+          }
+        ]
       }
     ]
   },
