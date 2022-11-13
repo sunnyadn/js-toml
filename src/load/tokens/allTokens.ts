@@ -26,6 +26,8 @@ import { SimpleKey } from './SimpleKey';
 import { InlineTableKeyValSep } from './InlineTableKeyValSep';
 import { StdTableClose } from './StdTableClose';
 import { StdTableOpen } from './StdTableOpen';
+import { ArrayTableOpen } from './ArrayTableOpen';
+import { ArrayTableClose } from './ArrayTableClose';
 
 const keyTokens = [
   WhiteSpace,
@@ -59,6 +61,8 @@ export const allTokens = {
       Comment,
       IgnoredNewline,
       KeyValueSeparator,
+      ArrayTableOpen,
+      ArrayTableClose,
       StdTableOpen,
       StdTableClose,
       ...keyTokens,

@@ -108,6 +108,8 @@ export class Interpreter extends BaseCstVisitor {
   table(ctx, root) {
     if (ctx.stdTable) {
       return this.visit(ctx.stdTable, root);
+    } else if (ctx.arrayTable) {
+      return this.visit(ctx.arrayTable, root);
     }
   }
 
@@ -123,6 +125,14 @@ export class Interpreter extends BaseCstVisitor {
       }
       throw e;
     }
+  }
+
+  arrayTable(ctx, root) {
+    const keys = this.visit(ctx.key);
+    const array = this.getOrCreateArray(keys, root);
+    const object = {};
+    array.push(object);
+    return object;
   }
 
   private cleanInternalProperties(object) {
@@ -197,6 +207,21 @@ export class Interpreter extends BaseCstVisitor {
       return this.createTable(rest, object[first]);
     }
     return this.tryCreatingObject(first, object, true, false);
+  }
+
+  private getOrCreateArray(keys, object) {
+    const [first, ...rest] = keys;
+    if (rest.length > 0) {
+      this.tryCreatingObject(first, object, false, true);
+      return this.getOrCreateArray(rest, object[first]);
+    }
+
+    if (object[first] && !Array.isArray(object[first])) {
+      throw new DuplicateKeyError();
+    }
+
+    object[first] = object[first] || [];
+    return object[first];
   }
 }
 

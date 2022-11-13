@@ -19,6 +19,8 @@ import { Integer } from './tokens/Integer';
 import { InlineTableSep } from './tokens/InlineTableSep';
 import { StdTableClose } from './tokens/StdTableClose';
 import { StdTableOpen } from './tokens/StdTableOpen';
+import { ArrayTableClose } from './tokens/ArrayTableClose';
+import { ArrayTableOpen } from './tokens/ArrayTableOpen';
 
 class Parser extends CstParser {
   private dottedKey = this.RULE('dottedKey', () => {
@@ -34,10 +36,21 @@ class Parser extends CstParser {
       { ALT: () => this.CONSUME(SimpleKey) },
     ]);
   });
+  private inlineTableKeyValues = this.RULE('inlineTableKeyValues', () => {
+    this.MANY_SEP({
+      SEP: InlineTableSep,
+      DEF: () => this.SUBRULE(this.keyValue),
+    });
+  });
   private inlineTable = this.RULE('inlineTable', () => {
     this.CONSUME(InlineTableOpen);
     this.OPTION(() => this.SUBRULE(this.inlineTableKeyValues));
     this.CONSUME(InlineTableClose);
+  });
+  private array = this.RULE('array', () => {
+    this.CONSUME(ArrayOpen);
+    this.OPTION(() => this.SUBRULE(this.arrayValues));
+    this.CONSUME(ArrayClose);
   });
   private value = this.RULE('value', () => {
     this.OR([
@@ -55,12 +68,6 @@ class Parser extends CstParser {
     this.CONSUME(KeyValueSeparator);
     this.SUBRULE(this.value);
   });
-  private inlineTableKeyValues = this.RULE('inlineTableKeyValues', () => {
-    this.MANY_SEP({
-      SEP: InlineTableSep,
-      DEF: () => this.SUBRULE(this.keyValue),
-    });
-  });
   private arrayValues = this.RULE('arrayValues', () => {
     this.SUBRULE(this.value);
     let havingMore = true;
@@ -75,19 +82,21 @@ class Parser extends CstParser {
       },
     });
   });
-  private array = this.RULE('array', () => {
-    this.CONSUME(ArrayOpen);
-    this.OPTION(() => this.SUBRULE(this.arrayValues));
-    this.CONSUME(ArrayClose);
-  });
   private stdTable = this.RULE('stdTable', () => {
     this.CONSUME(StdTableOpen);
     this.SUBRULE(this.key);
     this.CONSUME(StdTableClose);
   });
+  private arrayTable = this.RULE('arrayTable', () => {
+    this.CONSUME(ArrayTableOpen);
+    this.SUBRULE(this.key);
+    this.CONSUME(ArrayTableClose);
+  });
   private table = this.RULE('table', () => {
-    this.SUBRULE(this.stdTable);
-    // OR ArrayTable
+    this.OR([
+      { ALT: () => this.SUBRULE(this.stdTable) },
+      { ALT: () => this.SUBRULE(this.arrayTable) },
+    ]);
   });
   private expression = this.RULE('expression', () => {
     this.OR([
