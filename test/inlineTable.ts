@@ -63,3 +63,11 @@ type = { name = "Nail" }
 type.edible = false  # INVALID`;
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should throw error if adding keys to an already defined table in an inline table', () => {
+  const input = `[product]
+type.name = "Nail"
+type = { edible = false }  # INVALID`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});
