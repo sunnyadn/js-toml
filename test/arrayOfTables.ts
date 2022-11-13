@@ -97,3 +97,15 @@ name = "granny smith"`;
 
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should throw error if define an array of tables with the same name as a normal table', () => {
+  const input = `[fruits.physical]
+color = "red"
+shape = "round"
+
+# INVALID: This array of tables conflicts with the previous table
+[[fruits.physical]]
+color = "green"`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});
