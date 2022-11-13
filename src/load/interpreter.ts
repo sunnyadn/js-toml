@@ -18,7 +18,6 @@ const tryCreateKey = (operation, message) => {
     if (error instanceof DuplicateKeyError) {
       throw new InterpreterError(message);
     }
-    throw error;
   }
 };
 
