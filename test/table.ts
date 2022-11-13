@@ -88,3 +88,13 @@ apple = "red"
 texture = "smooth"`;
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should support defining tables out-of-order', () => {
+  const input = `# VALID BUT DISCOURAGED
+[fruit.apple]
+[animal]
+[fruit.orange]`;
+  const result = load(input);
+
+  expect(result).toEqual({ fruit: { apple: {}, orange: {} }, animal: {} });
+});
