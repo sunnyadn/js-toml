@@ -1,4 +1,4 @@
-import { load } from '../src';
+import { load, SyntaxParseError } from '../src';
 
 it('should support arrays of tables', () => {
   const input = `[[products]]
@@ -50,10 +50,26 @@ name = "plantain"`;
   const result = load(input);
 
   expect(result).toEqual({
-    fruits: [{
-      name: "apple",
-      physical: {color: "red", shape: "round"},
-      varieties: [{name: "red delicious"}, {name: "granny smith"}]
-    }, {name: "banana", varieties: [{name: "plantain"}]}]
+    fruits: [
+      {
+        name: 'apple',
+        physical: { color: 'red', shape: 'round' },
+        varieties: [{ name: 'red delicious' }, { name: 'granny smith' }],
+      },
+      { name: 'banana', varieties: [{ name: 'plantain' }] },
+    ],
   });
+});
+
+it('should throw error if redefine a table as an array of tables', () => {
+  const input = `# INVALID TOML DOC
+[fruit.physical]  # subtable, but to which parent element should it belong?
+color = "red"
+shape = "round"
+
+[[fruit]]  # parser must throw an error upon discovering that "fruit" is
+           # an array rather than a table
+name = "apple"`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
 });
