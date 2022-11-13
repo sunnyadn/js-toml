@@ -179,3 +179,13 @@ smooth = true`;
     },
   });
 });
+
+it('should throw error when extending table within static arrays', () => {
+  const input = `a = [{ b = 1 }]
+
+# Cannot extend tables within static arrays
+# https://github.com/toml-lang/toml/issues/908
+[a.c]
+foo = 1`;
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});

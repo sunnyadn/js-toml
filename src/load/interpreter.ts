@@ -218,6 +218,9 @@ export class Interpreter extends BaseCstVisitor {
     const [first, ...rest] = keys;
     if (rest.length > 0) {
       if (Array.isArray(object[first])) {
+        if (object[first][notEditable]) {
+          throw new DuplicateKeyError();
+        }
         const toAdd = object[first][object[first].length - 1];
         return this.createTable(rest, toAdd);
       }
