@@ -29,3 +29,8 @@ it('should throw error if an inline table spans multiple lines', () => {
 }`;
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should throw error if any terminating commas are found in inline tables', () => {
+  const input = 'a = { b = 1, }';
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});
