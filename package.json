@@ -31,5 +31,6 @@
   "dependencies": {
     "chevrotain": "^10.4.1",
     "xregexp": "^5.1.1"
-  }
+  },
+  "packageManager": "pnpm@7.15.0"
 }
