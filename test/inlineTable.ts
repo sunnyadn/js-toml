@@ -1,5 +1,18 @@
 import { load, SyntaxParseError } from '../src';
 
+it('should support inline tables', () => {
+  const input = `name = { first = "Tom", last = "Preston-Werner" }
+point = { x = 1, y = 2 }
+animal = { type.name = "pug" }`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    name: { first: 'Tom', last: 'Preston-Werner' },
+    point: { x: 1, y: 2 },
+    animal: { type: { name: 'pug' } },
+  });
+});
+
 it('should support empty inline tables', () => {
   const input = 'a = {}';
   const result = load(input);
