@@ -34,3 +34,12 @@ it('should throw error if any terminating commas are found in inline tables', ()
   const input = 'a = { b = 1, }';
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should support values spanning multiple lines in an inline table', () => {
+  const input = `a = { b = """multi
+line
+string""" }`;
+  const result = load(input);
+
+  expect(result).toEqual({ a: { b: 'multi\nline\nstring' } });
+});
