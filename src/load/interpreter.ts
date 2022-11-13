@@ -191,7 +191,7 @@ export class Interpreter extends BaseCstVisitor {
   private createTable(keys, object) {
     const [first, ...rest] = keys;
     if (rest.length > 0) {
-      this.tryCreatingObject(first, object, false, false);
+      this.tryCreatingObject(first, object, false, true);
       return this.createTable(rest, object[first]);
     }
     return this.tryCreatingObject(first, object, true, false);

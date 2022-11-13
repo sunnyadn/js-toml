@@ -144,3 +144,38 @@ fruit.apple.taste.sweet = true
     fruit: { apple: { color: 'red', taste: { sweet: true } } },
   });
 });
+
+it('should throw error if redefine a table by [table] header', () => {
+  const precondition = `[fruit]
+apple.color = "red"
+apple.taste.sweet = true
+
+`;
+
+  expect(() => load(precondition + '[fruit.apple]  # INVALID')).toThrow(
+    SyntaxParseError
+  );
+  expect(() => load(precondition + '[fruit.apple.taste]  # INVALID')).toThrow(
+    SyntaxParseError
+  );
+});
+
+it('should support defining sub-tables within tables defined via dotted keys', () => {
+  const input = `[fruit]
+apple.color = "red"
+apple.taste.sweet = true
+
+[fruit.apple.texture]  # you can add sub-tables
+smooth = true`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    fruit: {
+      apple: {
+        color: 'red',
+        taste: { sweet: true },
+        texture: { smooth: true },
+      },
+    },
+  });
+});
