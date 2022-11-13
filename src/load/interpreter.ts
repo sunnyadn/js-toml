@@ -13,6 +13,8 @@ class DuplicateKeyError extends Error {}
 
 const BaseCstVisitor = parser.getBaseCstVisitorConstructor();
 
+const tableDeclared = Symbol('tableDeclared');
+
 export class Interpreter extends BaseCstVisitor {
   constructor() {
     super();
@@ -25,6 +27,7 @@ export class Interpreter extends BaseCstVisitor {
     ctx.expression?.forEach(
       (expression) => (current = this.visit(expression, { current, root }))
     );
+    this.cleanInternalProperties(root);
     return root;
   }
 
@@ -107,7 +110,29 @@ export class Interpreter extends BaseCstVisitor {
 
   stdTable(ctx, root) {
     const keys = this.visit(ctx.key);
-    return this.assignValue(keys, null, root);
+
+    try {
+      return this.createTable(keys, root);
+    } catch (e) {
+      if (e instanceof DuplicateKeyError) {
+        const rawKey = keys.join('.');
+        throw new InterpreterError(`Cannot create table '${rawKey}'`);
+      }
+      throw e;
+    }
+  }
+
+  private cleanInternalProperties(object) {
+    for (const symbol of Object.getOwnPropertySymbols(object)) {
+      if (symbol === tableDeclared) {
+        delete object[symbol];
+      }
+    }
+    for (const key in object) {
+      if (typeof object[key] === 'object') {
+        this.cleanInternalProperties(object[key]);
+      }
+    }
   }
 
   private interpret(ctx, ...candidates: TokenType[]) {
@@ -127,14 +152,27 @@ export class Interpreter extends BaseCstVisitor {
     if (object[key]) {
       throw new DuplicateKeyError();
     }
+    if (typeof value === 'object') {
+      value[tableDeclared] = true;
+    }
+
     object[key] = value;
     return object;
   }
 
-  private tryCreatingObject(key, object) {
-    object[key] = object[key] || {};
-    if (typeof object[key] !== 'object') {
-      throw new DuplicateKeyError();
+  private tryCreatingObject(key, object, declareTable, ignoreDeclared) {
+    if (object[key]) {
+      if (
+        typeof object[key] !== 'object' ||
+        (!ignoreDeclared && object[key][tableDeclared])
+      ) {
+        throw new DuplicateKeyError();
+      }
+    } else {
+      object[key] = {};
+      if (declareTable) {
+        object[key][tableDeclared] = true;
+      }
     }
 
     return object[key];
@@ -143,13 +181,20 @@ export class Interpreter extends BaseCstVisitor {
   private assignValue(keys, value, object) {
     const [first, ...rest] = keys;
     if (rest.length > 0) {
-      this.tryCreatingObject(first, object);
+      this.tryCreatingObject(first, object, true, true);
       return this.assignValue(rest, value, object[first]);
-    } else if (value === null) {
-      return this.tryCreatingObject(first, object);
     }
 
     return this.assignPrimitiveValue(first, value, object);
+  }
+
+  private createTable(keys, object) {
+    const [first, ...rest] = keys;
+    if (rest.length > 0) {
+      this.tryCreatingObject(first, object, false, false);
+      return this.createTable(rest, object[first]);
+    }
+    return this.tryCreatingObject(first, object, true, false);
   }
 }
 

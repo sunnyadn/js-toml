@@ -1,4 +1,4 @@
-import { load } from '../src';
+import { load, SyntaxParseError } from '../src';
 
 it('should support table headers', () => {
   const input = '[table]';
@@ -18,8 +18,8 @@ key2 = 456`;
   const result = load(input);
 
   expect(result).toEqual({
-    'table-1': {key1: 'some string', key2: 123},
-    'table-2': {key1: 'another string', key2: 456},
+    'table-1': { key1: 'some string', key2: 123 },
+    'table-2': { key1: 'another string', key2: 456 },
   });
 });
 
@@ -28,7 +28,7 @@ it('should support tables with dots and quotes in their names', () => {
 type.name = "pug"`;
   const result = load(input);
 
-  expect(result).toEqual({dog: {'tater.man': {type: {name: 'pug'}}}});
+  expect(result).toEqual({ dog: { 'tater.man': { type: { name: 'pug' } } } });
 });
 
 it('should support whitespaces around table keys', () => {
@@ -39,10 +39,10 @@ it('should support whitespaces around table keys', () => {
   const result = load(input);
 
   expect(result).toEqual({
-    a: {b: {c: {}}},
-    d: {e: {f: {}}},
-    g: {h: {i: {}}},
-    j: {ʞ: {l: {}}},
+    a: { b: { c: {} } },
+    d: { e: { f: {} } },
+    g: { h: { i: {} } },
+    j: { ʞ: { l: {} } },
   });
 });
 
@@ -51,7 +51,7 @@ it('should ignore indentation', () => {
   b = 1`;
   const result = load(input);
 
-  expect(result).toEqual({a: {b: 1}});
+  expect(result).toEqual({ a: { b: 1 } });
 });
 
 it('should support creating super tables', () => {
@@ -64,5 +64,16 @@ it('should support creating super tables', () => {
 `;
   const result = load(input);
 
-  expect(result).toEqual({x: {y: {z: {w: {}}}}});
+  expect(result).toEqual({ x: { y: { z: { w: {} } } } });
+});
+
+it('should throw an error if a table is redefined', () => {
+  const input = `# DO NOT DO THIS
+
+[fruit]
+apple = "red"
+
+[fruit]
+orange = "orange"`;
+  expect(() => load(input)).toThrow(SyntaxParseError);
 });
