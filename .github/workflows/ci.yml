@@ -24,7 +24,7 @@ jobs:
       - name: Use Node.js on ${{ matrix.os }}
         uses: actions/setup-node@v3
         with:
-          node-version: lts/*
+          node-version-file: .tool-versions
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm test:cov
