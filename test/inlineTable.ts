@@ -1,4 +1,4 @@
-import { load } from '../src';
+import { load, SyntaxParseError } from '../src';
 
 it('should support empty inline tables', () => {
   const input = 'a = {}';
@@ -21,4 +21,11 @@ it('should support all value types in inline tables', () => {
       g: { h: 4 },
     },
   });
+});
+
+it('should throw error if an inline table spans multiple lines', () => {
+  const input = `a = {
+  b = 1
+}`;
+  expect(() => load(input)).toThrow(SyntaxParseError);
 });
