@@ -98,3 +98,49 @@ it('should support defining tables out-of-order', () => {
 
   expect(result).toEqual({ fruit: { apple: {}, orange: {} }, animal: {} });
 });
+
+it('should support defining tables in order', () => {
+  const input = `# RECOMMENDED
+[fruit.apple]
+[fruit.orange]
+[animal]`;
+  const result = load(input);
+
+  expect(result).toEqual({ fruit: { apple: {}, orange: {} }, animal: {} });
+});
+
+it('should support recognizing top-level table', () => {
+  const input = `# Top-level table begins.
+name = "Fido"
+breed = "pug"
+
+# Top-level table ends.
+[owner]
+name = "Regina Dogman"
+member_since = 1999-08-04`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    name: 'Fido',
+    breed: 'pug',
+    owner: {
+      name: 'Regina Dogman',
+      member_since: new Date(Date.UTC(1999, 7, 4)),
+    },
+  });
+});
+
+it('should create a table for each key part before the last one with dotted keys', () => {
+  const input = `fruit.apple.color = "red"
+# Defines a table named fruit
+# Defines a table named fruit.apple
+
+fruit.apple.taste.sweet = true
+# Defines a table named fruit.apple.taste
+# fruit and fruit.apple were already created`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    fruit: { apple: { color: 'red', taste: { sweet: true } } },
+  });
+});
