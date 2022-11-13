@@ -35,3 +35,9 @@ it('should throw error if control character is in a comment', () => {
 
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should throw error if delete character is in a comment', () => {
+  const input = 'comment-del = "0x7f" # ';
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});
