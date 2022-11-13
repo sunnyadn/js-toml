@@ -77,3 +77,14 @@ apple = "red"
 orange = "orange"`;
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should throw an error if overwriting a value with a table', () => {
+  const input = `# DO NOT DO THIS EITHER
+
+[fruit]
+apple = "red"
+
+[fruit.apple]
+texture = "smooth"`;
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});
