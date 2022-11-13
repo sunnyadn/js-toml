@@ -26,3 +26,34 @@ color = "gray"`;
     ],
   });
 });
+
+it('should support sub-tables and sub-arrays of tables within arrays of tables', () => {
+  const input = `[[fruits]]
+name = "apple"
+
+[fruits.physical]  # subtable
+color = "red"
+shape = "round"
+
+[[fruits.varieties]]  # nested array of tables
+name = "red delicious"
+
+[[fruits.varieties]]
+name = "granny smith"
+
+
+[[fruits]]
+name = "banana"
+
+[[fruits.varieties]]
+name = "plantain"`;
+  const result = load(input);
+
+  expect(result).toEqual({
+    fruits: [{
+      name: "apple",
+      physical: {color: "red", shape: "round"},
+      varieties: [{name: "red delicious"}, {name: "granny smith"}]
+    }, {name: "banana", varieties: [{name: "plantain"}]}]
+  });
+});

@@ -9,6 +9,19 @@ import { SimpleKey } from './tokens/SimpleKey';
 import { TomlString } from './tokens/TomlString';
 import { Integer } from './tokens/Integer';
 
+const isPlainObject = (obj): boolean => obj && obj.constructor === Object;
+
+const tryCreateKey = (operation, message) => {
+  try {
+    return operation();
+  } catch (error) {
+    if (error instanceof DuplicateKeyError) {
+      throw new InterpreterError(message);
+    }
+    throw error;
+  }
+};
+
 class DuplicateKeyError extends Error {}
 
 const BaseCstVisitor = parser.getBaseCstVisitorConstructor();
@@ -45,15 +58,10 @@ export class Interpreter extends BaseCstVisitor {
     const keys = this.visit(ctx.key);
     const value = this.visit(ctx.value);
 
-    try {
-      this.assignValue(keys, value, object);
-    } catch (e) {
-      if (e instanceof DuplicateKeyError) {
-        const rawKey = keys.join('.');
-        throw new InterpreterError(`Cannot assign value to key '${rawKey}'`);
-      }
-      throw e;
-    }
+    tryCreateKey(
+      () => this.assignValue(keys, value, object),
+      `Cannot assign value to '${keys.join('.')}'`
+    );
   }
 
   key(ctx) {
@@ -116,23 +124,20 @@ export class Interpreter extends BaseCstVisitor {
   stdTable(ctx, root) {
     const keys = this.visit(ctx.key);
 
-    try {
-      return this.createTable(keys, root);
-    } catch (e) {
-      if (e instanceof DuplicateKeyError) {
-        const rawKey = keys.join('.');
-        throw new InterpreterError(`Cannot create table '${rawKey}'`);
-      }
-      throw e;
-    }
+    return tryCreateKey(
+      () => this.createTable(keys, root),
+      `Cannot create table '${keys.join('.')}'`
+    );
   }
 
   arrayTable(ctx, root) {
     const keys = this.visit(ctx.key);
-    const array = this.getOrCreateArray(keys, root);
-    const object = {};
-    array.push(object);
-    return object;
+    return tryCreateKey(() => {
+      const array = this.getOrCreateArray(keys, root);
+      const object = {};
+      array.push(object);
+      return object;
+    }, `Cannot create array table '${keys.join('.')}'`);
   }
 
   private cleanInternalProperties(object) {
@@ -140,8 +145,10 @@ export class Interpreter extends BaseCstVisitor {
       delete object[symbol];
     }
     for (const key in object) {
-      if (typeof object[key] === 'object') {
+      if (isPlainObject(object[key])) {
         this.cleanInternalProperties(object[key]);
+      } else if (Array.isArray(object[key])) {
+        object[key].forEach((item) => this.cleanInternalProperties(item));
       }
     }
   }
@@ -163,7 +170,7 @@ export class Interpreter extends BaseCstVisitor {
     if (object[key]) {
       throw new DuplicateKeyError();
     }
-    if (typeof value === 'object') {
+    if (isPlainObject(value)) {
       value[tableDeclared] = true;
     }
 
@@ -174,7 +181,7 @@ export class Interpreter extends BaseCstVisitor {
   private tryCreatingObject(key, object, declareTable, ignoreDeclared) {
     if (object[key]) {
       if (
-        typeof object[key] !== 'object' ||
+        !isPlainObject(object[key]) ||
         (!ignoreDeclared && object[key][tableDeclared]) ||
         object[key][notEditable]
       ) {
@@ -203,6 +210,10 @@ export class Interpreter extends BaseCstVisitor {
   private createTable(keys, object) {
     const [first, ...rest] = keys;
     if (rest.length > 0) {
+      if (Array.isArray(object[first])) {
+        const toAdd = object[first][object[first].length - 1];
+        return this.createTable(rest, toAdd);
+      }
       this.tryCreatingObject(first, object, false, true);
       return this.createTable(rest, object[first]);
     }
@@ -212,6 +223,10 @@ export class Interpreter extends BaseCstVisitor {
   private getOrCreateArray(keys, object) {
     const [first, ...rest] = keys;
     if (rest.length > 0) {
+      if (Array.isArray(object[first])) {
+        const toAdd = object[first][object[first].length - 1];
+        return this.getOrCreateArray(rest, toAdd);
+      }
       this.tryCreatingObject(first, object, false, true);
       return this.getOrCreateArray(rest, object[first]);
     }
