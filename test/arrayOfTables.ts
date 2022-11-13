@@ -73,3 +73,12 @@ name = "apple"`;
 
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should throw error if attempt to append to statically defined array', () => {
+  const input = `# INVALID TOML DOC
+fruits = []
+
+[[fruits]] # Not allowed`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});

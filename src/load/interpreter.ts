@@ -101,16 +101,19 @@ export class Interpreter extends BaseCstVisitor {
     return this.interpret(ctx, TomlString, Float, Boolean, DateTime, Integer);
   }
 
-  arrayValues(ctx) {
-    return ctx.value.map((value) => this.visit(value));
+  arrayValues(ctx, array) {
+    ctx.value.forEach((value) => array.push(this.visit(value)));
+    return array;
   }
 
   array(ctx) {
+    const result = [];
+    result[notEditable] = true;
     if (ctx.arrayValues) {
-      return this.visit(ctx.arrayValues);
+      return this.visit(ctx.arrayValues, result);
     }
 
-    return [];
+    return result;
   }
 
   table(ctx, root) {
@@ -134,6 +137,10 @@ export class Interpreter extends BaseCstVisitor {
     const keys = this.visit(ctx.key);
     return tryCreateKey(() => {
       const array = this.getOrCreateArray(keys, root);
+      if (array[notEditable]) {
+        throw new DuplicateKeyError();
+      }
+
       const object = {};
       array.push(object);
       return object;
@@ -145,9 +152,11 @@ export class Interpreter extends BaseCstVisitor {
       delete object[symbol];
     }
     for (const key in object) {
-      if (isPlainObject(object[key])) {
+      if (typeof object[key] === 'object') {
         this.cleanInternalProperties(object[key]);
-      } else if (Array.isArray(object[key])) {
+      }
+
+      if (Array.isArray(object[key])) {
         object[key].forEach((item) => this.cleanInternalProperties(item));
       }
     }
