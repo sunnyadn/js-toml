@@ -70,8 +70,6 @@ const getRadix = (raw: string): number => {
   } else if (raw.startsWith('0b')) {
     return 2;
   }
-
-  return 10;
 };
 
 registerTokenInterpreter(NonDecimalInteger, (raw: string) => {

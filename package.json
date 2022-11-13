@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "test": "jest",
+    "test:cov": "jest --coverage",
     "diagram": "esr script/generateDiagram.ts",
     "lint": "prettier --check . && eslint .",
     "lint:fix": "prettier --write . && eslint . --fix"

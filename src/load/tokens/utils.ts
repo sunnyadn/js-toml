@@ -1,5 +1,3 @@
-import { InterpreterError } from '../exception';
-
 export const unescapeString = (string) => {
   let result = '';
   for (let i = 0; i < string.length; i++) {
@@ -40,8 +38,6 @@ export const unescapeString = (string) => {
           );
           i += 8;
           break;
-        default:
-          throw new InterpreterError(`Invalid escape sequence: \\${string[i]}`);
       }
     } else {
       result += char;

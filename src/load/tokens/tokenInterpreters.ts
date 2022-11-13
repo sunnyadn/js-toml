@@ -16,8 +16,6 @@ export const defaultFallbackInterpreter: InterpreterFunc = (
   if (interpreter) {
     return interpreter(raw, token, category);
   }
-
-  return null;
 };
 
 export const registerTokenInterpreter = (

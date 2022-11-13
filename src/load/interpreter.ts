@@ -171,7 +171,6 @@ export class Interpreter extends BaseCstVisitor {
         return result.length === 1 ? result[0] : result;
       }
     }
-    return null;
   }
 
   private assignPrimitiveValue(key, value, object) {
