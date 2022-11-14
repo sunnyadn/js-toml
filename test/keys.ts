@@ -214,3 +214,11 @@ falseValue = false`;
     falseValue: false,
   });
 });
+
+it('should throw error is the key value pair spans multiple lines', () => {
+  const input = `barekey
+   = 123
+`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});

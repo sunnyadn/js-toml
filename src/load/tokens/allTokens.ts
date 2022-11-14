@@ -20,7 +20,7 @@ import { True } from './True';
 import { False } from './False';
 import { Mode } from './modes';
 import { ArrayClose } from './ArrayClose';
-import { IgnoredNewline } from './IgnoredNewline';
+import { ArrayNewline } from './ArrayNewline';
 import { InlineTableSep } from './InlineTableSep';
 import { SimpleKey } from './SimpleKey';
 import { InlineTableKeyValSep } from './InlineTableKeyValSep';
@@ -28,6 +28,7 @@ import { StdTableClose } from './StdTableClose';
 import { StdTableOpen } from './StdTableOpen';
 import { ArrayTableOpen } from './ArrayTableOpen';
 import { ArrayTableClose } from './ArrayTableClose';
+import { ExpressionNewLine } from './ExpressionNewLine';
 
 const keyTokens = [
   WhiteSpace,
@@ -59,7 +60,7 @@ export const allTokens = {
   modes: {
     [Mode.Key]: [
       Comment,
-      IgnoredNewline,
+      ExpressionNewLine,
       KeyValueSeparator,
       ArrayTableOpen,
       ArrayTableClose,
@@ -68,7 +69,7 @@ export const allTokens = {
       ...keyTokens,
     ],
     [Mode.Value]: [...valueTokens, Newline, InlineTableSep, InlineTableClose],
-    [Mode.Array]: [...valueTokens, IgnoredNewline, ArraySep, ArrayClose],
+    [Mode.Array]: [...valueTokens, ArrayNewline, ArraySep, ArrayClose],
     [Mode.InlineTable]: [...keyTokens, InlineTableKeyValSep, InlineTableClose],
   },
 

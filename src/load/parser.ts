@@ -21,6 +21,7 @@ import { StdTableClose } from './tokens/StdTableClose';
 import { StdTableOpen } from './tokens/StdTableOpen';
 import { ArrayTableClose } from './tokens/ArrayTableClose';
 import { ArrayTableOpen } from './tokens/ArrayTableOpen';
+import { ExpressionNewLine } from './tokens/ExpressionNewLine';
 
 class Parser extends CstParser {
   private dottedKey = this.RULE('dottedKey', () => {
@@ -36,6 +37,11 @@ class Parser extends CstParser {
       { ALT: () => this.CONSUME(SimpleKey) },
     ]);
   });
+  private keyValue = this.RULE('keyValue', () => {
+    this.SUBRULE(this.key);
+    this.CONSUME(KeyValueSeparator);
+    this.SUBRULE(this.value);
+  });
   private inlineTableKeyValues = this.RULE('inlineTableKeyValues', () => {
     this.MANY_SEP({
       SEP: InlineTableSep,
@@ -46,6 +52,20 @@ class Parser extends CstParser {
     this.CONSUME(InlineTableOpen);
     this.OPTION(() => this.SUBRULE(this.inlineTableKeyValues));
     this.CONSUME(InlineTableClose);
+  });
+  private arrayValues = this.RULE('arrayValues', () => {
+    this.SUBRULE(this.value);
+    let havingMore = true;
+    this.MANY({
+      GATE: () => havingMore,
+      DEF: () => {
+        this.CONSUME(ArraySep);
+        const found = this.OPTION(() => this.SUBRULE1(this.value));
+        if (!found) {
+          havingMore = false;
+        }
+      },
+    });
   });
   private array = this.RULE('array', () => {
     this.CONSUME(ArrayOpen);
@@ -62,25 +82,6 @@ class Parser extends CstParser {
       { ALT: () => this.CONSUME(Float) },
       { ALT: () => this.CONSUME(Integer) },
     ]);
-  });
-  private keyValue = this.RULE('keyValue', () => {
-    this.SUBRULE(this.key);
-    this.CONSUME(KeyValueSeparator);
-    this.SUBRULE(this.value);
-  });
-  private arrayValues = this.RULE('arrayValues', () => {
-    this.SUBRULE(this.value);
-    let havingMore = true;
-    this.MANY({
-      GATE: () => havingMore,
-      DEF: () => {
-        this.CONSUME(ArraySep);
-        const found = this.OPTION(() => this.SUBRULE1(this.value));
-        if (!found) {
-          havingMore = false;
-        }
-      },
-    });
   });
   private stdTable = this.RULE('stdTable', () => {
     this.CONSUME(StdTableOpen);
@@ -105,12 +106,14 @@ class Parser extends CstParser {
     ]);
   });
   toml = this.RULE('toml', () => {
-    this.OPTION(() => this.SUBRULE(this.expression));
-    this.MANY(() => {
-      this.CONSUME(Newline);
+    this.MANY(() => this.CONSUME(ExpressionNewLine));
+    this.MANY1(() => {
       this.SUBRULE1(this.expression);
+      this.OPTION2(() => {
+        this.CONSUME1(Newline);
+        this.MANY3(() => this.CONSUME2(ExpressionNewLine));
+      });
     });
-    this.OPTION1(() => this.CONSUME1(Newline));
   });
 
   constructor() {
