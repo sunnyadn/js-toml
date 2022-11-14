@@ -15,7 +15,7 @@ it('should support unicode escape sequences', () => {
   const input = `str = "Jos\\u00E9 \\U0001F47B"`;
   const result = load(input);
 
-  expect(result).toEqual({str: 'José 👻'});
+  expect(result).toEqual({ str: 'José 👻' });
 });
 
 it('should throw error if unsupported escape sequence is used', () => {
@@ -83,7 +83,7 @@ it('should support unicode escape sequences in multi-line basic strings', () => 
   const input = `str = """Jos\\u00E9 \\U0001F47B"""`;
   const result = load(input);
 
-  expect(result).toEqual({str: 'José 👻'});
+  expect(result).toEqual({ str: 'José 👻' });
 });
 
 it('should throw error if unsupported control character is not escaped in multi-line basic strings', () => {
@@ -158,7 +158,7 @@ trimmed in raw strings.
   expect(result).toEqual({
     regex2: "I [dw]on't need \\d{2} apples",
     lines:
-        'The first newline is\ntrimmed in raw strings.\n   All other whitespace\n   is preserved.\n',
+      'The first newline is\ntrimmed in raw strings.\n   All other whitespace\n   is preserved.\n',
   });
 });
 
@@ -190,7 +190,7 @@ it('should support apostrophes inside multi-line literal strings', () => {
 str = ''''That,' she said, 'is still pointless.''''`;
   const result = load(input);
 
-  expect(result).toEqual({str: "'That,' she said, 'is still pointless.'"});
+  expect(result).toEqual({ str: "'That,' she said, 'is still pointless.'" });
 });
 
 it('should throw error when there is unsupported control character in multi-line literal strings', () => {
@@ -209,5 +209,13 @@ empty4 = ''''''`;
 
   const result = load(input);
 
-  expect(result).toEqual({empty1: "", empty2: "", empty3: "", empty4: ""});
+  expect(result).toEqual({ empty1: '', empty2: '', empty3: '', empty4: '' });
+});
+
+it('should support escaped slash in multiline basic string', () => {
+  const input = `escape-bs-1 = """a \\\\
+b"""`;
+  const result = load(input);
+
+  expect(result).toEqual({ 'escape-bs-1': 'a \\\nb' });
 });

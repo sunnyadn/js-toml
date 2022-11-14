@@ -1,9 +1,32 @@
+import XRegExp = require('xregexp');
+import { newline, whiteSpaceChar } from './patterns';
+
+const escapingWhitespaces = XRegExp.build(
+  '^{{whiteSpaceChar}}*{{newline}}(?:{{whiteSpaceChar}}|{{newline}})*',
+  {
+    whiteSpaceChar,
+    newline,
+  }
+);
+
+const getWhitespaceAndNewline = (str: string) => {
+  const match = XRegExp.exec(str, escapingWhitespaces);
+  return match ? match[0].length : 0;
+};
+
 export const unescapeString = (string) => {
   let result = '';
   for (let i = 0; i < string.length; i++) {
     const char = string[i];
     if (char === '\\') {
       i++;
+
+      const whitespaceAndNewline = getWhitespaceAndNewline(string.slice(i));
+      if (whitespaceAndNewline > 0) {
+        i += whitespaceAndNewline - 1;
+        continue;
+      }
+
       switch (string[i]) {
         case 'b':
           result += '\b';
@@ -38,6 +61,7 @@ export const unescapeString = (string) => {
           );
           i += 8;
           break;
+        case string.match(/^[0-7]{1,3}$/):
       }
     } else {
       result += char;

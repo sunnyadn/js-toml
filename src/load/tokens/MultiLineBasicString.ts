@@ -77,11 +77,7 @@ export const MultiLineBasicString = createToken({
   line_breaks: true,
 });
 
-const skipWhitespaceIfFindBackslash = (string) =>
-  string.replace(/\\[ \t]*(\r\n|\n)+[ \t]*/g, '');
-
 registerTokenInterpreter(MultiLineBasicString, (raw) => {
   const content = getMultiLineContent(raw);
-  const result = skipWhitespaceIfFindBackslash(content);
-  return unescapeString(result);
+  return unescapeString(content);
 });
