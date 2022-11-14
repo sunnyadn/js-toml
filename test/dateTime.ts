@@ -1,4 +1,4 @@
-import { load } from '../src';
+import { load, SyntaxParseError } from '../src';
 import timezoneMock = require('timezone-mock');
 
 it('should support offset date-times', () => {
@@ -57,4 +57,12 @@ lt2 = 00:32:00.999999`;
   const result = load(input);
 
   expect(result).toEqual({ lt1: '07:32:00', lt2: '00:32:00.999999' });
+});
+
+it('should throw error when hour is over 23', () => {
+  const input = `# time-hour       = 2DIGIT  ; 00-23
+d = 2006-01-01T24:00:00-00:00
+`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
 });
