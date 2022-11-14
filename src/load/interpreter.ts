@@ -174,7 +174,7 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   private assignPrimitiveValue(key, value, object) {
-    if (object[key]) {
+    if (key in object) {
       throw new DuplicateKeyError();
     }
     if (isPlainObject(value)) {

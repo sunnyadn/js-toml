@@ -117,6 +117,13 @@ name = "Pradyun"`;
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
 
+it('should throw error if a key with falsey value is duplicated', () => {
+  const input = `dupe = false
+dupe = true`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});
+
 it('should throw error when a bare key has the same name as a quoted key', () => {
   const input = `# THIS WILL NOT WORK
 spelling = "favorite"
