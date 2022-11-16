@@ -219,3 +219,10 @@ b"""`;
 
   expect(result).toEqual({ 'escape-bs-1': 'a \\\nb' });
 });
+
+it('should throw error when meeting non scalar character in string', () => {
+  const input =
+    'invalid-codepoint = "This string contains a non scalar unicode codepoint \\uD801"';
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});

@@ -1,5 +1,6 @@
 import XRegExp = require('xregexp');
 import { newline, whiteSpaceChar } from './patterns';
+import { SyntaxParseError } from '../exception';
 
 const escapingWhitespaces = XRegExp.build(
   '^{{whiteSpaceChar}}*{{newline}}(?:{{whiteSpaceChar}}|{{newline}})*',
@@ -49,18 +50,26 @@ export const unescapeString = (string) => {
         case '\\':
           result += '\\';
           break;
-        case 'u':
-          result += String.fromCharCode(
-            parseInt(string.substring(i + 1, i + 5), 16)
-          );
+        case 'u': {
+          const hex = string.slice(i + 1, i + 5);
+          const codePoint = parseInt(hex, 16);
+          if (codePoint > 0xd7ff && codePoint < 0xe000) {
+            throw new SyntaxParseError(`Invalid Unicode code point: \\u${hex}`);
+          }
+          result += String.fromCodePoint(codePoint);
           i += 4;
           break;
-        case 'U':
-          result += String.fromCodePoint(
-            parseInt(string.substring(i + 1, i + 9), 16)
-          );
+        }
+        case 'U': {
+          const hex = string.slice(i + 1, i + 9);
+          const codePoint = parseInt(hex, 16);
+          if (codePoint > 0x10ffff) {
+            throw new SyntaxParseError(`Invalid Unicode code point: \\U${hex}`);
+          }
+          result += String.fromCodePoint(codePoint);
           i += 8;
           break;
+        }
         case string.match(/^[0-7]{1,3}$/):
       }
     } else {
