@@ -1,5 +1,6 @@
 import glob from 'glob';
 import * as fs from 'fs';
+import { EOL } from 'os';
 import jstoml, { SyntaxParseError } from '../src';
 
 const converters = {
@@ -20,7 +21,7 @@ const converters = {
     }
     return parseFloat(value);
   },
-  string: (value) => value,
+  string: (value) => value.replace(/\n/g, EOL),
   bool: (value) => value === 'true',
   'date-local': (value) => new Date(value),
   'time-local': (value) => value,
