@@ -1,6 +1,5 @@
 import glob from 'glob';
 import * as fs from 'fs';
-import { EOL } from 'os';
 import jstoml, { SyntaxParseError } from '../src';
 
 const converters = {
@@ -21,7 +20,7 @@ const converters = {
     }
     return parseFloat(value);
   },
-  string: (value) => value.replace(/\n/g, EOL),
+  string: (value) => value,
   bool: (value) => value === 'true',
   'date-local': (value) => new Date(value),
   'time-local': (value) => value,
@@ -45,6 +44,23 @@ const covertJsonFiles = (json) => {
   }
 };
 
+const replaceWindowsNewLine = (result) => {
+  if (Array.isArray(result)) {
+    return result.map(replaceWindowsNewLine);
+  }
+  if (result.constructor === Object) {
+    const obj = {};
+    Object.keys(result).forEach((key) => {
+      obj[key] = replaceWindowsNewLine(result[key]);
+    });
+    return obj;
+  }
+  if (typeof result === 'string') {
+    return result.replace(/\r\n/g, '\n');
+  }
+  return result;
+};
+
 describe('Run TOML valid tests', () => {
   const validTestCases = glob.sync('testcase/valid/**/*.toml');
   for (const testCase of validTestCases) {
@@ -55,7 +71,7 @@ describe('Run TOML valid tests', () => {
       const expectedFile = testCase.replace('.toml', '.json');
       const json = JSON.parse(fs.readFileSync(expectedFile, 'utf8'));
       const expected = covertJsonFiles(json);
-      expect(result).toEqual(expected);
+      expect(replaceWindowsNewLine(result)).toEqual(expected);
     });
   }
 });
