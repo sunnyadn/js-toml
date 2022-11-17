@@ -25,7 +25,9 @@ class DuplicateKeyError extends Error {}
 
 const BaseCstVisitor = parser.getBaseCstVisitorConstructor();
 
-const tableDeclared = Symbol('tableDeclared');
+const explicitlyDeclared = Symbol('explicitlyDeclared');
+const implicitlyDeclared = Symbol('implicitlyDeclared');
+
 const notEditable = Symbol('notEditable');
 
 export class Interpreter extends BaseCstVisitor {
@@ -178,26 +180,33 @@ export class Interpreter extends BaseCstVisitor {
       throw new DuplicateKeyError();
     }
     if (isPlainObject(value)) {
-      value[tableDeclared] = true;
+      value[explicitlyDeclared] = true;
     }
 
     object[key] = value;
     return object;
   }
 
-  private tryCreatingObject(key, object, declareTable, ignoreDeclared) {
+  private tryCreatingObject(
+    key,
+    object,
+    declareSymbol,
+    ignoreImplicitDeclared,
+    ignoreExplicitDeclared
+  ) {
     if (object[key]) {
       if (
         !isPlainObject(object[key]) ||
-        (!ignoreDeclared && object[key][tableDeclared]) ||
+        (!ignoreExplicitDeclared && object[key][explicitlyDeclared]) ||
+        (!ignoreImplicitDeclared && object[key][implicitlyDeclared]) ||
         object[key][notEditable]
       ) {
         throw new DuplicateKeyError();
       }
     } else {
       object[key] = {};
-      if (declareTable) {
-        object[key][tableDeclared] = true;
+      if (declareSymbol) {
+        object[key][declareSymbol] = true;
       }
     }
 
@@ -207,7 +216,7 @@ export class Interpreter extends BaseCstVisitor {
   private assignValue(keys, value, object) {
     const [first, ...rest] = keys;
     if (rest.length > 0) {
-      this.tryCreatingObject(first, object, true, true);
+      this.tryCreatingObject(first, object, implicitlyDeclared, true, false);
       return this.assignValue(rest, value, object[first]);
     }
 
@@ -224,10 +233,16 @@ export class Interpreter extends BaseCstVisitor {
         const toAdd = object[first][object[first].length - 1];
         return this.createTable(rest, toAdd);
       }
-      this.tryCreatingObject(first, object, false, true);
+      this.tryCreatingObject(first, object, null, true, true);
       return this.createTable(rest, object[first]);
     }
-    return this.tryCreatingObject(first, object, true, false);
+    return this.tryCreatingObject(
+      first,
+      object,
+      explicitlyDeclared,
+      false,
+      false
+    );
   }
 
   private getOrCreateArray(keys, object) {
@@ -237,7 +252,7 @@ export class Interpreter extends BaseCstVisitor {
         const toAdd = object[first][object[first].length - 1];
         return this.getOrCreateArray(rest, toAdd);
       }
-      this.tryCreatingObject(first, object, false, true);
+      this.tryCreatingObject(first, object, null, true, true);
       return this.getOrCreateArray(rest, object[first]);
     }
 
