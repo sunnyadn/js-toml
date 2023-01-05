@@ -1,0 +1,10 @@
+{
+  "name": "js-toml-example",
+  "version": "0.0.1",
+  "description": "Example for js-toml",
+  "author": "Sunny Yang",
+  "license": "MIT",
+  "dependencies": {
+    "js-toml": "^0.1.0"
+  }
+}
