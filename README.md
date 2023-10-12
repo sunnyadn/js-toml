@@ -55,3 +55,13 @@ Under development.
 ## License
 
 MIT
+
+## References
+
+[TOML v1.0.0 Official Specs](https://toml.io/en/v1.0.0)
+
+[TOML GitHub Project](https://github.com/toml-lang/toml)
+
+[TOML Test](https://github.com/toml-lang/toml-test)
+
+[iarna-toml](https://github.com/iarna/iarna-toml)
