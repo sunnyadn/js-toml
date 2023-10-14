@@ -59,7 +59,7 @@
     "vitest": "^0.34.6"
   },
   "dependencies": {
-    "chevrotain": "^10.4.1",
+    "chevrotain": "^11.0.3",
     "xregexp": "^5.1.1"
   },
   "packageManager": "pnpm@8.9.0"
