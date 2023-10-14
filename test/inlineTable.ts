@@ -17,7 +17,7 @@ it('should support empty inline tables', () => {
   const input = 'a = {}';
   const result = load(input);
 
-  expect(result).toEqual({a: {}});
+  expect(result).toEqual({ a: {} });
 });
 
 it('should support all value types in inline tables', () => {
@@ -31,7 +31,7 @@ it('should support all value types in inline tables', () => {
       d: true,
       e: new Date(Date.UTC(1979, 4, 27, 7, 32, 0)),
       f: [1, 2, 3],
-      g: {h: 4},
+      g: { h: 4 },
     },
   });
 });
@@ -54,7 +54,7 @@ line
 string""" }`;
   const result = load(input);
 
-  expect(result).toEqual({a: {b: 'multi\nline\nstring'}});
+  expect(result).toEqual({ a: { b: 'multi\nline\nstring' } });
 });
 
 it('should throw error if adding keys outside the inline table', () => {
@@ -76,8 +76,14 @@ it('should support use inline tables as values in arrays', () => {
   const input = `points = [ { x = 1, y = 2, z = 3 },
            { x = 7, y = 8, z = 9 },
            { x = 2, y = 4, z = 8 } ]
-`
+`;
   const result = load(input);
 
-  expect(result).toEqual({points: [{x: 1, y: 2, z: 3}, {x: 7, y: 8, z: 9}, {x: 2, y: 4, z: 8}]});
+  expect(result).toEqual({
+    points: [
+      { x: 1, y: 2, z: 3 },
+      { x: 7, y: 8, z: 9 },
+      { x: 2, y: 4, z: 8 },
+    ],
+  });
 });
