@@ -28,7 +28,7 @@ pnpm add js-toml
 ## Usage
 
 ```typescript
-import {load} from 'js-toml';
+import { load } from 'js-toml';
 
 const toml = `
 title = "TOML Example"
