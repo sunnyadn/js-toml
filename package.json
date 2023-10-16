@@ -19,14 +19,21 @@
     "email": "sunnyadn@foxmail.com",
     "url": "https://www.linkedin.com/in/sunnyadn/"
   },
-  "files": [
-    "dist",
-    "src"
-  ],
-  "main": "dist/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/sunnyadn/js-toml.git"
+  },
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
   },
   "scripts": {
     "build": "tsup",
