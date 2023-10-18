@@ -1,4 +1,4 @@
-import XRegExp = require('xregexp');
+import XRegExp from 'xregexp';
 
 export const whiteSpaceChar = /[ \t]/;
 // const nonAscii = /[\x80-\uD7FF]|[\uE000-\u{10FFFF}]/u;
