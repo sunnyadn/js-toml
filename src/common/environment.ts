@@ -5,7 +5,7 @@ class Environment {
     this.debug = true;
   }
 
-  public get isDebug() {
+  public isDebug() {
     return this.debug;
   }
 }

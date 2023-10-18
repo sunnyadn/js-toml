@@ -4,5 +4,5 @@ import { allTokens } from './tokens/index.js';
 
 export const lexer = new Lexer(allTokens, {
   ensureOptimizations: true,
-  skipValidations: !envs.isDebug,
+  skipValidations: !envs.isDebug(),
 });
