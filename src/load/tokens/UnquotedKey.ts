@@ -1,8 +1,8 @@
 import { createToken } from 'chevrotain';
-import { digit } from './patterns';
-import { registerTokenInterpreter } from './tokenInterpreters';
-import { SimpleKey } from './SimpleKey';
-import XRegExp = require('xregexp');
+import { digit } from './patterns.js';
+import { registerTokenInterpreter } from './tokenInterpreters.js';
+import { SimpleKey } from './SimpleKey.js';
+import XRegExp from 'xregexp';
 
 const alpha = /[a-zA-Z]/;
 

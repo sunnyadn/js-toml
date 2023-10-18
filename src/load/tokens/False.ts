@@ -1,6 +1,6 @@
 import { createToken } from 'chevrotain';
-import { Boolean } from './Boolean';
-import { registerTokenInterpreter } from './tokenInterpreters';
+import { Boolean } from './Boolean.js';
+import { registerTokenInterpreter } from './tokenInterpreters.js';
 
 const falsePattern = /false/;
 

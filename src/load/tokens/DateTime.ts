@@ -1,8 +1,8 @@
-import XRegExp = require('xregexp');
-import { digit } from './patterns';
+import XRegExp from 'xregexp';
+import { digit } from './patterns.js';
 import { createToken } from 'chevrotain';
-import { registerTokenInterpreter } from './tokenInterpreters';
-import { SyntaxParseError } from '../exception';
+import { registerTokenInterpreter } from './tokenInterpreters.js';
+import { SyntaxParseError } from '../exception.js';
 
 const dateFullYear = XRegExp.build('{{digit}}{4}', { digit });
 const dateMonth = XRegExp.build('{{digit}}{2}', { digit });

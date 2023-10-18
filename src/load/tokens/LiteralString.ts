@@ -1,9 +1,9 @@
 import { createToken } from 'chevrotain';
-import { apostrophe, nonAscii } from './patterns';
-import { registerTokenInterpreter } from './tokenInterpreters';
-import { QuotedKey } from './QuotedKey';
-import { TomlString } from './TomlString';
-import XRegExp = require('xregexp');
+import { apostrophe, nonAscii } from './patterns.js';
+import { registerTokenInterpreter } from './tokenInterpreters.js';
+import { QuotedKey } from './QuotedKey.js';
+import { TomlString } from './TomlString.js';
+import XRegExp from 'xregexp';
 
 const literalChar = XRegExp.build('\t|[\x20-\x26]|[\\x28-\x7E]|{{nonAscii}}', {
   nonAscii,

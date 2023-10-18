@@ -1,4 +1,4 @@
-import { load } from '../src';
+import { load } from '../src/index.js';
 
 it('should support booleans', () => {
   const input = `bool1 = true

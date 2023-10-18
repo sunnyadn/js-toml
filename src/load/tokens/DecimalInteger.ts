@@ -1,7 +1,7 @@
 import { createToken } from 'chevrotain';
-import { registerTokenInterpreter } from './tokenInterpreters';
-import { decimalInteger } from './patterns';
-import { Integer } from './Integer';
+import { registerTokenInterpreter } from './tokenInterpreters.js';
+import { decimalInteger } from './patterns.js';
+import { Integer } from './Integer.js';
 
 export const DecimalInteger = createToken({
   name: 'DecimalInteger',

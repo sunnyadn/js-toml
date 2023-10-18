@@ -1,5 +1,5 @@
 import { createToken } from 'chevrotain';
-import { newline } from './patterns';
+import { newline } from './patterns.js';
 
 export const Newline = createToken({
   name: 'Newline',

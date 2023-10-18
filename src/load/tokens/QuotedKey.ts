@@ -1,9 +1,9 @@
 import { createToken, Lexer } from 'chevrotain';
-import { SimpleKey } from './SimpleKey';
+import { SimpleKey } from './SimpleKey.js';
 import {
   defaultFallbackInterpreter,
   registerTokenInterpreter,
-} from './tokenInterpreters';
+} from './tokenInterpreters.js';
 
 export const QuotedKey = createToken({
   name: 'QuotedKey',

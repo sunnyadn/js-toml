@@ -1,5 +1,5 @@
 import { createToken } from 'chevrotain';
-import { Mode } from './modes';
+import { Mode } from './modes.js';
 
 const inlineTableOpen = /{/;
 

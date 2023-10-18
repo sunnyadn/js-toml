@@ -1,10 +1,15 @@
 import { createToken } from 'chevrotain';
-import { escaped, nonAscii, quotationMark, whiteSpaceChar } from './patterns';
-import { registerTokenInterpreter } from './tokenInterpreters';
-import { unescapeString } from './utils';
-import { QuotedKey } from './QuotedKey';
-import { TomlString } from './TomlString';
-import XRegExp = require('xregexp');
+import {
+  escaped,
+  nonAscii,
+  quotationMark,
+  whiteSpaceChar,
+} from './patterns.js';
+import { registerTokenInterpreter } from './tokenInterpreters.js';
+import { unescapeString } from './utils.js';
+import { QuotedKey } from './QuotedKey.js';
+import { TomlString } from './TomlString.js';
+import XRegExp from 'xregexp';
 
 const basicUnescaped = XRegExp.build(
   '{{whiteSpaceChar}}|!|[\x23-\\x5B]|[\\x5D-\x7E]|{{nonAscii}}',

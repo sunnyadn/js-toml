@@ -6,11 +6,11 @@ import {
   nonAscii,
   quotationMark,
   whiteSpaceChar,
-} from './patterns';
-import { registerTokenInterpreter } from './tokenInterpreters';
-import { getMultiLineContent, unescapeString } from './utils';
-import { TomlString } from './TomlString';
-import XRegExp = require('xregexp');
+} from './patterns.js';
+import { registerTokenInterpreter } from './tokenInterpreters.js';
+import { getMultiLineContent, unescapeString } from './utils.js';
+import { TomlString } from './TomlString.js';
+import XRegExp from 'xregexp';
 
 const multiLineBasicStringDelimiter = XRegExp.build('{{quotationMark}}{3}', {
   quotationMark,

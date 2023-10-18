@@ -1,4 +1,4 @@
-import { load, SyntaxParseError } from '../src';
+import { load, SyntaxParseError } from '../src/index.js';
 
 it('should support escaped characters', () => {
   const input = `str = "I'm a string. \\"You can quote me\\". Name\\tJos\\u00E9\\nLocation\\tSF."

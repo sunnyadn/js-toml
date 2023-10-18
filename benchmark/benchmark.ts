@@ -1,7 +1,7 @@
 import Benchmark from 'benchmark';
 import glob from 'glob';
-import fs from 'fs';
-import jstoml from '../src';
+import * as fs from 'fs';
+import * as jstoml from '../src/index.js';
 
 const suite = new Benchmark.Suite();
 

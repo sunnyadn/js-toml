@@ -1,4 +1,4 @@
-import { load, SyntaxParseError } from '../src';
+import { load, SyntaxParseError } from '../src/index.js';
 
 it('should support inline tables', () => {
   const input = `name = { first = "Tom", last = "Preston-Werner" }

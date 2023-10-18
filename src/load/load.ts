@@ -1,7 +1,7 @@
-import { lexer } from './lexer';
-import { LexerError, ParserError } from './exception';
-import { parser } from './parser';
-import { interpreter } from './interpreter';
+import { lexer } from './lexer.js';
+import { LexerError, ParserError } from './exception.js';
+import { parser } from './parser.js';
+import { interpreter } from './interpreter.js';
 
 export const load = (toml: string): object => {
   const lexingResult = lexer.tokenize(toml);

@@ -1,8 +1,8 @@
 import { createToken } from 'chevrotain';
-import { hexDigit, underscore } from './patterns';
-import { registerTokenInterpreter } from './tokenInterpreters';
-import { Integer } from './Integer';
-import XRegExp = require('xregexp');
+import { hexDigit, underscore } from './patterns.js';
+import { registerTokenInterpreter } from './tokenInterpreters.js';
+import { Integer } from './Integer.js';
+import XRegExp from 'xregexp';
 
 const hexPrefix = /0x/;
 const octPrefix = /0o/;

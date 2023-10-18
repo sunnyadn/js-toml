@@ -1,6 +1,6 @@
-import XRegExp = require('xregexp');
-import { newline, whiteSpaceChar } from './patterns';
-import { SyntaxParseError } from '../exception';
+import XRegExp from 'xregexp';
+import { newline, whiteSpaceChar } from './patterns.js';
+import { SyntaxParseError } from '../exception.js';
 
 const escapingWhitespaces = XRegExp.build(
   '^{{whiteSpaceChar}}*{{newline}}(?:{{whiteSpaceChar}}|{{newline}})*',

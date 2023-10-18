@@ -1,4 +1,4 @@
-import { load, SyntaxParseError } from '../src';
+import { load, SyntaxParseError } from '../src/index.js';
 
 it('should support bare keys', () => {
   const input = `key = "value"

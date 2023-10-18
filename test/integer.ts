@@ -1,4 +1,4 @@
-import { load, SyntaxParseError } from '../src';
+import { load, SyntaxParseError } from '../src/index.js';
 
 it('should support decimal integers', () => {
   const input = `int1 = +99

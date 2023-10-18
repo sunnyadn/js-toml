@@ -1,6 +1,6 @@
 import glob from 'glob';
 import * as fs from 'fs';
-import jstoml, { SyntaxParseError } from '../src';
+import { load, SyntaxParseError } from '../src/index.js';
 
 const converters = {
   integer: (value) => {
@@ -67,7 +67,7 @@ describe('Run TOML valid tests', () => {
     const testName = testCase.replace(/^testcase\//, '').replace(/\.toml$/, '');
     it(`should parse ${testName} correctly`, () => {
       const toml = fs.readFileSync(testCase, 'utf8');
-      const result = jstoml.load(toml);
+      const result = load(toml);
       const expectedFile = testCase.replace('.toml', '.json');
       const json = JSON.parse(fs.readFileSync(expectedFile, 'utf8'));
       const expected = covertJsonFiles(json);
@@ -82,7 +82,7 @@ describe('Run TOML invalid tests', () => {
     const testName = testCase.replace(/^testcase\//, '').replace(/\.toml$/, '');
     it(`should throw error for ${testName}`, () => {
       const toml = fs.readFileSync(testCase, 'utf8');
-      expect(() => jstoml.load(toml)).toThrow(SyntaxParseError);
+      expect(() => load(toml)).toThrow(SyntaxParseError);
     });
   }
 });

@@ -1,5 +1,5 @@
-import { load, SyntaxParseError } from '../src';
-import timezoneMock = require('timezone-mock');
+import { load, SyntaxParseError } from '../src/index.js';
+import timezoneMock from 'timezone-mock';
 
 it('should support offset date-times', () => {
   const input = `odt1 = 1979-05-27T07:32:00Z

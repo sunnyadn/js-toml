@@ -1,4 +1,4 @@
-import { load } from '../src';
+import { load } from '../src/index.js';
 
 it('should parse empty string', () => {
   const input = '';

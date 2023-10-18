@@ -2,7 +2,7 @@ import { createToken, Lexer } from 'chevrotain';
 import {
   defaultFallbackInterpreter,
   registerTokenInterpreter,
-} from './tokenInterpreters';
+} from './tokenInterpreters.js';
 
 export const Boolean = createToken({
   name: 'Boolean',

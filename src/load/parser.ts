@@ -1,27 +1,27 @@
 import { CstParser } from 'chevrotain';
 import {
   allTokens,
+  ArrayClose,
+  ArrayOpen,
+  ArraySep,
+  ArrayTableClose,
+  ArrayTableOpen,
   Boolean,
+  DateTime,
   DotSeparator,
+  ExpressionNewLine,
+  Float,
+  InlineTableClose,
+  InlineTableOpen,
+  InlineTableSep,
+  Integer,
   KeyValueSeparator,
   Newline,
-} from './tokens';
-import { Float } from './tokens/Float';
-import { DateTime } from './tokens/DateTime';
-import { ArrayOpen } from './tokens/ArrayOpen';
-import { ArrayClose } from './tokens/ArrayClose';
-import { ArraySep } from './tokens/ArraySep';
-import { InlineTableOpen } from './tokens/InlineTableOpen';
-import { InlineTableClose } from './tokens/InlineTableClose';
-import { SimpleKey } from './tokens/SimpleKey';
-import { TomlString } from './tokens/TomlString';
-import { Integer } from './tokens/Integer';
-import { InlineTableSep } from './tokens/InlineTableSep';
-import { StdTableClose } from './tokens/StdTableClose';
-import { StdTableOpen } from './tokens/StdTableOpen';
-import { ArrayTableClose } from './tokens/ArrayTableClose';
-import { ArrayTableOpen } from './tokens/ArrayTableOpen';
-import { ExpressionNewLine } from './tokens/ExpressionNewLine';
+  SimpleKey,
+  StdTableClose,
+  StdTableOpen,
+  TomlString,
+} from './tokens/index.js';
 
 class Parser extends CstParser {
   private dottedKey = this.RULE('dottedKey', () => {

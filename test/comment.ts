@@ -1,4 +1,4 @@
-import { load, SyntaxParseError } from '../src';
+import { load, SyntaxParseError } from '../src/index.js';
 
 it('should ignore full-line comment', () => {
   const input = '# This is a full-line comment';

@@ -1,4 +1,4 @@
-import { load } from '../src';
+import { load } from '../src/index.js';
 
 it('should support arrays', () => {
   const input = `integers = [ 1, 2, 3 ]

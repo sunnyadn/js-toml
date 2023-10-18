@@ -1,6 +1,6 @@
 import { createToken, Lexer } from 'chevrotain';
-import { whiteSpaceChar } from './patterns';
-import XRegExp = require('xregexp');
+import { whiteSpaceChar } from './patterns.js';
+import XRegExp from 'xregexp';
 
 const whiteSpace = XRegExp.build('{{whiteSpaceChar}}+', { whiteSpaceChar });
 

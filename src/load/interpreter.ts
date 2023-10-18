@@ -1,13 +1,11 @@
-import { parser } from './parser';
-import { InterpreterError } from './exception';
+import { parser } from './parser.js';
+import { InterpreterError } from './exception.js';
 import { TokenType } from 'chevrotain';
-import { tokenInterpreters } from './tokens/tokenInterpreters';
-import { Boolean } from './tokens';
-import { Float } from './tokens/Float';
-import { DateTime } from './tokens/DateTime';
-import { SimpleKey } from './tokens/SimpleKey';
-import { TomlString } from './tokens/TomlString';
-import { Integer } from './tokens/Integer';
+import { tokenInterpreters } from './tokens/tokenInterpreters.js';
+import { Boolean, SimpleKey, TomlString } from './tokens/index.js';
+import { Float } from './tokens/Float.js';
+import { DateTime } from './tokens/DateTime.js';
+import { Integer } from './tokens/Integer.js';
 
 const isPlainObject = (obj): boolean => obj && obj.constructor === Object;
 
