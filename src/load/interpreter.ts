@@ -134,16 +134,19 @@ export class Interpreter extends BaseCstVisitor {
 
   arrayTable(ctx, root) {
     const keys = this.visit(ctx.key);
-    return tryCreateKey(() => {
-      const array = this.getOrCreateArray(keys, root);
-      if (array[notEditable]) {
-        throw new DuplicateKeyError();
-      }
+    return tryCreateKey(
+      () => {
+        const array = this.getOrCreateArray(keys, root);
+        if (array[notEditable]) {
+          throw new DuplicateKeyError();
+        }
 
-      const object = {};
-      array.push(object);
-      return object;
-    }, `Cannot create array table '${keys.join('.')}'`);
+        const object = {};
+        array.push(object);
+        return object;
+      },
+      `Cannot create array table '${keys.join('.')}'`
+    );
   }
 
   private cleanInternalProperties(object) {
