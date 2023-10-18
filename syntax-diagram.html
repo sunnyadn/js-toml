@@ -91,55 +91,6 @@
   },
   {
     "type": "Rule",
-    "name": "keyValue",
-    "orgText": "",
-    "definition": [
-      {
-        "type": "NonTerminal",
-        "name": "key",
-        "idx": 0
-      },
-      {
-        "type": "Terminal",
-        "name": "KeyValueSeparator",
-        "label": "=",
-        "idx": 0,
-        "pattern": "="
-      },
-      {
-        "type": "NonTerminal",
-        "name": "value",
-        "idx": 0
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "inlineTableKeyValues",
-    "orgText": "",
-    "definition": [
-      {
-        "type": "RepetitionWithSeparator",
-        "idx": 0,
-        "separator": {
-          "type": "Terminal",
-          "name": "InlineTableSep",
-          "label": ",",
-          "idx": 1,
-          "pattern": ","
-        },
-        "definition": [
-          {
-            "type": "NonTerminal",
-            "name": "keyValue",
-            "idx": 0
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "type": "Rule",
     "name": "inlineTable",
     "orgText": "",
     "definition": [
@@ -167,74 +118,6 @@
         "label": "}",
         "idx": 0,
         "pattern": "}"
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "arrayValues",
-    "orgText": "",
-    "definition": [
-      {
-        "type": "NonTerminal",
-        "name": "value",
-        "idx": 0
-      },
-      {
-        "type": "Repetition",
-        "idx": 0,
-        "definition": [
-          {
-            "type": "Terminal",
-            "name": "Comma",
-            "label": ",",
-            "idx": 0,
-            "pattern": ","
-          },
-          {
-            "type": "Option",
-            "idx": 0,
-            "definition": [
-              {
-                "type": "NonTerminal",
-                "name": "value",
-                "idx": 1
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "array",
-    "orgText": "",
-    "definition": [
-      {
-        "type": "Terminal",
-        "name": "ArrayOpen",
-        "label": "[",
-        "idx": 0,
-        "pattern": "\\["
-      },
-      {
-        "type": "Option",
-        "idx": 0,
-        "definition": [
-          {
-            "type": "NonTerminal",
-            "name": "arrayValues",
-            "idx": 0
-          }
-        ]
-      },
-      {
-        "type": "Terminal",
-        "name": "ArrayClose",
-        "label": "]",
-        "idx": 0,
-        "pattern": "]"
       }
     ]
   },
@@ -328,6 +211,123 @@
             ]
           }
         ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "keyValue",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "key",
+        "idx": 0
+      },
+      {
+        "type": "Terminal",
+        "name": "KeyValueSeparator",
+        "label": "=",
+        "idx": 0,
+        "pattern": "="
+      },
+      {
+        "type": "NonTerminal",
+        "name": "value",
+        "idx": 0
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "inlineTableKeyValues",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "RepetitionWithSeparator",
+        "idx": 0,
+        "separator": {
+          "type": "Terminal",
+          "name": "InlineTableSep",
+          "label": ",",
+          "idx": 1,
+          "pattern": ","
+        },
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "keyValue",
+            "idx": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "arrayValues",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "value",
+        "idx": 0
+      },
+      {
+        "type": "Repetition",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "Comma",
+            "label": ",",
+            "idx": 0,
+            "pattern": ","
+          },
+          {
+            "type": "Option",
+            "idx": 0,
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "value",
+                "idx": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "array",
+    "orgText": "",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "ArrayOpen",
+        "label": "[",
+        "idx": 0,
+        "pattern": "\\["
+      },
+      {
+        "type": "Option",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "arrayValues",
+            "idx": 0
+          }
+        ]
+      },
+      {
+        "type": "Terminal",
+        "name": "ArrayClose",
+        "label": "]",
+        "idx": 0,
+        "pattern": "]"
       }
     ]
   },

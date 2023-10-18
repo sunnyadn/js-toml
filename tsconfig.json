@@ -1,9 +1,7 @@
 {
   "compilerOptions": {
     "moduleResolution": "nodenext",
-    "types": [
-      "vitest/globals"
-    ],
+    "types": ["vitest/globals"],
     "allowSyntheticDefaultImports": true
   },
   "exclude": ["node_modules"]
