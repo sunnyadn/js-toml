@@ -1,4 +1,4 @@
-import { CstParser } from 'chevrotain';
+import { CstNode, CstParser, IOrAlt, IToken } from 'chevrotain';
 import {
   allTokens,
   ArrayClose,
@@ -24,6 +24,7 @@ import {
 } from './tokens/index.js';
 
 class Parser extends CstParser {
+  private valueCache: IOrAlt<IToken | CstNode>[];
   private dottedKey = this.RULE('dottedKey', () => {
     this.CONSUME(SimpleKey);
     this.AT_LEAST_ONE(() => {
@@ -37,22 +38,6 @@ class Parser extends CstParser {
       { ALT: () => this.CONSUME(SimpleKey) },
     ]);
   });
-  private inlineTable = this.RULE('inlineTable', () => {
-    this.CONSUME(InlineTableOpen);
-    this.OPTION(() => this.SUBRULE(this.inlineTableKeyValues));
-    this.CONSUME(InlineTableClose);
-  });
-  private value = this.RULE('value', () => {
-    this.OR([
-      { ALT: () => this.CONSUME(TomlString) },
-      { ALT: () => this.CONSUME(Boolean) },
-      { ALT: () => this.SUBRULE(this.array) },
-      { ALT: () => this.SUBRULE(this.inlineTable) },
-      { ALT: () => this.CONSUME(DateTime) },
-      { ALT: () => this.CONSUME(Float) },
-      { ALT: () => this.CONSUME(Integer) },
-    ]);
-  });
   private keyValue = this.RULE('keyValue', () => {
     this.SUBRULE(this.key);
     this.CONSUME(KeyValueSeparator);
@@ -63,6 +48,11 @@ class Parser extends CstParser {
       SEP: InlineTableSep,
       DEF: () => this.SUBRULE(this.keyValue),
     });
+  });
+  private inlineTable = this.RULE('inlineTable', () => {
+    this.CONSUME(InlineTableOpen);
+    this.OPTION(() => this.SUBRULE(this.inlineTableKeyValues));
+    this.CONSUME(InlineTableClose);
   });
   private arrayValues = this.RULE('arrayValues', () => {
     this.SUBRULE(this.value);
@@ -82,6 +72,20 @@ class Parser extends CstParser {
     this.CONSUME(ArrayOpen);
     this.OPTION(() => this.SUBRULE(this.arrayValues));
     this.CONSUME(ArrayClose);
+  });
+  private value = this.RULE('value', () => {
+    this.OR(
+      this.valueCache ||
+        (this.valueCache = [
+          { ALT: () => this.CONSUME(TomlString) },
+          { ALT: () => this.CONSUME(Boolean) },
+          { ALT: () => this.SUBRULE(this.array) },
+          { ALT: () => this.SUBRULE(this.inlineTable) },
+          { ALT: () => this.CONSUME(DateTime) },
+          { ALT: () => this.CONSUME(Float) },
+          { ALT: () => this.CONSUME(Integer) },
+        ])
+    );
   });
   private stdTable = this.RULE('stdTable', () => {
     this.CONSUME(StdTableOpen);
