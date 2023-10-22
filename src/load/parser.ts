@@ -25,6 +25,17 @@ import {
 import { envs } from '../common/environment.js';
 
 class Parser extends CstParser {
+  toml = this.RULE('toml', () => {
+    this.MANY(() => this.CONSUME(ExpressionNewLine));
+    this.MANY1(() => {
+      this.SUBRULE1(this.expression);
+      this.OPTION2(() => {
+        this.CONSUME1(Newline);
+        this.MANY3(() => this.CONSUME2(ExpressionNewLine));
+      });
+    });
+  });
+
   private valueCache: IOrAlt<IToken | CstNode>[];
   private dottedKey = this.RULE('dottedKey', () => {
     this.CONSUME(SimpleKey);
@@ -42,10 +53,21 @@ class Parser extends CstParser {
       ],
     });
   });
+  private inlineTableKeyValues = this.RULE('inlineTableKeyValues', () => {
+    this.MANY_SEP({
+      SEP: InlineTableSep,
+      DEF: () => this.SUBRULE(this.keyValue),
+    });
+  });
   private inlineTable = this.RULE('inlineTable', () => {
     this.CONSUME(InlineTableOpen);
     this.OPTION(() => this.SUBRULE(this.inlineTableKeyValues));
     this.CONSUME(InlineTableClose);
+  });
+  private array = this.RULE('array', () => {
+    this.CONSUME(ArrayOpen);
+    this.OPTION(() => this.SUBRULE(this.arrayValues));
+    this.CONSUME(ArrayClose);
   });
   private value = this.RULE('value', () => {
     this.OR(
@@ -66,12 +88,6 @@ class Parser extends CstParser {
     this.CONSUME(KeyValueSeparator);
     this.SUBRULE(this.value);
   });
-  private inlineTableKeyValues = this.RULE('inlineTableKeyValues', () => {
-    this.MANY_SEP({
-      SEP: InlineTableSep,
-      DEF: () => this.SUBRULE(this.keyValue),
-    });
-  });
   private arrayValues = this.RULE('arrayValues', () => {
     this.SUBRULE(this.value);
     let havingMore = true;
@@ -85,11 +101,6 @@ class Parser extends CstParser {
         }
       },
     });
-  });
-  private array = this.RULE('array', () => {
-    this.CONSUME(ArrayOpen);
-    this.OPTION(() => this.SUBRULE(this.arrayValues));
-    this.CONSUME(ArrayClose);
   });
   private stdTable = this.RULE('stdTable', () => {
     this.CONSUME(StdTableOpen);
@@ -112,16 +123,6 @@ class Parser extends CstParser {
       { ALT: () => this.SUBRULE(this.keyValue) },
       { ALT: () => this.SUBRULE(this.table) },
     ]);
-  });
-  toml = this.RULE('toml', () => {
-    this.MANY(() => this.CONSUME(ExpressionNewLine));
-    this.MANY1(() => {
-      this.SUBRULE1(this.expression);
-      this.OPTION2(() => {
-        this.CONSUME1(Newline);
-        this.MANY3(() => this.CONSUME2(ExpressionNewLine));
-      });
-    });
   });
 
   constructor() {

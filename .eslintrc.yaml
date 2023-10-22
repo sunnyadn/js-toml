@@ -5,3 +5,5 @@ extends:
 parser: '@typescript-eslint/parser'
 plugins:
   - '@typescript-eslint'
+rules:
+  '@typescript-eslint/member-ordering': error

@@ -8,21 +8,21 @@ export class SyntaxParseError extends Error {
 }
 
 export class LexerError extends SyntaxParseError {
+  errors: ILexingError[];
+
   constructor(errors: ILexingError[]) {
     super('Syntax error\n' + errors.map((error) => error.message).join('\n'));
     this.errors = errors;
   }
-
-  errors: ILexingError[];
 }
 
 export class ParserError extends SyntaxParseError {
+  errors: IRecognitionException[];
+
   constructor(errors: IRecognitionException[]) {
     super('Syntax error\n' + errors.map((error) => error.message).join('\n'));
     this.errors = errors;
   }
-
-  errors: IRecognitionException[];
 }
 
 export class InterpreterError extends SyntaxParseError {
