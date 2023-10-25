@@ -4,7 +4,13 @@
   "description": "Example for js-toml",
   "author": "Sunny Yang",
   "license": "MIT",
+  "scripts": {
+    "start": "ts-node index.ts"
+  },
   "dependencies": {
-    "js-toml": "^0.1.0"
+    "js-toml": "^0.1.1"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1"
   }
 }
