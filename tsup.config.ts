@@ -1,9 +1,20 @@
 import { defineConfig } from 'tsup';
 
-export default defineConfig({
+const config = {
   entry: ['src/index.ts'],
-  format: ['cjs', 'esm'],
   dts: true,
   minify: true,
   treeshake: true,
-});
+};
+
+export default defineConfig([
+  {
+    ...config,
+    format: ['esm'],
+  },
+  {
+    ...config,
+    format: ['cjs'],
+    noExternal: ['chevrotain'],
+  },
+]);
