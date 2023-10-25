@@ -126,7 +126,11 @@ class Parser extends CstParser {
   });
 
   constructor() {
-    super(allTokens, { traceInitPerf: envs.isDebug(), maxLookahead: 1 });
+    super(allTokens, {
+      traceInitPerf: envs.isDebug(),
+      maxLookahead: 1,
+      skipValidations: !envs.isDebug(),
+    });
     this.performSelfAnalysis();
   }
 }
