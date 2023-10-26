@@ -1,5 +1,6 @@
 {
-  "name": "js-toml-example",
+  "name": "js-toml-cjs-example",
+  "private": true,
   "version": "0.0.1",
   "description": "Example for js-toml",
   "author": "Sunny Yang",
@@ -8,7 +9,7 @@
     "start": "ts-node index.ts"
   },
   "dependencies": {
-    "js-toml": "^0.1.1"
+    "js-toml": "^1.0.0"
   },
   "devDependencies": {
     "ts-node": "^10.9.1"
