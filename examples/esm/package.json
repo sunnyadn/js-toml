@@ -1,0 +1,17 @@
+{
+  "name": "js-toml-esm-example",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun run index.ts"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "js-toml": "^1.0.0"
+  }
+}
