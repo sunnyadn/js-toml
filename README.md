@@ -6,6 +6,7 @@
 [![npm version](https://badge.fury.io/js/js-toml.svg)](https://badge.fury.io/js/js-toml)
 
 A TOML parser for JavaScript and TypeScript. Fully tested and 100% compatible with the TOML v1.0.0 spec.
+Support Node.js, browsers and Bun⚡️!
 
 ## Installation
 
@@ -25,10 +26,16 @@ or with pnpm
 pnpm add js-toml
 ```
 
+even support bun!
+
+```bash
+bun add js-toml
+```
+
 ## Usage
 
 ```typescript
-import { load } from 'js-toml';
+import {load} from 'js-toml';
 
 const toml = `
 title = "TOML Example"
