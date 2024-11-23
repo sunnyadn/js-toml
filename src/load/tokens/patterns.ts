@@ -1,8 +1,9 @@
 import XRegExp from 'xregexp';
 
 export const whiteSpaceChar = /[ \t]/;
-// const nonAscii = /[\x80-\uD7FF]|[\uE000-\u{10FFFF}]/u;
-export const nonAscii = /[\x80-\uD7FF]|[\uE000-\uFFFF]/;
+// Handle full Unicode range including surrogate pairs for characters beyond BMP
+export const nonAscii =
+  /[\x80-\uD7FF]|[\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]/;
 
 export const newline = /\r\n|\n/;
 

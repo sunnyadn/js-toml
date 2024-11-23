@@ -232,3 +232,42 @@ it('should throw error when meeting non-scalar \\U character in string', () => {
 
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should support simple emoji strings', () => {
+  const input = 'asdf = "🔖"';
+  const result = load(input);
+  expect(result).toEqual({ asdf: '🔖' });
+});
+
+it('should support comprehensive Unicode and emoji strings', () => {
+  const input = `# Mixed ASCII, Unicode and Emojis with Escape Sequences
+mixed = "Hello 世界 🌍! \\u00A9 2024"
+
+# Emojis with text modifiers and ZWJ sequences
+skin_tone = "👋🏽 Hi there 👨🏾‍💻"
+family = "👨‍👩‍👧‍👦 is my 👨‍👦 family"
+
+# Mixing escape sequences with emojis
+escaped_mix = "\\u0048\\u0069 🙋‍♂️ \\U0001F4BB"
+
+# Unicode characters mixed with emojis
+multilang = "Café ☕️ & Ramen 🍜 = 💖"
+
+# Special characters and emojis
+special = "🎵 La-la-la ♪ (⌐■_■) →★←"
+
+# Stress test string
+stress = "🏳️‍🌈 Hello\\t世界\\n☮️\\u0026\\u2764 Peace & Love ✌🏽 🌏"`;
+  
+  const result = load(input);
+
+  expect(result).toEqual({
+    mixed: 'Hello 世界 🌍! © 2024',
+    skin_tone: '👋🏽 Hi there 👨🏾‍💻',
+    family: '👨‍👩‍👧‍👦 is my 👨‍👦 family',
+    escaped_mix: 'Hi 🙋‍♂️ 💻',
+    multilang: 'Café ☕️ & Ramen 🍜 = 💖',
+    special: '🎵 La-la-la ♪ (⌐■_■) →★←',
+    stress: '🏳️‍🌈 Hello\t世界\n☮️&❤ Peace & Love ✌🏽 🌏'
+  });
+});
