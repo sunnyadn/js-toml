@@ -1,6 +1,6 @@
 {
   "name": "js-toml",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A TOML parser for JavaScript/TypeScript, targeting TOML 1.0.0 Spec",
   "keywords": [
     "toml",
@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/sunnyadn/js-toml.git"
+    "url": "git+https://github.com/sunnyadn/js-toml.git"
   },
   "type": "module",
   "files": [
