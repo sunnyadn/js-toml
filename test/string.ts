@@ -258,7 +258,7 @@ special = "🎵 La-la-la ♪ (⌐■_■) →★←"
 
 # Stress test string
 stress = "🏳️‍🌈 Hello\\t世界\\n☮️\\u0026\\u2764 Peace & Love ✌🏽 🌏"`;
-  
+
   const result = load(input);
 
   expect(result).toEqual({
@@ -268,6 +268,6 @@ stress = "🏳️‍🌈 Hello\\t世界\\n☮️\\u0026\\u2764 Peace & Love ✌�
     escaped_mix: 'Hi 🙋‍♂️ 💻',
     multilang: 'Café ☕️ & Ramen 🍜 = 💖',
     special: '🎵 La-la-la ♪ (⌐■_■) →★←',
-    stress: '🏳️‍🌈 Hello\t世界\n☮️&❤ Peace & Love ✌🏽 🌏'
+    stress: '🏳️‍🌈 Hello\t世界\n☮️&❤ Peace & Love ✌🏽 🌏',
   });
 });
