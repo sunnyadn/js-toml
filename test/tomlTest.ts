@@ -1,6 +1,7 @@
 import glob from 'glob';
 import * as fs from 'fs';
 import { load, SyntaxParseError } from '../src/index.js';
+import { isPlainObject } from '../src/common/utils.js';
 
 const converters = {
   integer: (value) => {
@@ -48,7 +49,7 @@ const replaceWindowsNewLine = (result) => {
   if (Array.isArray(result)) {
     return result.map(replaceWindowsNewLine);
   }
-  if (result.constructor === Object) {
+  if (isPlainObject(result)) {
     const obj = {};
     Object.keys(result).forEach((key) => {
       obj[key] = replaceWindowsNewLine(result[key]);

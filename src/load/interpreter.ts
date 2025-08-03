@@ -6,12 +6,19 @@ import { Boolean, SimpleKey, TomlString } from './tokens/index.js';
 import { Float } from './tokens/Float.js';
 import { DateTime } from './tokens/DateTime.js';
 import { Integer } from './tokens/Integer.js';
-
-const isPlainObject = (obj): boolean =>
-  obj && (obj.constructor === Object || obj.constructor === undefined);
+import { isPlainObject } from '../common/utils.js';
 
 // Create a safe object without prototype pollution vulnerability
 const createSafeObject = () => Object.create(null);
+
+// Helper functions to safely handle symbols on objects created with Object.create(null)
+const setSymbol = (obj: unknown, symbol: symbol, value: unknown) => {
+  (obj as Record<symbol, unknown>)[symbol] = value;
+};
+
+const hasSymbol = (obj: unknown, symbol: symbol): boolean => {
+  return symbol in (obj as Record<symbol, unknown>);
+};
 
 const tryCreateKey = (operation, message) => {
   try {
@@ -87,7 +94,7 @@ export class Interpreter extends BaseCstVisitor {
 
   inlineTable(ctx) {
     const result = createSafeObject();
-    result[notEditable] = true;
+    setSymbol(result, notEditable, true);
     if (ctx.inlineTableKeyValues) {
       this.visit(ctx.inlineTableKeyValues, result);
     }
@@ -112,7 +119,7 @@ export class Interpreter extends BaseCstVisitor {
 
   array(ctx) {
     const result = [];
-    result[notEditable] = true;
+    setSymbol(result, notEditable, true);
     if (ctx.arrayValues) {
       return this.visit(ctx.arrayValues, result);
     }
@@ -142,7 +149,7 @@ export class Interpreter extends BaseCstVisitor {
     return tryCreateKey(
       () => {
         const array = this.getOrCreateArray(keys, root);
-        if (array[notEditable]) {
+        if (hasSymbol(array, notEditable)) {
           throw new DuplicateKeyError();
         }
 
@@ -186,7 +193,7 @@ export class Interpreter extends BaseCstVisitor {
       throw new DuplicateKeyError();
     }
     if (isPlainObject(value)) {
-      value[explicitlyDeclared] = true;
+      setSymbol(value, explicitlyDeclared, true);
     }
 
     object[key] = value;
@@ -203,16 +210,18 @@ export class Interpreter extends BaseCstVisitor {
     if (object[key]) {
       if (
         !isPlainObject(object[key]) ||
-        (!ignoreExplicitDeclared && object[key][explicitlyDeclared]) ||
-        (!ignoreImplicitDeclared && object[key][implicitlyDeclared]) ||
-        object[key][notEditable]
+        (!ignoreExplicitDeclared &&
+          hasSymbol(object[key], explicitlyDeclared)) ||
+        (!ignoreImplicitDeclared &&
+          hasSymbol(object[key], implicitlyDeclared)) ||
+        hasSymbol(object[key], notEditable)
       ) {
         throw new DuplicateKeyError();
       }
     } else {
       object[key] = createSafeObject();
       if (declareSymbol) {
-        object[key][declareSymbol] = true;
+        setSymbol(object[key], declareSymbol, true);
       }
     }
 
@@ -233,7 +242,7 @@ export class Interpreter extends BaseCstVisitor {
     const [first, ...rest] = keys;
     if (rest.length > 0) {
       if (Array.isArray(object[first])) {
-        if (object[first][notEditable]) {
+        if (hasSymbol(object[first], notEditable)) {
           throw new DuplicateKeyError();
         }
         const toAdd = object[first][object[first].length - 1];
