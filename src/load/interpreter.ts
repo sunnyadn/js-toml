@@ -7,7 +7,11 @@ import { Float } from './tokens/Float.js';
 import { DateTime } from './tokens/DateTime.js';
 import { Integer } from './tokens/Integer.js';
 
-const isPlainObject = (obj): boolean => obj && obj.constructor === Object;
+const isPlainObject = (obj): boolean =>
+  obj && (obj.constructor === Object || obj.constructor === undefined);
+
+// Create a safe object without prototype pollution vulnerability
+const createSafeObject = () => Object.create(null);
 
 const tryCreateKey = (operation, message) => {
   try {
@@ -35,7 +39,7 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   toml(ctx) {
-    const root = {};
+    const root = createSafeObject();
     let current = root;
     ctx.expression?.forEach(
       (expression) => (current = this.visit(expression, { current, root }))
@@ -82,7 +86,8 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   inlineTable(ctx) {
-    const result = { [notEditable]: true };
+    const result = createSafeObject();
+    result[notEditable] = true;
     if (ctx.inlineTableKeyValues) {
       this.visit(ctx.inlineTableKeyValues, result);
     }
@@ -141,7 +146,7 @@ export class Interpreter extends BaseCstVisitor {
           throw new DuplicateKeyError();
         }
 
-        const object = {};
+        const object = createSafeObject();
         array.push(object);
         return object;
       },
@@ -205,7 +210,7 @@ export class Interpreter extends BaseCstVisitor {
         throw new DuplicateKeyError();
       }
     } else {
-      object[key] = {};
+      object[key] = createSafeObject();
       if (declareSymbol) {
         object[key][declareSymbol] = true;
       }
