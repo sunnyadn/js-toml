@@ -105,3 +105,9 @@ dist
 
 # IDEA files
 .idea
+
+# Example lock files
+examples/*/yarn.lock
+examples/*/bun.lockb
+examples/*/package-lock.json
+examples/*/bun.lock
