@@ -1,4 +1,4 @@
-import glob from 'glob';
+import { globSync } from 'glob';
 import * as fs from 'fs';
 import { load, SyntaxParseError } from '../src/index.js';
 import { isPlainObject } from '../src/common/utils.js';
@@ -63,7 +63,7 @@ const replaceWindowsNewLine = (result) => {
 };
 
 describe('Run TOML valid tests', () => {
-  const validTestCases = glob.sync('testcase/valid/**/*.toml');
+  const validTestCases = globSync('testcase/valid/**/*.toml');
   for (const testCase of validTestCases) {
     const testName = testCase.replace(/^testcase\//, '').replace(/\.toml$/, '');
     it(`should parse ${testName} correctly`, () => {
@@ -78,7 +78,7 @@ describe('Run TOML valid tests', () => {
 });
 
 describe('Run TOML invalid tests', () => {
-  const invalidTestCases = glob.sync('testcase/invalid/**/*.toml');
+  const invalidTestCases = globSync('testcase/invalid/**/*.toml');
   for (const testCase of invalidTestCases) {
     const testName = testCase.replace(/^testcase\//, '').replace(/\.toml$/, '');
     it(`should throw error for ${testName}`, () => {

@@ -9,7 +9,7 @@
     "start": "ts-node index.ts"
   },
   "dependencies": {
-    "js-toml": "^1.0.0"
+    "js-toml": "^1.0.2"
   },
   "devDependencies": {
     "ts-node": "^10.9.1"

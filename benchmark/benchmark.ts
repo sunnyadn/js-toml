@@ -1,11 +1,11 @@
 import Benchmark from 'benchmark';
-import glob from 'glob';
+import { globSync } from 'glob';
 import * as fs from 'fs';
 import * as jstoml from '../src/index.js';
 
 const suite = new Benchmark.Suite();
 
-const cases = glob.sync('benchmark/case/*.toml');
+const cases = globSync('benchmark/case/*.toml');
 const contents = {};
 
 for (const testCase of cases) {
