@@ -1,6 +1,7 @@
 import { globSync } from 'glob';
 import * as fs from 'fs';
 import { load, SyntaxParseError } from '../src/index.js';
+import { dump } from '../src/dump/index.js';
 import { isPlainObject } from '../src/common/utils.js';
 
 const converters = {
@@ -73,6 +74,17 @@ describe('Run TOML valid tests', () => {
       const json = JSON.parse(fs.readFileSync(expectedFile, 'utf8'));
       const expected = covertJsonFiles(json);
       expect(replaceWindowsNewLine(result)).toEqual(expected);
+
+      // Round trip test: ensure dumped result parses back to the exact same JS object
+      try {
+        const dumped = dump(result);
+        const doubleLoad = load(dumped);
+        expect(replaceWindowsNewLine(doubleLoad)).toEqual(expected);
+      } catch (e) {
+        // Some properties might not be supported natively by our generator yet
+        // but it's worth checking where it fails
+        throw new Error(`Round-trip dump failed for ${testName}: ${e.message}`);
+      }
     });
   }
 });

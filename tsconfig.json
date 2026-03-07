@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
+    "module": "nodenext",
     "moduleResolution": "nodenext",
+    "skipLibCheck": true,
     "types": [
       "vitest/globals"
     ]
