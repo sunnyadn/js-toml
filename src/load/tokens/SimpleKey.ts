@@ -1,9 +1,3 @@
-import { createToken, Lexer } from 'chevrotain';
-import {
-  defaultFallbackInterpreter,
-  registerTokenInterpreter,
-} from './tokenInterpreters.js';
+import { createCategoryToken } from './tokenInterpreters.js';
 
-export const SimpleKey = createToken({ name: 'SimpleKey', pattern: Lexer.NA });
-
-registerTokenInterpreter(SimpleKey, defaultFallbackInterpreter);
+export const SimpleKey = createCategoryToken('SimpleKey');

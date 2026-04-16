@@ -70,7 +70,6 @@ export const unescapeString = (string) => {
           i += 8;
           break;
         }
-        case string.match(/^[0-7]{1,3}$/):
       }
     } else {
       result += char;

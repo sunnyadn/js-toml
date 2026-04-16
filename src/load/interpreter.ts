@@ -20,6 +20,8 @@ const hasSymbol = (obj: unknown, symbol: symbol): boolean => {
   return symbol in (obj as Record<symbol, unknown>);
 };
 
+class DuplicateKeyError extends Error {}
+
 const tryCreateKey = (operation, message) => {
   try {
     return operation();
@@ -27,10 +29,9 @@ const tryCreateKey = (operation, message) => {
     if (error instanceof DuplicateKeyError) {
       throw new InterpreterError(message);
     }
+    throw error;
   }
 };
-
-class DuplicateKeyError extends Error {}
 
 const BaseCstVisitor = parser.getBaseCstVisitorConstructor();
 
@@ -179,8 +180,9 @@ export class Interpreter extends BaseCstVisitor {
   private interpret(ctx, ...candidates: TokenType[]) {
     for (const type of candidates) {
       if (ctx[type.name]) {
+        const interpret = tokenInterpreters.get(type.name);
         const result = ctx[type.name].map((token) =>
-          tokenInterpreters[type.name](token.image, token, type.name)
+          interpret(token.image, token, type.name)
         );
 
         return result.length === 1 ? result[0] : result;
