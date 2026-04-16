@@ -94,13 +94,7 @@ function hasRenderableHeader(val: Record<string, unknown>): boolean {
   const entries = Object.values(val);
   if (entries.length === 0) return true;
   return entries.some(
-    (v) =>
-      typeof v === 'string' ||
-      typeof v === 'number' ||
-      typeof v === 'boolean' ||
-      typeof v === 'bigint' ||
-      v instanceof Date ||
-      (Array.isArray(v) && !isTableArray(v))
+    (v) => !isPlainObject(v) && !(Array.isArray(v) && isTableArray(v))
   );
 }
 
