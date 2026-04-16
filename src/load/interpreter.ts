@@ -167,12 +167,13 @@ export class Interpreter extends BaseCstVisitor {
       delete object[symbol];
     }
     for (const key in object) {
-      if (typeof object[key] === 'object') {
-        this.cleanInternalProperties(object[key]);
-      }
-
       if (Array.isArray(object[key])) {
+        for (const symbol of Object.getOwnPropertySymbols(object[key])) {
+          delete object[key][symbol];
+        }
         object[key].forEach((item) => this.cleanInternalProperties(item));
+      } else if (typeof object[key] === 'object') {
+        this.cleanInternalProperties(object[key]);
       }
     }
   }
@@ -230,28 +231,28 @@ export class Interpreter extends BaseCstVisitor {
     return object[key];
   }
 
-  private assignValue(keys, value, object) {
-    const [first, ...rest] = keys;
-    if (rest.length > 0) {
+  private assignValue(keys, value, object, idx = 0) {
+    const first = keys[idx];
+    if (idx < keys.length - 1) {
       this.tryCreatingObject(first, object, implicitlyDeclared, true, false);
-      return this.assignValue(rest, value, object[first]);
+      return this.assignValue(keys, value, object[first], idx + 1);
     }
 
     return this.assignPrimitiveValue(first, value, object);
   }
 
-  private createTable(keys, object) {
-    const [first, ...rest] = keys;
-    if (rest.length > 0) {
+  private createTable(keys, object, idx = 0) {
+    const first = keys[idx];
+    if (idx < keys.length - 1) {
       if (Array.isArray(object[first])) {
         if (hasSymbol(object[first], notEditable)) {
           throw new DuplicateKeyError();
         }
         const toAdd = object[first][object[first].length - 1];
-        return this.createTable(rest, toAdd);
+        return this.createTable(keys, toAdd, idx + 1);
       }
       this.tryCreatingObject(first, object, null, true, true);
-      return this.createTable(rest, object[first]);
+      return this.createTable(keys, object[first], idx + 1);
     }
     return this.tryCreatingObject(
       first,
@@ -262,15 +263,15 @@ export class Interpreter extends BaseCstVisitor {
     );
   }
 
-  private getOrCreateArray(keys, object) {
-    const [first, ...rest] = keys;
-    if (rest.length > 0) {
+  private getOrCreateArray(keys, object, idx = 0) {
+    const first = keys[idx];
+    if (idx < keys.length - 1) {
       if (Array.isArray(object[first])) {
         const toAdd = object[first][object[first].length - 1];
-        return this.getOrCreateArray(rest, toAdd);
+        return this.getOrCreateArray(keys, toAdd, idx + 1);
       }
       this.tryCreatingObject(first, object, null, true, true);
-      return this.getOrCreateArray(rest, object[first]);
+      return this.getOrCreateArray(keys, object[first], idx + 1);
     }
 
     if (object[first] && !Array.isArray(object[first])) {

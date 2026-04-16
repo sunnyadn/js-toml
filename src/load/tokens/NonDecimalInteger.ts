@@ -63,13 +63,10 @@ const parseBigInt = (string: string, radix: number): bigint => {
 };
 
 const getRadix = (raw: string): number => {
-  if (raw.startsWith('0x')) {
-    return 16;
-  } else if (raw.startsWith('0o')) {
-    return 8;
-  } else if (raw.startsWith('0b')) {
-    return 2;
-  }
+  if (raw.startsWith('0x')) return 16;
+  if (raw.startsWith('0o')) return 8;
+  if (raw.startsWith('0b')) return 2;
+  throw new Error(`Unknown integer prefix: ${raw}`);
 };
 
 registerTokenInterpreter(NonDecimalInteger, (raw: string) => {

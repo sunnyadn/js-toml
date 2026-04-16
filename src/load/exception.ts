@@ -1,7 +1,7 @@
 import { ILexingError, IRecognitionException } from 'chevrotain';
 
 export class SyntaxParseError extends Error {
-  constructor(message) {
+  constructor(message: string) {
     super(message);
     this.name = 'SyntaxParseError';
   }

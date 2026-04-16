@@ -67,15 +67,17 @@ export const DateTime = createToken({
   pattern: dateTime,
 });
 
+const datePattern = XRegExp.build(
+  '({{dateFullYear}})-({{dateMonth}})-({{dateMDay}})',
+  { dateFullYear, dateMonth, dateMDay }
+);
+
+const timePattern = XRegExp.build(
+  '({{timeHour}}):({{timeMinute}}):({{timeSecond}})',
+  { timeHour, timeMinute, timeSecond }
+);
+
 const isValidDate = (value: string) => {
-  const datePattern = XRegExp.build(
-    '({{dateFullYear}})-({{dateMonth}})-({{dateMDay}})',
-    {
-      dateFullYear,
-      dateMonth,
-      dateMDay,
-    }
-  );
   const date = XRegExp.exec(value, datePattern);
   if (date) {
     const year = Number(date[1]);
@@ -93,14 +95,6 @@ const isValidDate = (value: string) => {
 };
 
 const isValidTime = (value: string) => {
-  const timePattern = XRegExp.build(
-    '({{timeHour}}):({{timeMinute}}):({{timeSecond}})',
-    {
-      timeHour,
-      timeMinute,
-      timeSecond,
-    }
-  );
   const time = XRegExp.exec(value, timePattern);
   if (time) {
     const hour = Number(time[1]);

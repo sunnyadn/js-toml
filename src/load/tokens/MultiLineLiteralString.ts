@@ -1,5 +1,5 @@
 import { createToken } from 'chevrotain';
-import { apostrophe, newline, nonAscii } from './patterns.js';
+import { apostrophe, literalChar, newline } from './patterns.js';
 import { registerTokenInterpreter } from './tokenInterpreters.js';
 import { getMultiLineContent } from './utils.js';
 import { TomlString } from './TomlString.js';
@@ -9,15 +9,10 @@ const multiLineLiteralStringDelimiter = XRegExp.build('{{apostrophe}}{3}', {
   apostrophe,
 });
 
-const multiLineLiteralChar = XRegExp.build(
-  '\t|[\x20-\x26]|[\\x28-\x7E]|{{nonAscii}}',
-  { nonAscii }
-);
-
-const multiLineLiteralContent = XRegExp.build(
-  '{{multiLineLiteralChar}}|{{newline}}',
-  { multiLineLiteralChar, newline }
-);
+const multiLineLiteralContent = XRegExp.build('{{literalChar}}|{{newline}}', {
+  literalChar,
+  newline,
+});
 
 const multiLineLiteralQuotes = XRegExp.build('{{apostrophe}}{1,2}', {
   apostrophe,

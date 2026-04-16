@@ -1,9 +1,9 @@
 import { createToken } from 'chevrotain';
 import {
+  basicUnescaped,
   escape,
   escaped,
   newline,
-  nonAscii,
   quotationMark,
   whiteSpaceChar,
 } from './patterns.js';
@@ -16,18 +16,10 @@ const multiLineBasicStringDelimiter = XRegExp.build('{{quotationMark}}{3}', {
   quotationMark,
 });
 
-const multiLineBasicUnescaped = XRegExp.build(
-  '{{whiteSpaceChar}}|!|[\x23-\\x5B]|[\\x5D-\x7E]|{{nonAscii}}',
-  {
-    whiteSpaceChar,
-    nonAscii,
-  }
-);
-
-const multiLineBasicChar = XRegExp.build(
-  '{{multiLineBasicUnescaped}}|{{escaped}}',
-  { multiLineBasicUnescaped, escaped }
-);
+const multiLineBasicChar = XRegExp.build('{{basicUnescaped}}|{{escaped}}', {
+  basicUnescaped,
+  escaped,
+});
 
 const whiteSpace = XRegExp.build('{{whiteSpaceChar}}*', { whiteSpaceChar });
 

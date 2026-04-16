@@ -25,6 +25,16 @@ export const escaped = XRegExp.build('{{escape}}{{escapeSeqChar}}', {
   escapeSeqChar,
 });
 
+export const basicUnescaped = XRegExp.build(
+  '{{whiteSpaceChar}}|!|[\x23-\\x5B]|[\\x5D-\x7E]|{{nonAscii}}',
+  { whiteSpaceChar, nonAscii }
+);
+
+export const literalChar = XRegExp.build(
+  '\t|[\x20-\x26]|[\\x28-\x7E]|{{nonAscii}}',
+  { nonAscii }
+);
+
 export const apostrophe = /'/;
 
 export const underscore = /_/;
