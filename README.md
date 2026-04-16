@@ -51,6 +51,8 @@ bun add js-toml
 
 ## Usage
 
+### Parsing TOML
+
 ```typescript
 import {load} from 'js-toml';
 
@@ -66,15 +68,44 @@ const data = load(toml);
 console.log(data);
 ```
 
+### Serializing to TOML
+
+```typescript
+import {dump} from 'js-toml';
+
+const toml = dump({
+  title: 'TOML Example',
+  owner: {
+    name: 'Tom Preston-Werner',
+    dob: new Date('1979-05-27T07:32:00-08:00'),
+  },
+});
+
+console.log(toml);
+```
+
 ## API
 
 ### load(toml: string): object
 
 Parses a TOML string and returns a JavaScript object.
 
-### dump(object: object): string
+### dump(object: object, options?: DumpOptions): string
 
-Under development.
+Serializes a JavaScript object into a TOML string. The input must be a plain
+object (i.e. a TOML table).
+
+Supported value types: string, number, `bigint`, boolean, `Date`, array,
+plain object, and array-of-tables. Strings are always emitted as single-line
+basic strings; multiline string output is not currently supported.
+
+#### DumpOptions
+
+| Option            | Type               | Default | Description                                                                                  |
+| ----------------- | ------------------ | ------- | -------------------------------------------------------------------------------------------- |
+| `newline`         | `'\n'` \| `'\r\n'` | `'\n'`  | Newline sequence used between lines.                                                         |
+| `ignoreUndefined` | `boolean`          | `false` | If `true`, properties with unsupported values (`undefined`, `Symbol`, `Function`) are silently dropped instead of throwing. |
+| `forceQuotes`     | `boolean`          | `false` | If `true`, string keys are always quoted, even when they only contain bare-key characters.   |
 
 ## License
 

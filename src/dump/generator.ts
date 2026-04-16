@@ -1,14 +1,22 @@
 import { DumpOptions } from './options.js';
 import { isPlainObject } from '../common/utils.js';
 
-function isBareKey(key: string): boolean {
-  return /^[A-Za-z0-9_-]+$/.test(key);
+interface NormalizedOptions {
+  newline: '\n' | '\r\n';
+  forceQuotes: boolean;
 }
 
+function normalize(options: DumpOptions): NormalizedOptions {
+  return {
+    newline: options.newline ?? '\n',
+    forceQuotes: options.forceQuotes ?? false,
+  };
+}
+
+const BARE_KEY_REGEX = /^[A-Za-z0-9_-]+$/;
+
 function dumpKey(key: string, forceQuotes: boolean): string {
-  if (!forceQuotes && isBareKey(key)) {
-    return key;
-  }
+  if (!forceQuotes && BARE_KEY_REGEX.test(key)) return key;
   return dumpString(key);
 }
 
@@ -27,40 +35,25 @@ const ESCAPE_REGEX = /["\\\x00-\x1F\x7F]/g;
 
 function dumpString(str: string): string {
   const escaped = str.replace(ESCAPE_REGEX, (char) => {
-    if (CHAR_ESCAPE_MAP[char]) {
-      return CHAR_ESCAPE_MAP[char];
-    }
-    const code = char.charCodeAt(0);
-    return `\\u${code.toString(16).padStart(4, '0')}`;
+    if (CHAR_ESCAPE_MAP[char]) return CHAR_ESCAPE_MAP[char];
+    return `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`;
   });
   return `"${escaped}"`;
 }
 
 function dumpNumber(num: number | bigint): string {
-  if (typeof num === 'bigint') {
-    return num.toString();
-  }
+  if (typeof num === 'bigint') return num.toString();
   if (Number.isNaN(num)) return 'nan';
   if (num === Number.POSITIVE_INFINITY) return 'inf';
   if (num === Number.NEGATIVE_INFINITY) return '-inf';
+  if (num === 0 && 1 / num === Number.NEGATIVE_INFINITY) return '-0.0';
+  if (Number.isInteger(num)) return num.toString();
 
-  // Check if it's explicitly -0
-  if (num === 0 && 1 / num === Number.NEGATIVE_INFINITY) {
-    return '-0.0';
-  }
-
-  if (Number.isInteger(num)) {
-    return num.toString();
-  }
-  let str = num.toString();
+  const str = num.toString();
   if (!str.includes('.') && !str.includes('e') && !str.includes('E')) {
-    str += '.0';
+    return str + '.0';
   }
   return str;
-}
-
-function dumpBoolean(bool: boolean): string {
-  return bool ? 'true' : 'false';
 }
 
 function dumpDate(date: Date): string {
@@ -70,55 +63,37 @@ function dumpDate(date: Date): string {
   return date.toISOString();
 }
 
-function dumpValue(value: unknown, options: DumpOptions): string | undefined {
+function dumpValue(value: unknown, opts: NormalizedOptions): string {
   if (typeof value === 'string') return dumpString(value);
   if (typeof value === 'number' || typeof value === 'bigint')
     return dumpNumber(value);
-  if (typeof value === 'boolean') return dumpBoolean(value);
+  if (typeof value === 'boolean') return value ? 'true' : 'false';
   if (value instanceof Date) return dumpDate(value);
-
-  if (Array.isArray(value)) {
-    return dumpInlineArray(value, options);
-  }
-
-  if (isPlainObject(value)) {
-    return dumpInlineTable(value, options);
-  }
-
+  if (Array.isArray(value)) return dumpInlineArray(value, opts);
+  if (isPlainObject(value)) return dumpInlineTable(value, opts);
   throw new Error(`Unexpected value type during generation: ${typeof value}`);
 }
 
-function dumpInlineArray(arr: unknown[], options: DumpOptions): string {
-  const elements: string[] = [];
-  for (const item of arr) {
-    elements.push(dumpValue(item, options));
-  }
-  return `[${elements.join(', ')}]`;
+function dumpInlineArray(arr: unknown[], opts: NormalizedOptions): string {
+  return `[${arr.map((item) => dumpValue(item, opts)).join(', ')}]`;
 }
 
-function dumpInlineTable(obj: object, options: DumpOptions): string {
-  const pairs: string[] = [];
-  for (const [key, value] of Object.entries(obj)) {
-    const dumpedValue = dumpValue(value, options);
-    const dumpedKey = dumpKey(key, options.forceQuotes ?? false);
-    pairs.push(`${dumpedKey} = ${dumpedValue}`);
-  }
-  return `{ ${pairs.join(', ')} }`;
+function dumpInlineTable(obj: object, opts: NormalizedOptions): string {
+  const pairs = Object.entries(obj).map(
+    ([key, value]) =>
+      `${dumpKey(key, opts.forceQuotes)} = ${dumpValue(value, opts)}`
+  );
+  return pairs.length === 0 ? '{}' : `{ ${pairs.join(', ')} }`;
 }
-
-// -------------------------------------------------------------
-// Main entry for the top-level tree
-// -------------------------------------------------------------
 
 function isTableArray(arr: unknown[]): arr is Record<string, unknown>[] {
   return arr.length > 0 && arr.every((v) => isPlainObject(v));
 }
 
-function shouldPrintTableHeader(val: Record<string, unknown>): boolean {
-  const keys = Object.keys(val);
-  if (keys.length === 0) return true;
-
-  return Object.values(val).some(
+function hasRenderableHeader(val: Record<string, unknown>): boolean {
+  const entries = Object.values(val);
+  if (entries.length === 0) return true;
+  return entries.some(
     (v) =>
       typeof v === 'string' ||
       typeof v === 'number' ||
@@ -133,19 +108,15 @@ export function generateBase(
   obj: Record<string, unknown>,
   options: DumpOptions
 ): string {
-  const rootResult = generateTableBody(obj, [], options);
-  // Ensure trailing newline
-  const nl = options.newline ?? '\n';
-  return rootResult.replace(/(\\r?\\n){3,}/g, nl + nl).trim() + nl;
+  return generateTableBody(obj, [], normalize(options));
 }
 
 function generateTableBody(
   obj: Record<string, unknown>,
   pathPrefix: string[],
-  options: DumpOptions
+  opts: NormalizedOptions
 ): string {
-  const nl = options.newline ?? '\n';
-  const forceQuotes = options.forceQuotes ?? false;
+  const { newline: nl, forceQuotes } = opts;
 
   const simplePairs: string[] = [];
   const nestedTables: { key: string; val: Record<string, unknown> }[] = [];
@@ -160,49 +131,37 @@ function generateTableBody(
     } else if (isPlainObject(value)) {
       nestedTables.push({ key, val: value });
     } else {
-      const dumpedValue = dumpValue(value, options);
-      simplePairs.push(`${dumpKey(key, forceQuotes)} = ${dumpedValue}`);
+      simplePairs.push(
+        `${dumpKey(key, forceQuotes)} = ${dumpValue(value, opts)}`
+      );
     }
   }
 
-  let result = simplePairs.join(nl);
-  if (
-    simplePairs.length > 0 &&
-    (nestedTables.length > 0 || nestedArraysOfTables.length > 0)
-  ) {
-    result += nl + nl; // padding after simple key-values
+  const sections: string[] = [];
+
+  if (simplePairs.length > 0) {
+    sections.push(simplePairs.join(nl) + nl);
   }
 
-  for (let i = 0; i < nestedTables.length; i++) {
-    const { key, val } = nestedTables[i];
+  for (const { key, val } of nestedTables) {
     const fullPath = [...pathPrefix, dumpKey(key, forceQuotes)];
-
-    if (result.length > 0 && !result.endsWith(nl + nl)) {
-      result += result.endsWith(nl) ? nl : nl + nl;
+    let section = '';
+    if (hasRenderableHeader(val)) {
+      section += `[${fullPath.join('.')}]${nl}`;
     }
-
-    // Print table header only if it contains primitives or is empty
-    if (fullPath.length > 0 && shouldPrintTableHeader(val)) {
-      result += `[${fullPath.join('.')}]${nl}`;
-    }
-    result += generateTableBody(val, fullPath, options);
+    section += generateTableBody(val, fullPath, opts);
+    sections.push(section);
   }
 
-  for (let i = 0; i < nestedArraysOfTables.length; i++) {
-    const { key, arr } = nestedArraysOfTables[i];
+  for (const { key, arr } of nestedArraysOfTables) {
     const fullPath = [...pathPrefix, dumpKey(key, forceQuotes)];
-
-    for (let j = 0; j < arr.length; j++) {
-      const item = arr[j];
-
-      if (result.length > 0 && !result.endsWith(nl + nl)) {
-        result += result.endsWith(nl) ? nl : nl + nl;
-      }
-
-      result += `[[${fullPath.join('.')}]]${nl}`;
-      result += generateTableBody(item, fullPath, options);
+    for (const item of arr) {
+      sections.push(
+        `[[${fullPath.join('.')}]]${nl}` +
+          generateTableBody(item, fullPath, opts)
+      );
     }
   }
 
-  return result;
+  return sections.join(nl);
 }
