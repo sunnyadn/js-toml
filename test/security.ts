@@ -1,7 +1,45 @@
 import { describe, it, expect } from 'vitest';
-import { load } from '../src/index.js';
+import { load, SyntaxParseError } from '../src/index.js';
 
 describe('Security', () => {
+  describe('Radix-prefixed integer literal length cap', () => {
+    // Each of these inputs would, on an unpatched build, run the hand-written
+    // `parseBigInt` loop `O(n^2)` times.  With the 1000-digit cap they are
+    // rejected at the interpreter callsite in microseconds.
+    it('should reject 0x literals longer than 1000 hex digits', () => {
+      const toml = `x = 0x${'f'.repeat(1001)}`;
+      expect(() => load(toml)).toThrow(SyntaxParseError);
+    });
+
+    it('should reject 0o literals longer than 1000 octal digits', () => {
+      const toml = `x = 0o${'7'.repeat(1001)}`;
+      expect(() => load(toml)).toThrow(SyntaxParseError);
+    });
+
+    it('should reject 0b literals longer than 1000 binary digits', () => {
+      const toml = `x = 0b${'1'.repeat(1001)}`;
+      expect(() => load(toml)).toThrow(SyntaxParseError);
+    });
+
+    it('should accept 0x literals up to the 1000-digit cap', () => {
+      const toml = `x = 0x${'1'.repeat(1000)}`;
+      const result = load(toml) as { x: bigint };
+      // 4 bits per hex digit, leading `1` so result has 1000*4 - 3 bits set
+      expect(typeof result.x).toBe('bigint');
+      expect(result.x.toString(16)).toBe('1'.repeat(1000));
+    });
+
+    it('should reject the literal in microseconds, not seconds', () => {
+      const toml = `x = 0x${'f'.repeat(50_000)}`;
+      const t0 = process.hrtime.bigint();
+      expect(() => load(toml)).toThrow(SyntaxParseError);
+      const elapsedMs = Number(process.hrtime.bigint() - t0) / 1e6;
+      // Unpatched build needs ~200 ms here; the cap should make it < 50 ms
+      // even on slow CI runners.
+      expect(elapsedMs).toBeLessThan(500);
+    });
+  });
+
   describe('Prototype Pollution Prevention', () => {
     it('should not allow __proto__ pollution', () => {
       const toml = `
