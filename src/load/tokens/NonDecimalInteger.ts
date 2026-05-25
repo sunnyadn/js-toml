@@ -65,10 +65,14 @@ export const NonDecimalInteger = createToken({
 const MAX_RADIX_LITERAL_LENGTH = 1000;
 
 const getRadix = (raw: string): number => {
-  if (raw.startsWith('0x')) return 16;
-  if (raw.startsWith('0o')) return 8;
-  if (raw.startsWith('0b')) return 2;
-  throw new Error(`Unknown integer prefix: ${raw}`);
+  switch (raw.slice(0, 2) as '0x' | '0o' | '0b') {
+    case '0x':
+      return 16;
+    case '0o':
+      return 8;
+    case '0b':
+      return 2;
+  }
 };
 
 registerTokenInterpreter(NonDecimalInteger, (raw: string) => {
