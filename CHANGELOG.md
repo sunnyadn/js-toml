@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-05-25
+
+### Security
+
+- Fix CPU exhaustion via O(n²) BigInt construction on radix-prefixed integer literals ([GHSA-wp3c-266w-4qfq](https://github.com/sunnyadn/js-toml/security/advisories/GHSA-wp3c-266w-4qfq), CWE-400, CWE-407). The `0x` / `0o` / `0b` integer parser previously used a hand-written `BigInt` accumulator loop that ran in O(n²) in the literal length, allowing a single ~500 kB literal to block the event loop for tens of seconds. Switched to the native `BigInt(prefixedString)` constructor (O(n)) and capped radix-prefixed literals at 1000 digits. Reported by [@tonghuaroot](https://github.com/tonghuaroot).
+
 ## [1.1.0] - 2026-04-15
 
 ### Added
@@ -54,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for Node.js, browsers, and Bun
 - ESM and CJS output formats
 
+[1.1.1]: https://github.com/sunnyadn/js-toml/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/sunnyadn/js-toml/compare/v1.0.3...v1.1.0
 [1.0.3]: https://github.com/sunnyadn/js-toml/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/sunnyadn/js-toml/compare/v1.0.1...v1.0.2
