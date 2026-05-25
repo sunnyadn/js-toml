@@ -1,5 +1,8 @@
 import { DumpOptions } from './options.js';
 import { isPlainObject } from '../common/utils.js';
+import { SanitizedValue } from './sanitize.js';
+
+type SanitizedTable = { [key: string]: SanitizedValue };
 
 interface NormalizedOptions {
   newline: '\n' | '\r\n';
@@ -57,23 +60,24 @@ function dumpDate(date: Date): string {
   return date.toISOString();
 }
 
-function dumpValue(value: unknown, opts: NormalizedOptions): string {
+function dumpValue(value: SanitizedValue, opts: NormalizedOptions): string {
   if (typeof value === 'string') return dumpString(value);
   if (typeof value === 'number' || typeof value === 'bigint')
     return dumpNumber(value);
   if (typeof value === 'boolean') return value ? 'true' : 'false';
   if (value instanceof Date) return dumpDate(value);
   if (Array.isArray(value)) return dumpInlineArray(value, opts);
-  if (isPlainObject(value)) return dumpInlineTable(value, opts);
-  /* v8 ignore next -- sanitize() filters all unsupported types before generation */
-  throw new Error(`Unexpected value type during generation: ${typeof value}`);
+  return dumpInlineTable(value, opts);
 }
 
-function dumpInlineArray(arr: unknown[], opts: NormalizedOptions): string {
+function dumpInlineArray(
+  arr: SanitizedValue[],
+  opts: NormalizedOptions
+): string {
   return `[${arr.map((item) => dumpValue(item, opts)).join(', ')}]`;
 }
 
-function dumpInlineTable(obj: object, opts: NormalizedOptions): string {
+function dumpInlineTable(obj: SanitizedTable, opts: NormalizedOptions): string {
   const pairs = Object.entries(obj).map(
     ([key, value]) =>
       `${dumpKey(key, opts.forceQuotes)} = ${dumpValue(value, opts)}`
@@ -81,11 +85,11 @@ function dumpInlineTable(obj: object, opts: NormalizedOptions): string {
   return pairs.length === 0 ? '{}' : `{ ${pairs.join(', ')} }`;
 }
 
-function isTableArray(arr: unknown[]): arr is Record<string, unknown>[] {
+function isTableArray(arr: SanitizedValue[]): arr is SanitizedTable[] {
   return arr.length > 0 && arr.every((v) => isPlainObject(v));
 }
 
-function hasRenderableHeader(val: Record<string, unknown>): boolean {
+function hasRenderableHeader(val: SanitizedTable): boolean {
   const entries = Object.values(val);
   if (entries.length === 0) return true;
   return entries.some(
@@ -94,24 +98,24 @@ function hasRenderableHeader(val: Record<string, unknown>): boolean {
 }
 
 export function generateBase(
-  obj: Record<string, unknown>,
+  obj: SanitizedTable,
   options: DumpOptions
 ): string {
   return generateTableBody(obj, [], normalize(options));
 }
 
 function generateTableBody(
-  obj: Record<string, unknown>,
+  obj: SanitizedTable,
   pathPrefix: string[],
   opts: NormalizedOptions
 ): string {
   const { newline: nl, forceQuotes } = opts;
 
   const simplePairs: string[] = [];
-  const nestedTables: { key: string; val: Record<string, unknown> }[] = [];
+  const nestedTables: { key: string; val: SanitizedTable }[] = [];
   const nestedArraysOfTables: {
     key: string;
-    arr: Record<string, unknown>[];
+    arr: SanitizedTable[];
   }[] = [];
 
   for (const [key, value] of Object.entries(obj)) {

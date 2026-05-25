@@ -1,7 +1,19 @@
 import { DumpOptions } from './options.js';
 import { isPlainObject } from '../common/utils.js';
 
-export function sanitize(value: unknown, options: DumpOptions): unknown {
+export type SanitizedValue =
+  | string
+  | number
+  | bigint
+  | boolean
+  | Date
+  | SanitizedValue[]
+  | { [key: string]: SanitizedValue };
+
+export function sanitize(
+  value: unknown,
+  options: DumpOptions
+): SanitizedValue | undefined {
   if (value === undefined || value === null) {
     if (options.ignoreUndefined) return undefined;
     throw new Error(`Cannot dump unsupported value type: ${value}`);
@@ -18,7 +30,7 @@ export function sanitize(value: unknown, options: DumpOptions): unknown {
   }
 
   if (Array.isArray(value)) {
-    const result: unknown[] = [];
+    const result: SanitizedValue[] = [];
     for (const item of value) {
       const sanitized = sanitize(item, options);
       if (sanitized !== undefined) result.push(sanitized);
@@ -27,7 +39,7 @@ export function sanitize(value: unknown, options: DumpOptions): unknown {
   }
 
   if (isPlainObject(value)) {
-    const result: Record<string, unknown> = {};
+    const result: { [key: string]: SanitizedValue } = {};
     for (const [k, v] of Object.entries(value)) {
       const sanitized = sanitize(v, options);
       if (sanitized !== undefined) result[k] = sanitized;
