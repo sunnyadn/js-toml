@@ -2,6 +2,7 @@ import { createToken } from 'chevrotain';
 import { hexDigit, underscore } from './patterns.js';
 import { registerTokenInterpreter } from './tokenInterpreters.js';
 import { Integer } from './Integer.js';
+import { SyntaxParseError } from '../exception.js';
 import XRegExp from 'xregexp';
 
 const hexPrefix = /0x/;
@@ -51,16 +52,17 @@ export const NonDecimalInteger = createToken({
   categories: [Integer],
 });
 
-const parseBigInt = (string: string, radix: number): bigint => {
-  let result = BigInt(0);
-  for (let i = 0; i < string.length; i++) {
-    const char = string[i];
-    const digit = parseInt(char, radix);
-    result = result * BigInt(radix) + BigInt(digit);
-  }
-
-  return result;
-};
+// Cap the digit length of `0x` / `0o` / `0b` integer literals.
+//
+// The previous hand-written `parseBigInt` loop performed
+// `result = result * BigInt(radix) + BigInt(digit)` once per input digit, so
+// the per-iteration cost grew linearly with the number of digits already
+// consumed and the whole loop was `O(n^2)`. Switching to the V8 native
+// `BigInt(prefixedString)` constructor brings the per-call cost down to
+// `O(n)`, but a multi-megabyte literal can still tie up the event loop on a
+// single document, so we also cap the literal length up front. 1000 matches
+// the `jackson-core` `StreamReadConstraints.maxNumberLength` default.
+const MAX_RADIX_LITERAL_LENGTH = 1000;
 
 const getRadix = (raw: string): number => {
   if (raw.startsWith('0x')) return 16;
@@ -74,11 +76,18 @@ registerTokenInterpreter(NonDecimalInteger, (raw: string) => {
   const digits = intString.slice(2);
   const radix = getRadix(raw);
 
+  if (digits.length > MAX_RADIX_LITERAL_LENGTH) {
+    throw new SyntaxParseError(
+      `Radix-prefixed integer literal exceeds ${MAX_RADIX_LITERAL_LENGTH} digits (length ${digits.length})`
+    );
+  }
+
   const int = parseInt(digits, radix);
 
   if (Number.isSafeInteger(int)) {
     return int;
   }
 
-  return parseBigInt(digits, radix);
+  // `BigInt` natively accepts the `0x` / `0o` / `0b` prefix and parses in O(n).
+  return BigInt(intString);
 });
