@@ -172,4 +172,28 @@ describe('dump', () => {
       'Cannot dump unsupported value type: undefined'
     );
   });
+
+  it('should throw when called with a non-plain-object input', () => {
+    expect(() =>
+      dump('not an object' as unknown as Record<string, unknown>)
+    ).toThrow('dump requires a plain object (TOML table) as input');
+    expect(() => dump(42 as unknown as Record<string, unknown>)).toThrow(
+      'dump requires a plain object (TOML table) as input'
+    );
+    expect(() => dump([] as unknown as Record<string, unknown>)).toThrow(
+      'dump requires a plain object (TOML table) as input'
+    );
+  });
+
+  it('should throw on unsupported value types (Symbol)', () => {
+    const obj = { s: Symbol('a') };
+    expect(() => dump(obj as unknown as Record<string, unknown>)).toThrow(
+      'Cannot dump unsupported type: symbol'
+    );
+  });
+
+  it('should throw when dumping an invalid Date', () => {
+    const obj = { d: new Date('invalid') };
+    expect(() => dump(obj)).toThrow('Cannot dump invalid Date');
+  });
 });

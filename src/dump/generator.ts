@@ -47,13 +47,7 @@ function dumpNumber(num: number | bigint): string {
   if (num === Number.POSITIVE_INFINITY) return 'inf';
   if (num === Number.NEGATIVE_INFINITY) return '-inf';
   if (num === 0 && 1 / num === Number.NEGATIVE_INFINITY) return '-0.0';
-  if (Number.isInteger(num)) return num.toString();
-
-  const str = num.toString();
-  if (!str.includes('.') && !str.includes('e') && !str.includes('E')) {
-    return str + '.0';
-  }
-  return str;
+  return num.toString();
 }
 
 function dumpDate(date: Date): string {
@@ -71,6 +65,7 @@ function dumpValue(value: unknown, opts: NormalizedOptions): string {
   if (value instanceof Date) return dumpDate(value);
   if (Array.isArray(value)) return dumpInlineArray(value, opts);
   if (isPlainObject(value)) return dumpInlineTable(value, opts);
+  /* v8 ignore next -- sanitize() filters all unsupported types before generation */
   throw new Error(`Unexpected value type during generation: ${typeof value}`);
 }
 
