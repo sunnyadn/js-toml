@@ -40,6 +40,58 @@ describe('Security', () => {
     });
   });
 
+  describe('Falsy-primitive duplicate-key bypass (GHSA-m34p-749j-x6m6)', () => {
+    // A falsy-typed value (false, 0, 0.0, -0.0, nan, "") followed by a table,
+    // dotted-key sub-table, or array-of-tables sharing the same name must be a
+    // duplicate-key parse error, not a silent overwrite. The interpreter used
+    // `if (object[key])` (truthy test) instead of `if (key in object)`.
+    const falsyValues = [
+      'false',
+      '0',
+      '0x0',
+      '0o0',
+      '0b0',
+      '0.0',
+      '-0.0',
+      'nan',
+      '""',
+    ];
+
+    it('should reject the advisory PoC (boolean false shadowed by a table)', () => {
+      const toml = `isAdmin = false\n[isAdmin]\nforced = "yes"`;
+      expect(() => load(toml)).toThrow(SyntaxParseError);
+    });
+
+    falsyValues.forEach((value) => {
+      it(`should reject a [stdTable] redefining a key valued ${value}`, () => {
+        expect(() => load(`k = ${value}\n[k]\nx = 1`)).toThrow(
+          SyntaxParseError
+        );
+      });
+
+      it(`should reject a dotted-key sub-table over a key valued ${value}`, () => {
+        expect(() => load(`k = ${value}\nk.b = "x"`)).toThrow(SyntaxParseError);
+      });
+
+      it(`should reject an array-of-tables over a key valued ${value}`, () => {
+        expect(() => load(`k = ${value}\n[[k]]\nb = 1`)).toThrow(
+          SyntaxParseError
+        );
+      });
+    });
+
+    it('should still accept a single falsy primitive value', () => {
+      expect(load('k = false')).toEqual({ k: false });
+      expect(load('k = 0')).toEqual({ k: 0 });
+      expect(load('k = ""')).toEqual({ k: '' });
+    });
+
+    it('should still accept a falsy value alongside an unrelated table', () => {
+      const result = load(`flag = false\n[other]\nx = 1`);
+      expect(result).toEqual({ flag: false, other: { x: 1 } });
+    });
+  });
+
   describe('Prototype Pollution Prevention', () => {
     it('should not allow __proto__ pollution', () => {
       const toml = `

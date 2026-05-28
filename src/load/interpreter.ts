@@ -211,7 +211,7 @@ export class Interpreter extends BaseCstVisitor {
     ignoreImplicitDeclared,
     ignoreExplicitDeclared
   ) {
-    if (object[key]) {
+    if (key in object) {
       if (
         !isPlainObject(object[key]) ||
         (!ignoreExplicitDeclared &&
@@ -275,7 +275,7 @@ export class Interpreter extends BaseCstVisitor {
       return this.getOrCreateArray(keys, object[first], idx + 1);
     }
 
-    if (object[first] && !Array.isArray(object[first])) {
+    if (first in object && !Array.isArray(object[first])) {
       throw new DuplicateKeyError();
     }
 
