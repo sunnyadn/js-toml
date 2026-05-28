@@ -109,3 +109,27 @@ color = "green"`;
 
   expect(() => load(input)).toThrow(SyntaxParseError);
 });
+
+it('should throw error if a nested array of tables targets an empty statically defined array', () => {
+  const input = `fruits = []
+
+[[fruits.varieties]] # INVALID: fruits is a static array, not a table`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});
+
+it('should throw error if a nested array of tables targets a non-empty statically defined array', () => {
+  const input = `fruits = [{ name = "apple" }]
+
+[[fruits.varieties]] # INVALID: fruits is a static array of inline tables`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});
+
+it('should throw error if a nested array of tables targets a statically defined array of primitives', () => {
+  const input = `fruits = [1, 2]
+
+[[fruits.varieties]] # INVALID: cannot descend into a static array`;
+
+  expect(() => load(input)).toThrow(SyntaxParseError);
+});
