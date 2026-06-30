@@ -1,3 +1,4 @@
+import { IToken } from 'chevrotain';
 import { lexer } from './lexer.js';
 import {
   DepthLimitError,
@@ -26,10 +27,7 @@ export interface LoadOptions {
 
 // Bound array / inline-table nesting by scanning the token stream before the recursive
 // parser runs, so nesting can never drive the parser past the native call stack.
-const checkNestingDepth = (
-  tokens: ReturnType<typeof lexer.tokenize>['tokens'],
-  maxDepth: number
-): void => {
+const checkNestingDepth = (tokens: IToken[], maxDepth: number): void => {
   let depth = 0;
   for (const token of tokens) {
     const type = token.tokenType;

@@ -73,7 +73,6 @@ export class Interpreter extends BaseCstVisitor {
 
   keyValue(ctx, object) {
     const keys = this.visit(ctx.key);
-    this.checkKeyDepth(keys);
     const value = this.visit(ctx.value);
 
     tryCreateKey(
@@ -83,11 +82,13 @@ export class Interpreter extends BaseCstVisitor {
   }
 
   key(ctx) {
-    if (ctx.dottedKey) {
-      return this.visit(ctx.dottedKey);
-    } else {
-      return [this.interpret(ctx, SimpleKey)];
+    const keys = ctx.dottedKey
+      ? this.visit(ctx.dottedKey)
+      : [this.interpret(ctx, SimpleKey)];
+    if (keys.length > this.maxDepth) {
+      throw new DepthLimitError(this.maxDepth);
     }
+    return keys;
   }
 
   dottedKey(ctx) {
@@ -145,7 +146,6 @@ export class Interpreter extends BaseCstVisitor {
 
   stdTable(ctx, root) {
     const keys = this.visit(ctx.key);
-    this.checkKeyDepth(keys);
 
     return tryCreateKey(
       () => this.createTable(keys, root),
@@ -155,7 +155,6 @@ export class Interpreter extends BaseCstVisitor {
 
   arrayTable(ctx, root) {
     const keys = this.visit(ctx.key);
-    this.checkKeyDepth(keys);
     return tryCreateKey(
       () => {
         const array = this.getOrCreateArray(keys, root);
@@ -169,12 +168,6 @@ export class Interpreter extends BaseCstVisitor {
       },
       `Cannot create array table '${keys.join('.')}'`
     );
-  }
-
-  private checkKeyDepth(keys) {
-    if (keys.length > this.maxDepth) {
-      throw new DepthLimitError(this.maxDepth);
-    }
   }
 
   private cleanInternalProperties(object) {
