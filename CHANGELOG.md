@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.3] - 2026-06-30
+
+### Security
+
+- Fix uncontrolled recursion that let deeply nested input (arrays / inline tables) or a long dotted key drive `load()` past the V8 call stack and throw an uncaught `RangeError`, violating the documented `SyntaxParseError` contract and enabling a denial-of-service in services that parse untrusted TOML ([GHSA-3g82-77xr-68x5](https://github.com/sunnyadn/js-toml/security/advisories/GHSA-3g82-77xr-68x5), CWE-674). Neither the recursive-descent parser nor the tree-walking interpreter bounded nesting depth. `load()` now enforces a configurable maximum depth (`load(toml, { maxDepth })`, default `100`), rejecting over-deep input as `SyntaxParseError`, with a top-level backstop that converts any residual native stack overflow into `SyntaxParseError` as well. Reported by [@kaimandalic](https://github.com/kaimandalic).
+
+### Added
+
+- `LoadOptions` with a `maxDepth` option for `load()`, and an exported `DEFAULT_MAX_DEPTH` constant.
+
 ## [1.1.2] - 2026-05-28
 
 ### Security
