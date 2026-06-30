@@ -30,3 +30,9 @@ export class InterpreterError extends SyntaxParseError {
     super(message);
   }
 }
+
+export class DepthLimitError extends SyntaxParseError {
+  constructor(maxDepth: number) {
+    super(`Maximum nesting depth of ${maxDepth} exceeded`);
+  }
+}

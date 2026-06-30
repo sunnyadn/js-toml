@@ -224,4 +224,68 @@ polluted = true
     expect(result).toHaveProperty('prototype');
     expect(result['prototype']).toEqual({ polluted: true });
   });
+
+  describe('Recursion depth limit (GHSA-3g82-77xr-68x5)', () => {
+    // Deeply nested input or a long dotted key must NOT drive recursion past the V8
+    // call stack and surface a raw RangeError. It must be rejected as a
+    // SyntaxParseError, preserving the documented error contract.
+
+    const deepArray = (n: number) => 'x = ' + '['.repeat(n) + ']'.repeat(n);
+    const deepInlineTable = (n: number) => {
+      let v = '1';
+      for (let i = 0; i < n; i++) v = `{ a = ${v} }`;
+      return 'x = ' + v;
+    };
+    const deepDottedKey = (n: number) =>
+      Array.from({ length: n }, (_, i) => 'a' + i).join('.') + ' = 1';
+
+    it('should reject deeply nested arrays as SyntaxParseError, not RangeError', () => {
+      expect(() => load(deepArray(1000))).toThrow(SyntaxParseError);
+      expect(() => load(deepArray(1000))).not.toThrow(RangeError);
+    });
+
+    it('should reject deeply nested inline tables as SyntaxParseError, not RangeError', () => {
+      expect(() => load(deepInlineTable(1000))).toThrow(SyntaxParseError);
+      expect(() => load(deepInlineTable(1000))).not.toThrow(RangeError);
+    });
+
+    it('should reject deep dotted keys as SyntaxParseError, not RangeError', () => {
+      expect(() => load(deepDottedKey(5000))).toThrow(SyntaxParseError);
+      expect(() => load(deepDottedKey(5000))).not.toThrow(RangeError);
+    });
+
+    it('should accept documents within the default depth limit', () => {
+      expect(load(deepArray(50))).toEqual({
+        x: expect.anything(),
+      });
+      const dotted = load(deepDottedKey(50)) as Record<string, unknown>;
+      expect(dotted).toHaveProperty('a0');
+    });
+
+    it('should accept depth that a raised maxDepth permits', () => {
+      // depth 200 exceeds the default (100) but is allowed with maxDepth 500
+      expect(() => load(deepArray(200))).toThrow(SyntaxParseError);
+      expect(() => load(deepArray(200), { maxDepth: 500 })).not.toThrow();
+      expect(() => load(deepDottedKey(200), { maxDepth: 500 })).not.toThrow();
+    });
+
+    it('should reject depth that a lowered maxDepth forbids', () => {
+      // depth 30 is fine by default but rejected with maxDepth 10
+      expect(() => load(deepArray(30))).not.toThrow();
+      expect(() => load(deepArray(30), { maxDepth: 10 })).toThrow(
+        SyntaxParseError
+      );
+    });
+
+    it('should never leak a RangeError even when maxDepth exceeds native capacity', () => {
+      // Pre-scan passes (depth 1000 < 5000) but the native stack overflows first;
+      // the top-level backstop must still surface a SyntaxParseError.
+      expect(() => load(deepInlineTable(1000), { maxDepth: 5000 })).toThrow(
+        SyntaxParseError
+      );
+      expect(() => load(deepInlineTable(1000), { maxDepth: 5000 })).not.toThrow(
+        RangeError
+      );
+    });
+  });
 });

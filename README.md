@@ -86,9 +86,18 @@ console.log(toml);
 
 ## API
 
-### load(toml: string): object
+### load(toml: string, options?: LoadOptions): object
 
 Parses a TOML string and returns a JavaScript object.
+
+#### LoadOptions
+
+| Option     | Type     | Default | Description                                                                                                                                                                                                 |
+| ---------- | -------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `maxDepth` | `number` | `100`   | Maximum nesting depth for arrays / inline tables and dotted-key / table-header segments. Input exceeding this is rejected with a `SyntaxParseError` instead of overflowing the call stack with a `RangeError`. |
+
+Any invalid input — including input that exceeds `maxDepth` — is reported by
+throwing `SyntaxParseError`.
 
 ### dump(object: object, options?: DumpOptions): string
 

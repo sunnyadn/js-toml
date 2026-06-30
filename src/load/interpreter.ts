@@ -1,5 +1,5 @@
 import { parser } from './parser.js';
-import { InterpreterError } from './exception.js';
+import { DepthLimitError, InterpreterError } from './exception.js';
 import { TokenType } from 'chevrotain';
 import { tokenInterpreters } from './tokens/tokenInterpreters.js';
 import { Boolean, SimpleKey, TomlString } from './tokens/index.js';
@@ -42,6 +42,11 @@ const implicitlyDeclared = Symbol('implicitlyDeclared');
 const notEditable = Symbol('notEditable');
 
 export class Interpreter extends BaseCstVisitor {
+  // Maximum dotted-key / table-header depth. Bounds the per-segment recursion in
+  // assignValue/createTable/getOrCreateArray. Set by load() per call; defaults to
+  // unbounded so direct interpreter use stays backward compatible.
+  maxDepth = Number.POSITIVE_INFINITY;
+
   constructor() {
     super();
     this.validateVisitor();
@@ -68,6 +73,7 @@ export class Interpreter extends BaseCstVisitor {
 
   keyValue(ctx, object) {
     const keys = this.visit(ctx.key);
+    this.checkKeyDepth(keys);
     const value = this.visit(ctx.value);
 
     tryCreateKey(
@@ -139,6 +145,7 @@ export class Interpreter extends BaseCstVisitor {
 
   stdTable(ctx, root) {
     const keys = this.visit(ctx.key);
+    this.checkKeyDepth(keys);
 
     return tryCreateKey(
       () => this.createTable(keys, root),
@@ -148,6 +155,7 @@ export class Interpreter extends BaseCstVisitor {
 
   arrayTable(ctx, root) {
     const keys = this.visit(ctx.key);
+    this.checkKeyDepth(keys);
     return tryCreateKey(
       () => {
         const array = this.getOrCreateArray(keys, root);
@@ -161,6 +169,12 @@ export class Interpreter extends BaseCstVisitor {
       },
       `Cannot create array table '${keys.join('.')}'`
     );
+  }
+
+  private checkKeyDepth(keys) {
+    if (keys.length > this.maxDepth) {
+      throw new DepthLimitError(this.maxDepth);
+    }
   }
 
   private cleanInternalProperties(object) {
