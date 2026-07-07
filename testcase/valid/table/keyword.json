@@ -1,6 +1,6 @@
 {
-  "true": {},
-  "false": {},
-  "inf": {},
-  "nan": {}
+    "false": {},
+    "inf":   {},
+    "nan":   {},
+    "true":  {}
 }

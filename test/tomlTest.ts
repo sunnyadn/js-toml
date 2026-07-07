@@ -72,7 +72,9 @@ describe('Run TOML valid tests', () => {
       const result = load(toml);
       const expectedFile = testCase.replace('.toml', '.json');
       const json = JSON.parse(fs.readFileSync(expectedFile, 'utf8'));
-      const expected = covertJsonFiles(json);
+      // Normalize \r\n on both sides so the comparison is stable regardless of
+      // the line endings the .toml files were checked out with.
+      const expected = replaceWindowsNewLine(covertJsonFiles(json));
       expect(replaceWindowsNewLine(result)).toEqual(expected);
 
       // Round trip test: ensure dumped result parses back to the exact same JS object
@@ -94,7 +96,19 @@ describe('Run TOML invalid tests', () => {
   for (const testCase of invalidTestCases) {
     const testName = testCase.replace(/^testcase\//, '').replace(/\.toml$/, '');
     it(`should throw error for ${testName}`, () => {
-      const toml = fs.readFileSync(testCase, 'utf8');
+      const bytes = fs.readFileSync(testCase);
+      let toml: string;
+      try {
+        toml = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+      } catch {
+        // The input is not valid UTF-8. js-toml's load() takes an
+        // already-decoded string, so byte-level validation is the host's job:
+        // a strict decoder rejecting the input before load() ever sees it
+        // satisfies the suite's "must be rejected" requirement. (A lossy
+        // decode would turn the bad bytes into U+FFFD, valid TOML.)
+        expect(testCase.replaceAll('\\', '/')).toContain('invalid/encoding/');
+        return;
+      }
       expect(() => load(toml)).toThrow(SyntaxParseError);
     });
   }

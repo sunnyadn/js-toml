@@ -231,9 +231,13 @@ export class Interpreter extends BaseCstVisitor {
       }
     } else {
       object[key] = createSafeObject();
-      if (declareSymbol) {
-        setSymbol(object[key], declareSymbol, true);
-      }
+    }
+
+    // Mark existing tables too: a super-table created implicitly by a child
+    // header (e.g. `[a.b]` then `[a]`) becomes explicitly declared the first
+    // time its own header appears, so a second `[a]` is rejected.
+    if (declareSymbol) {
+      setSymbol(object[key], declareSymbol, true);
     }
 
     return object[key];
