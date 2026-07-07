@@ -106,7 +106,7 @@ describe('Run TOML invalid tests', () => {
         // a strict decoder rejecting the input before load() ever sees it
         // satisfies the suite's "must be rejected" requirement. (A lossy
         // decode would turn the bad bytes into U+FFFD, valid TOML.)
-        expect(testCase).toContain('invalid/encoding/');
+        expect(testCase.replaceAll('\\', '/')).toContain('invalid/encoding/');
         return;
       }
       expect(() => load(toml)).toThrow(SyntaxParseError);
