@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- [TOML v1.1.0](https://toml.io/en/v1.1.0) support, enabled by default ([spec changelog](https://github.com/toml-lang/toml/blob/1.1.0/CHANGELOG.md)):
+  - Inline tables may span multiple lines, contain comments, and end with a trailing comma (toml-lang/toml#904). Newlines are still rejected inside a key/value pair itself (around `=` or a dotted-key `.`), exactly as the spec ABNF requires.
+  - `\xHH` escapes in basic and multi-line basic strings, decoding to the Unicode code point U+00HH (toml-lang/toml#796).
+  - `\e` escape (U+001B) in basic and multi-line basic strings (toml-lang/toml#790).
+  - Seconds are optional in times and date-times (toml-lang/toml#894); omitted seconds are normalized to `:00` (`13:37` loads as `"13:37:00"`). Fractional seconds still require whole seconds per the spec ABNF.
+
+### Changed
+
+- Documents that were syntax errors under TOML 1.0.0 but are valid TOML 1.1.0 (see above) now parse successfully instead of throwing `SyntaxParseError`. Every valid TOML 1.0.0 document parses exactly as before.
+- `dump()` intentionally keeps emitting TOML v1.0.0-compatible output (single-line inline tables, no trailing commas, `\uXXXX` escapes, full-precision datetimes) so generated documents remain readable by 1.0-only parsers.
+
 ## [1.1.3] - 2026-06-30
 
 ### Security
@@ -80,6 +95,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for Node.js, browsers, and Bun
 - ESM and CJS output formats
 
+[Unreleased]: https://github.com/sunnyadn/js-toml/compare/v1.1.3...HEAD
+[1.1.3]: https://github.com/sunnyadn/js-toml/compare/v1.1.2...v1.1.3
+[1.1.2]: https://github.com/sunnyadn/js-toml/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/sunnyadn/js-toml/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/sunnyadn/js-toml/compare/v1.0.3...v1.1.0
 [1.0.3]: https://github.com/sunnyadn/js-toml/compare/v1.0.2...v1.0.3

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-js-toml is a TOML v1.0.0 parser for JavaScript/TypeScript using the Chevrotain parsing library. It follows a lexer → parser → interpreter architecture to transform TOML text into JavaScript objects.
+js-toml is a TOML v1.1.0 parser for JavaScript/TypeScript using the Chevrotain parsing library. It follows a lexer → parser → interpreter architecture to transform TOML text into JavaScript objects. The `dump()` serializer intentionally emits TOML v1.0.0-compatible output only.
 
 ## Common Commands
 
@@ -48,10 +48,10 @@ The parser follows a three-stage pipeline:
 
 ### Token System
 
-The token system is comprehensive, covering all TOML v1.0.0 features including:
-- Basic and multiline strings (literal and quoted)
-- Integer, float, boolean, and datetime types
-- Arrays and inline tables
+The token system is comprehensive, covering all TOML v1.1.0 features including:
+- Basic and multiline strings (literal and quoted), with `\xHH` and `\e` escapes
+- Integer, float, boolean, and datetime types (seconds optional since TOML 1.1)
+- Arrays and inline tables (multi-line inline tables with trailing commas since TOML 1.1)
 - Standard tables and array-of-tables
 - Comments and whitespace handling
 

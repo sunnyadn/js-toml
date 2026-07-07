@@ -6,7 +6,9 @@
 [![npm version](https://badge.fury.io/js/js-toml.svg)](https://badge.fury.io/js/js-toml)
 ![NPM Downloads](https://img.shields.io/npm/d18m/js-toml)
 
-A TOML parser for JavaScript and TypeScript. Fully tested and 100% compatible with the TOML v1.0.0 spec.
+A TOML parser for JavaScript and TypeScript. Fully tested and 100% compatible with the TOML v1.1.0 spec
+(every valid TOML v1.0.0 document parses identically; `dump()` keeps emitting TOML v1.0.0-compatible output
+for maximum downstream compatibility).
 Support Node.js, browsers and Bun⚡️!
 
 ---
@@ -122,7 +124,7 @@ MIT
 
 ## References
 
-[TOML v1.0.0 Official Specs](https://toml.io/en/v1.0.0)
+[TOML v1.1.0 Official Specs](https://toml.io/en/v1.1.0)
 
 [TOML GitHub Project](https://github.com/toml-lang/toml)
 

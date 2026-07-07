@@ -15,8 +15,10 @@ export const digit = /[0-9]/;
 
 export const hexDigit = XRegExp.build('{{digit}}|[A-Fa-f]', { digit });
 
+// TOML 1.1 adds `\e` (U+001B) and `\xHH` (U+00HH) escapes:
+// escape-seq-char =/ %x65 / %x78 2HEXDIG
 const escapeSeqChar = XRegExp.build(
-  '["\\\\bfnrt]|u{{hexDigit}}{4}|U{{hexDigit}}{8}',
+  '["\\\\befnrt]|x{{hexDigit}}{2}|u{{hexDigit}}{4}|U{{hexDigit}}{8}',
   { hexDigit }
 );
 

@@ -1,0 +1,3 @@
+# Valid since TOML 1.1: seconds are optional in date-time and time values
+# (toml-lang/toml CHANGELOG 1.1.0, #894). Omitted seconds normalize to :00.
+no-secs = 1987-07-05T17:45Z

@@ -3,4 +3,5 @@ export enum Mode {
   Value = 'Value',
   Array = 'Array',
   InlineTable = 'InlineTable',
+  InlineTableValue = 'InlineTableValue',
 }

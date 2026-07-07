@@ -18,8 +18,10 @@ const timeNumOffset = XRegExp.build('[+-]{{timeHour}}:{{timeMinute}}', {
 });
 const timeOffset = XRegExp.build('[Zz]|{{timeNumOffset}}', { timeNumOffset });
 
+// TOML 1.1: seconds are optional; a fractional part still requires them
+// (partial-time = time-hour ":" time-minute [ ":" time-second [ time-secfrac ] ])
 const partialTime = XRegExp.build(
-  '{{timeHour}}:{{timeMinute}}:{{timeSecond}}{{timeSecFrac}}?',
+  '{{timeHour}}:{{timeMinute}}(?::{{timeSecond}}{{timeSecFrac}}?)?',
   {
     timeHour,
     timeMinute,
@@ -114,15 +116,31 @@ const isValidTime = (value: string) => {
 const isValidDateTime = (value: string) =>
   isValidDate(value) && isValidTime(value);
 
+// Matches a seconds-less time (TOML 1.1) right before its end or offset, so the
+// omitted seconds can be normalized to `:00`. Encodes the same optional-seconds
+// grammar as `partialTime` above — the two must stay in sync.
+const secondsLessTime = XRegExp.build(
+  '^((?:{{fullDate}}{{timeDelim}})?{{timeHour}}:{{timeMinute}})(?=$|[Zz+-])',
+  { fullDate, timeDelim, timeHour, timeMinute }
+);
+
 registerTokenInterpreter(DateTime, (raw) => {
-  if (!isValidDateTime(raw)) {
+  // O(1) seconds-presence gate before the regex replace: the first `:` in any
+  // DateTime token is always hour:minute, so seconds are present iff the char
+  // three positions later is another `:`. Date-only tokens have no `:` at all.
+  const firstColon = raw.indexOf(':');
+  const value =
+    firstColon !== -1 && raw.charCodeAt(firstColon + 3) !== 58 /* ':' */
+      ? raw.replace(secondsLessTime, '$1:00')
+      : raw;
+  if (!isValidDateTime(value)) {
     throw new SyntaxParseError(`Invalid date time: ${raw}`);
   }
 
-  const onlyTime = raw.match(localTime)?.index === 0;
+  const onlyTime = value.match(localTime)?.index === 0;
   if (onlyTime) {
-    return raw;
+    return value;
   }
 
-  return new Date(raw);
+  return new Date(value);
 });

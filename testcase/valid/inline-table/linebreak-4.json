@@ -1,0 +1,12 @@
+{
+  "json_like": {
+    "first": {
+      "type": "string",
+      "value": "Tom"
+    },
+    "last": {
+      "type": "string",
+      "value": "Preston-Werner"
+    }
+  }
+}

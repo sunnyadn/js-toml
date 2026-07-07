@@ -29,6 +29,7 @@ import { StdTableOpen } from './StdTableOpen.js';
 import { ArrayTableOpen } from './ArrayTableOpen.js';
 import { ArrayTableClose } from './ArrayTableClose.js';
 import { ExpressionNewLine } from './ExpressionNewLine.js';
+import { InlineTableNewline } from './InlineTableNewline.js';
 
 const keyTokens = [
   WhiteSpace,
@@ -68,9 +69,25 @@ export const allTokens = {
       StdTableClose,
       ...keyTokens,
     ],
-    [Mode.Value]: [...valueTokens, Newline, InlineTableSep, InlineTableClose],
+    [Mode.Value]: [...valueTokens, Newline],
     [Mode.Array]: [...valueTokens, ArrayNewline, ArraySep, ArrayClose],
-    [Mode.InlineTable]: [...keyTokens, InlineTableKeyValSep, InlineTableClose],
+    // TOML 1.1: inline tables may span multiple lines and contain comments.
+    // Legal newlines are validated and skipped by the lexer (see
+    // InlineTableNewline); comments are lexed into the ignored group. The
+    // parser rules never see either.
+    [Mode.InlineTable]: [
+      ...keyTokens,
+      Comment,
+      InlineTableNewline,
+      InlineTableKeyValSep,
+      InlineTableClose,
+    ],
+    [Mode.InlineTableValue]: [
+      ...valueTokens,
+      InlineTableNewline,
+      InlineTableSep,
+      InlineTableClose,
+    ],
   },
 
   defaultMode: Mode.Key,
