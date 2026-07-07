@@ -196,4 +196,41 @@ describe('dump', () => {
     const obj = { d: new Date('invalid') };
     expect(() => dump(obj)).toThrow('Cannot dump invalid Date');
   });
+
+  // TOML 1.1 documents must round-trip through dump(), while dump() itself
+  // keeps emitting TOML 1.0-compatible syntax only (documented decision).
+  it('should round-trip TOML 1.1 syntax through 1.0-only dump output', () => {
+    const input = `table = {
+  esc = "\\e[1m\\x61",
+  time = 13:37,
+  nested = { x = 1,
+             y = 2, },
+}`;
+    const loaded = load(input);
+    const dumped = dump(loaded);
+
+    // dump() output stays TOML 1.0: single-line inline tables, no trailing
+    // commas, and only 1.0 escape sequences.
+    expect(dumped).toMatchInlineSnapshot(`
+      "[table]
+      esc = "\\u001b[1ma"
+      time = "13:37:00"
+
+      [table.nested]
+      x = 1
+      y = 2
+      "
+    `);
+
+    expect(load(dumped)).toEqual(loaded);
+  });
+
+  it('should round-trip seconds-less date-times as full-precision 1.0 datetimes', () => {
+    const input = 'odt = 1987-07-05T17:45Z';
+    const loaded = load(input);
+    const dumped = dump(loaded);
+
+    expect(dumped).toBe('odt = 1987-07-05T17:45:00.000Z\n');
+    expect(load(dumped)).toEqual(loaded);
+  });
 });

@@ -1,0 +1,3 @@
+# Valid since TOML 1.1: a terminating (trailing) comma is permitted after the
+# last key/value pair in an inline table (toml-lang/toml CHANGELOG 1.1.0, #904).
+abc = { abc = 123, }

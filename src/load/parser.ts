@@ -53,10 +53,20 @@ class Parser extends CstParser {
       ],
     });
   });
+  // TOML 1.1: a trailing comma may precede `}` (newlines inside inline tables
+  // are validated and skipped by the lexer, see InlineTableNewline).
   private inlineTableKeyValues = this.RULE('inlineTableKeyValues', () => {
-    this.MANY_SEP({
-      SEP: InlineTableSep,
-      DEF: () => this.SUBRULE(this.keyValue),
+    this.SUBRULE(this.keyValue);
+    let havingMore = true;
+    this.MANY({
+      GATE: () => havingMore,
+      DEF: () => {
+        this.CONSUME(InlineTableSep);
+        const found = this.OPTION(() => this.SUBRULE1(this.keyValue));
+        if (!found) {
+          havingMore = false;
+        }
+      },
     });
   });
   private inlineTable = this.RULE('inlineTable', () => {
@@ -88,6 +98,7 @@ class Parser extends CstParser {
     this.CONSUME(KeyValueSeparator);
     this.SUBRULE(this.value);
   });
+  // Same trailing-separator gate idiom as inlineTableKeyValues above.
   private arrayValues = this.RULE('arrayValues', () => {
     this.SUBRULE(this.value);
     let havingMore = true;

@@ -44,6 +44,17 @@ export const unescapeString = (string) => {
         case 'r':
           result += '\r';
           break;
+        case 'e':
+          // TOML 1.1: \e is the escape character U+001B
+          result += '\u001b';
+          break;
+        case 'x': {
+          // TOML 1.1: \xHH is the Unicode code point U+00HH (not a raw byte)
+          const hex = string.slice(i + 1, i + 3);
+          result += String.fromCodePoint(parseInt(hex, 16));
+          i += 2;
+          break;
+        }
         case '"':
           result += '"';
           break;

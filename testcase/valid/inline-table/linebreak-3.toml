@@ -1,0 +1,3 @@
+# Valid since TOML 1.1: newlines are allowed inside inline tables (#904).
+t = {a=1
+,b=2}
