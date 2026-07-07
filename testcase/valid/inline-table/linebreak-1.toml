@@ -1,4 +1,0 @@
-# Valid since TOML 1.1: newlines are allowed inside inline tables
-# (toml-lang/toml CHANGELOG 1.1.0, #904).
-simple = { a = 1 
-}

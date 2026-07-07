@@ -85,11 +85,14 @@ const isValidDate = (value: string) => {
     const year = Number(date[1]);
     const month = Number(date[2]);
     const day = Number(date[3]);
-    const dateObject = new Date(year, month - 1, day);
+    // setUTCFullYear (not the Date constructor) so years 00-99 are not
+    // remapped to 1900-1999, which would use the wrong year's leap rules.
+    const dateObject = new Date(0);
+    dateObject.setUTCFullYear(year, month - 1, day);
     return (
-      dateObject.getFullYear() === year &&
-      dateObject.getMonth() + 1 === month &&
-      dateObject.getDate() === day
+      dateObject.getUTCFullYear() === year &&
+      dateObject.getUTCMonth() + 1 === month &&
+      dateObject.getUTCDate() === day
     );
   }
 
@@ -113,8 +116,21 @@ const isValidTime = (value: string) => {
   return true;
 };
 
+// Numeric offset at the end of an offset date-time (the date part never
+// matches: it has no `:`). RFC 3339: offset hour is 00-23, minute is 00-59.
+const offsetPattern = /[+-](\d{2}):(\d{2})$/;
+
+const isValidOffset = (value: string) => {
+  const offset = offsetPattern.exec(value);
+  if (offset) {
+    return Number(offset[1]) <= 23 && Number(offset[2]) <= 59;
+  }
+
+  return true;
+};
+
 const isValidDateTime = (value: string) =>
-  isValidDate(value) && isValidTime(value);
+  isValidDate(value) && isValidTime(value) && isValidOffset(value);
 
 // Matches a seconds-less time (TOML 1.1) right before its end or offset, so the
 // omitted seconds can be normalized to `:00`. Encodes the same optional-seconds
@@ -142,5 +158,8 @@ registerTokenInterpreter(DateTime, (raw) => {
     return value;
   }
 
-  return new Date(value);
+  // Canonicalize the delimiter and offset markers so Date() always takes the
+  // ISO 8601 parsing path. V8's legacy parser (used for e.g. a space
+  // delimiter) remaps years 00-99: new Date('0001-01-01 00:00:00Z') → 2001.
+  return new Date(value.replace(/[t ]/, 'T').replace(/z$/, 'Z'));
 });

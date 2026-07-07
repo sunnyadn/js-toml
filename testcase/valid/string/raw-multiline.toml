@@ -12,3 +12,11 @@ has ' a quote character
 and more than
 one newline
 in it.'''
+
+# Tab character in literal string does not need to be escaped
+multiline_with_tab = '''First line
+	 Followed by a tab'''
+
+this-str-has-apostrophes='''' there's one already
+'' two more
+'''''
