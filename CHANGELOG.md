@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-07-08
+
+### Fixed
+
+- Dates with years below 100 (e.g. `0001-01-01T00:00:00Z`) were rejected or mis-parsed via JavaScript's legacy `Date` year mapping; they now parse correctly.
+- Out-of-range UTC offsets (`+25:00`, `+12:60`) were accepted; they are now rejected per RFC 3339.
+- Duplicate super-table headers (`[a.b]` then `[a]` twice) were accepted; redefinition is now an error per the spec.
+
+### Changed
+
+- The vendored [toml-test](https://github.com/toml-lang/toml-test) suite is upgraded to the official v2.2.0 TOML-1.1.0-gated set (332 → 681 cases, zero exclusions).
+
 ## [1.2.0] - 2026-07-08
 
 ### Added
@@ -95,7 +107,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for Node.js, browsers, and Bun
 - ESM and CJS output formats
 
-[Unreleased]: https://github.com/sunnyadn/js-toml/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/sunnyadn/js-toml/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/sunnyadn/js-toml/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/sunnyadn/js-toml/compare/v1.1.3...v1.2.0
 [1.1.3]: https://github.com/sunnyadn/js-toml/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/sunnyadn/js-toml/compare/v1.1.1...v1.1.2
