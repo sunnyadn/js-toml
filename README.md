@@ -9,20 +9,20 @@
 A TOML parser for JavaScript and TypeScript. Fully tested and 100% compatible with the TOML v1.1.0 spec
 (every valid TOML v1.0.0 document parses identically; `dump()` keeps emitting TOML v1.0.0-compatible output
 for maximum downstream compatibility).
+Passes all 681 cases of the official [toml-test](https://github.com/toml-lang/toml-test) suite.
 Support Node.js, browsers and Bun⚡️!
 
 ---
 
 ## Trusted By
 
-`js-toml` is trusted in production by teams at leading companies and major open-source projects, including:
+`js-toml` is used by leading companies and major open-source projects, including:
 
-* **Microsoft** (in `pyright`)
-* **AWS (Amazon Web Services)** (in `aws-lambda-rust-runtime`)
+* **MongoDB** (in the `snooty` documentation compiler)
+* **LINE** (in `abc-user-feedback`)
+* **cargo-lambda** (in `cargo-lambda-cdk`, the CDK construct for deploying Rust on AWS Lambda)
 * **Mise** (a next-gen `asdf`)
 * **Open edX** (in over 28 packages)
-* **LINE** (in `abc-user-feedback`)
-* **MongoDB** (in the `snooty` documentation compiler)
 * ... and [many more](https://github.com/sunnyadn/js-toml/network/dependents).
 
 ---
