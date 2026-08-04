@@ -210,7 +210,7 @@ isAdmin = true
 polluted = true
 `;
 
-      const result = load(toml);
+      const result = load(toml) as Record<string, object>;
 
       const testObj = {};
       expect('polluted' in testObj).toBe(false);

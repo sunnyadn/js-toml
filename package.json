@@ -48,6 +48,7 @@
     "test": "vitest",
     "test:cov": "vitest --coverage",
     "diagram": "tsx script/generateDiagram.ts",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "benchmark": "tsx benchmark/benchmark.ts"

@@ -30,6 +30,10 @@ jobs:
           node-version: lts/*
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+      # Neither of these ran in CI before, so a type error sat on main
+      # undetected. Same shape as the timezone gap below: nothing observed it.
+      - run: pnpm typecheck
+      - run: pnpm lint
       - run: pnpm test:cov
       # Runners are UTC, where a host-timezone dependence in date handling is
       # invisible. Extra steps rather than a matrix axis: the suite is under a
