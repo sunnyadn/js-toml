@@ -29,6 +29,9 @@ export class TomlTime extends Date {
     // Seconds are optional in TOML 1.1 but not in the stored form, which is
     // what `toISOString` returns and what `dump()` writes back.
     const normalized = `${time[1]}:${time[2]}:${time[3] ?? '00'}${time[4] ?? ''}`;
+    // `Date` parses exactly three fraction digits, so the anchor keeps only
+    // those; anything finer lives in `#time` alone. Shorter forms slice to
+    // themselves.
     super(`1970-01-01T${normalized.slice(0, 12)}Z`);
     this.#time = normalized;
   }
@@ -64,6 +67,6 @@ export class TomlTime extends Date {
    * which is why this one type overrides it and `TomlDate` does not.
    */
   toString(): string {
-    return this.#time;
+    return this.toISOString();
   }
 }

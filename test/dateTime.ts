@@ -157,6 +157,14 @@ describe('type-preserving round trip', () => {
     expect(out.trim()).toBe('x = 1979-05-27T07:32:00.000Z');
   });
 
+  // The slice offsets live on the type now, so they have to hold at any year
+  // width. `dump()` still rejects the value; `toISOString()` must not mangle it.
+  it('should not mangle a year outside TOML range', () => {
+    const big = new TomlDate('+010000-01-01T00:00:00Z', 'local-date');
+    expect(big.toISOString()).toBe('+010000-01-01');
+    expect(() => dump({ x: big })).toThrow('out-of-range year');
+  });
+
   it('should expose the type through instanceof rather than constructor', () => {
     const { x } = load('x = 1979-05-27T07:32:00') as { x: TomlDate };
     expect(x).toBeInstanceOf(Date);

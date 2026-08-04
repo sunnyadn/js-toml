@@ -171,7 +171,6 @@ registerTokenInterpreter(LocalDate, (raw) => {
   return new TomlDate(raw, 'local-date');
 });
 
-// A time of day is not an instant, so it gets a `String` rather than a `Date`.
-// The lexer admits `25:99`, so the range check is `TomlTime`'s, which it now
-// owns for hand-built values too.
+// The lexer admits `25:99`, so the range check is `TomlTime`'s, which it owns
+// for hand-built values too.
 registerTokenInterpreter(LocalTime, (raw) => new TomlTime(raw));

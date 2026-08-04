@@ -34,7 +34,10 @@ export class TomlDate extends Date {
    */
   toISOString(): string {
     const iso = super.toISOString();
-    if (this.#kind === 'local-date') return iso.slice(0, 10);
+    // Cut at the delimiter, not at a fixed 10: outside years 0000-9999
+    // `toISOString` emits the expanded form and a fixed offset would slice
+    // `+010000-01-01T...` down to `+010000-01`, which is not a date at all.
+    if (this.#kind === 'local-date') return iso.slice(0, iso.indexOf('T'));
     return this.#kind === 'local-date-time' ? iso.slice(0, -1) : iso;
   }
 }

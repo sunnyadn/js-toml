@@ -1,11 +1,10 @@
 import { createToken, IToken, Lexer, TokenType } from 'chevrotain';
-import { TomlTime } from '../../common/TomlTime.js';
 
 export type InterpreterFunc = (
   raw: string,
   token: IToken,
   category: string
-) => string | boolean | number | bigint | Date | TomlTime;
+) => string | boolean | number | bigint | Date;
 
 export const tokenInterpreters = new Map<string, InterpreterFunc>();
 
