@@ -111,4 +111,3 @@ examples/*/yarn.lock
 examples/*/bun.lockb
 examples/*/package-lock.json
 examples/*/bun.lock
-.drafts-2026-08-04.md
