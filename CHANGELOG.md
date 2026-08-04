@@ -17,24 +17,18 @@ reading changes silently rather than throwing, so it should not arrive through
 
 - **BREAKING**: local date-times (an RFC 3339 date-time with no offset, such as `1979-05-27T07:32:00`) now read their wall clock as UTC instead of as the host machine's local time. Previously the same document parsed to different instants on servers in different timezones, and the reading was ambiguous even on a single machine: a wall clock inside a daylight-saving gap does not exist, and one inside a fall-back hour occurs twice. The new value matches what `smol-toml` and `@iarna/toml` return, to the millisecond. **Migration**: read local date-times with the `getUTC*` accessors (`start.getUTCHours()`) rather than the local ones (`start.getHours()`). Hosts running in UTC, which includes most servers and CI, see no change. Offset date-times, local dates, and local times are unaffected.
 - Date/time semantics are documented in the README for the first time, including which JavaScript type each of the four TOML date/time types loads as.
-
-### Fixed
-
-- Time-of-day validation round-tripped its fields through a `Date` built from local components. The check is an hour/minute/second range test and now says so directly, which removes the clock, and with it the timezone surface, from a function that had no use for either. Behaviour is unchanged: the two forms agree on every input the grammar can produce, and leap seconds stay rejected.
+- **BREAKING**: `dump()` writes each TOML date/time type back in its own form. A local date-time was previously re-emitted as `1979-05-27T07:32:00.000Z` and a local date as a full offset date-time, so a round trip through this library silently added a timezone claim the document never made. TOML defines a local date-time as carrying no relation to an offset or timezone at all. A local time was re-emitted as a quoted string, degrading it to a different TOML type. A plain `Date` supplied by a caller is still written as an offset date-time, since one instant is all it carries. Note that a time written without seconds still normalizes on load, so `07:32` round-trips as `07:32:00`: valid TOML, different bytes.
 
 ### Added
 
-- CI runs the suite under three timezones rather than only the runner's UTC. The local date-time reading above survived four years because a UTC-only suite cannot observe it.
-
-### Added
-
+- CI runs the suite under three timezones rather than only the runner's UTC. The local date-time reading above had been there since 2022 because a UTC-only suite cannot observe it.
 - `TomlTime`, exported, is what `load()` now returns for a local time, replacing a bare `string`. It extends `String`, so interpolation, `split`, `startsWith`, `length`, `JSON.stringify` and `==` all behave exactly as before, and it adds `hour`, `minute`, `second` and `fraction`. Its constructor validates: `new TomlTime(x)` throws `SyntaxParseError` unless `x` is a TOML local time, and fills omitted seconds so the stored form is always `HH:MM:SS[.frac]`. That matters because `dump()` writes a `TomlTime` bare rather than quoted, so an unchecked one would serialize as invalid TOML. **Migration**: `typeof t === 'string'` is now false, use `instanceof String`; `t === '07:32:00'` is false, and TypeScript reports `TS2367` on that comparison, which makes it a compile error rather than a silent one. Deliberately not a `Date`: both `smol-toml` and `@iarna/toml` put local times on a sentinel date, where `getHours()` on `07:32:00` returns a number shifted by the host's UTC offset and sub-millisecond precision is rounded away. `TomlTime` keeps the source precision exactly.
 - `TomlDate`, exported, is what `load()` now returns for every TOML date/time value. It extends `Date` and adds `kind`, one of `'offset-date-time'`, `'local-date-time'` or `'local-date'`. It is an accessor rather than an own property, so deep-equality, `Object.keys` and object spread treat an instance exactly like the `Date` it extends; existing assertions comparing against a plain `Date` keep passing. `constructor === Date` is false, so test with `instanceof`, and `structuredClone` returns a plain `Date`, keeping the instant but dropping the type.
 - The toml-test round trip now compares which date/time type each value came from, not only the instant. Deep-equality compares `Date`s by instant alone, which is why a local date-time re-emitted as `...Z` went unnoticed: the implementation and the test oracle shared the same blind spot.
 
-### Changed
+### Fixed
 
-- **BREAKING**: `dump()` writes each TOML date/time type back in its own form. A local date-time was previously re-emitted as `1979-05-27T07:32:00.000Z` and a local date as a full offset date-time, so a round trip through this library silently added a timezone claim the document never made. TOML defines a local date-time as carrying no relation to an offset or timezone at all. A local time was re-emitted as a quoted string, degrading it to a different TOML type. A plain `Date` supplied by a caller is still written as an offset date-time, since one instant is all it carries. Note that a time written without seconds still normalizes on load, so `07:32` round-trips as `07:32:00`: valid TOML, different bytes.
+- Time-of-day validation round-tripped its fields through a `Date` built from local components. The check is an hour/minute/second range test and now says so directly, which removes the clock, and with it the timezone surface, from a function that had no use for either. Behaviour is unchanged: the two forms agree on every input the grammar can produce, and leap seconds stay rejected.
 
 ## [1.2.2] - 2026-08-04
 

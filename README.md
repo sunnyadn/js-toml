@@ -98,7 +98,7 @@ Parses a TOML string and returns a JavaScript object.
 | ---------- | -------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `maxDepth` | `number` | `100`   | Maximum nesting depth for arrays / inline tables and dotted-key / table-header segments. Input exceeding this is rejected with a `SyntaxParseError` instead of overflowing the call stack with a `RangeError`. |
 
-Any invalid input — including input that exceeds `maxDepth` — is reported by
+Any invalid input, including input that exceeds `maxDepth`, is reported by
 throwing `SyntaxParseError`.
 
 #### Dates and times
@@ -108,21 +108,17 @@ throwing `SyntaxParseError`.
 | Offset date-time | `1979-05-27T07:32:00Z` | `TomlDate` at that instant         |
 | Local date-time  | `1979-05-27T07:32:00`  | `TomlDate`, wall clock read as UTC |
 | Local date       | `1979-05-27`           | `TomlDate` at midnight UTC         |
-| Local time       | `07:32:00`             | `TomlTime`, a `String`             |
+| Local time       | `07:32:00`             | `TomlTime`, a `String` object      |
 
-Local date-times carry no offset, so read them back with `getUTCHours()` and
-friends rather than `getHours()`, which would shift with the host timezone.
+A local date-time carries no offset, so read it with `getUTCHours()` and
+friends; `getHours()` would shift with the host timezone.
 
 `TomlDate` extends `Date` and adds `kind`, one of `'offset-date-time'`,
-`'local-date-time'` or `'local-date'`, which is how `dump()` knows to write
-each value back in the form it was read. Use `instanceof Date` to test one:
-`constructor === Date` is false, and `structuredClone` keeps the instant but
-returns a plain `Date`.
+`'local-date-time'` or `'local-date'`, which is how `dump()` writes each value
+back in the form it was read. `TomlTime` extends `String` and adds `hour`,
+`minute`, `second` and `fraction`. Test either with `instanceof`, not `typeof`.
 
-`TomlTime` extends `String`, because a time of day is not an instant. It reads
-and serializes like the plain string it used to be, and adds `hour`, `minute`,
-`second` and `fraction`. Test it with `instanceof String`: `typeof` is
-`'object'`, and `===` against a string literal is false.
+Upgrading from 1.x: see the [2.0.0 notes](CHANGELOG.md#200---2026-08-04).
 
 ### dump(object: object, options?: DumpOptions): string
 
