@@ -1,1 +1,7 @@
+# Check out with LF everywhere. Without this, git's Windows default rewrites
+# source and config to CRLF and prettier reports every line as an error.
+* text=auto eol=lf
+
+# Except the conformance fixtures: several encode CRLF, or a bare CR, as the
+# thing under test, so their bytes must survive a checkout untouched.
 testcase/** -text
