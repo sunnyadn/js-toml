@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] - 2026-08-04
+
+### Security
+
+- Fix exponential backtracking in the multi-line basic string grammar ([GHSA-j4cp-cc36-jxwg](https://github.com/sunnyadn/js-toml/security/advisories/GHSA-j4cp-cc36-jxwg), CWE-1333). The escaped-newline rule ended in `(whiteSpaceChar | newline)*`, which is ambiguous with the enclosing content loop over the same characters, so an unterminated multi-line basic string made the lexer enumerate every composition of the whitespace run. Cost doubled roughly every three bytes of input: a 97-byte document blocked the event loop for about nine seconds, and ~160 bytes for over a year. Unlike a size-proportional CPU bug, request-size limits give no protection. The trailing group is redundant, since `unescapeString` performs line-ending-backslash trimming at interpretation time, and removing it leaves the accepted language unchanged. All versions up to and including 1.2.1 are affected. Found while triaging an unrelated report.
+- Cap decimal integer literals at 1000 digits, matching the existing radix-prefixed cap (CWE-400). `NonDecimalInteger` enforced `MAX_RADIX_LITERAL_LENGTH` while `DecimalInteger` passed the whole literal to `BigInt()` unbounded. No advisory was published for this one: `BigInt()` on a decimal string measures at roughly O(n^1.28) on every supported Node (18 through 24 each parse a million digits in ~41 ms), and a megabyte of digits costs less to parse than a megabyte of ordinary key/value pairs, so there is no amplification to exploit. It is fixed as a consistency guard. Reported by [@arpitjain099](https://github.com/arpitjain099).
+
+### Changed
+
+- Decimal integer literals longer than 1000 digits now raise `SyntaxParseError` instead of loading as a `bigint`. TOML's 64-bit integer range needs at most 20 digits, so this affects only documents that deliberately carry oversized integers.
+
 ## [1.2.1] - 2026-07-08
 
 ### Fixed
