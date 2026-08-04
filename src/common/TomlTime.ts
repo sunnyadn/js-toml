@@ -9,8 +9,9 @@ const PARTIAL_TIME = /^(\d{2}):(\d{2})(?::(\d{2})(\.\d+)?)?$/;
  * A TOML local time: a wall clock, not an instant. It extends `Date` so that
  * generic value walkers, which reach for `instanceof Date` and have no branch
  * for anything else, see it. Read it with `toISOString()` or the `getUTC*`
- * accessors. The instant is anchored on 1970-01-01, which only has to stay
- * inside TOML's year range because `dumpDate` guards every `Date`.
+ * accessors. The anchor must be midnight UTC, or those accessors stop reading
+ * back the wall clock, and inside TOML's 0000-9999, since `dumpDate` guards
+ * every `Date`. The epoch satisfies both.
  */
 export class TomlTime extends Date {
   readonly #time: string;
@@ -63,9 +64,9 @@ export class TomlTime extends Date {
   }
 
   /**
-   * `Date`'s version renders the anchor day in the host timezone, so `13:37`
-   * prints as `06:37` in Edmonton and there is no day here to render.
-   * `TomlDate` does not override: matching a plain `Date` was chosen instead.
+   * `Date`'s version would render the anchor day in the host timezone, so
+   * `13:37` would print as `06:37` in Edmonton. `TomlDate` does not override,
+   * so a local date still prints host-local: `1979-05-27` as the 26th.
    */
   toString(): string {
     return this.toISOString();

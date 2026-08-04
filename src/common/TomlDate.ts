@@ -21,9 +21,9 @@ export class TomlDate extends Date {
   /**
    * Which TOML form this was written in, and only that: not the offset it
    * carried, nor precision below a millisecond. An accessor rather than an own
-   * property, so structural deep-equality (`toEqual`) treats an instance like
-   * a `Date`. Prototype-checking equality (`toStrictEqual`) still separates
-   * them, which no accessor choice can change.
+   * property, so `Object.keys` and spread see a bare `Date`. Equality is
+   * unaffected either way: matchers compare `Date`s by instant and ignore own
+   * properties, then separate subclasses on the prototype.
    */
   get kind(): TomlDateKind {
     return this.#kind;

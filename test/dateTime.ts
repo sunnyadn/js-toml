@@ -185,9 +185,9 @@ describe('local time', () => {
   it('should expose fields without a sentinel date to shift them', () => {
     const { t } = load('t = 07:32:00.5') as { t: TomlTime };
     expect([t.hour, t.minute, t.second]).toEqual([7, 32, 0]);
-    // The anchor is what `instanceof Date` consumers compare on. Nothing else
-    // pins it: the other comparisons are TomlTime against TomlTime, so both
-    // sides move together. `.5` is 500ms, not 5.
+    // The anchor is what `instanceof Date` consumers compare on. No other
+    // comparison pins it, since the rest are TomlTime against TomlTime; its
+    // year is pinned separately by dumpDate's guard. `.5` is 500ms, not 5.
     expect(t.getTime()).toBe(27120500);
   });
 
@@ -196,7 +196,7 @@ describe('local time', () => {
   // (it is zero there) nor the fraction slice (one digit slices the same).
   it('should build the anchor from every field', () => {
     const t = new TomlTime('23:59:59.123456789');
-    expect(t.getTime()).toBe(((23 * 60 + 59) * 60 + 59) * 1000 + 123);
+    expect(t.getTime()).toBe(((23 * 60 + 59) * 60 + 59) * 1000 + 123); // 86399123
   });
 
   // `dump()` writes a TomlTime bare, so anything that is not a time would come
