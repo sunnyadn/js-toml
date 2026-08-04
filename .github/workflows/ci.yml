@@ -17,14 +17,20 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
+        # Runners are UTC, where a host-timezone dependence in date handling is
+        # invisible. One negative and one non-hour offset keep that honest.
+        tz: [UTC, America/Edmonton, Australia/Adelaide]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     runs-on: ${{ matrix.os }}
 
+    env:
+      TZ: ${{ matrix.tz }}
+
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2
-      - name: Use Node.js on ${{ matrix.os }}
+      - name: Use Node.js on ${{ matrix.os }} (TZ=${{ matrix.tz }})
         uses: actions/setup-node@v3
         with:
           node-version: lts/*
@@ -36,3 +42,4 @@ jobs:
         with:
           directory: coverage
           flags: unittests,${{ matrix.os }}
+        if: matrix.tz == 'UTC'

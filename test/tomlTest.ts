@@ -24,9 +24,12 @@ const converters = {
   },
   string: (value) => value,
   bool: (value) => value === 'true',
+  // `date-local` is date-only, which `Date()` already reads as UTC. A bare
+  // `datetime-local` would be read as host-local time, so pin it to UTC to
+  // match how the loader represents an offset-less date-time.
   'date-local': (value) => new Date(value),
   'time-local': (value) => value,
-  'datetime-local': (value) => new Date(value),
+  'datetime-local': (value) => new Date(`${value}Z`),
 };
 
 const covertJsonFiles = (json) => {

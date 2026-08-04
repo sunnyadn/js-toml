@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **BREAKING**: local date-times (an RFC 3339 date-time with no offset, such as `1979-05-27T07:32:00`) now read their wall clock as UTC instead of as the host machine's local time. Previously the same document parsed to different instants on servers in different timezones, and the reading was ambiguous even on a single machine: a wall clock inside a daylight-saving gap does not exist, and one inside a fall-back hour occurs twice. The new value matches what `smol-toml` and `@iarna/toml` return, to the millisecond. **Migration**: read local date-times with the `getUTC*` accessors (`start.getUTCHours()`) rather than the local ones (`start.getHours()`). Hosts running in UTC, which includes most servers and CI, see no change. Offset date-times, local dates, and local times are unaffected.
+- Date/time semantics are documented in the README for the first time, including which JavaScript type each of the four TOML date/time types loads as.
+
+### Fixed
+
+- Time-of-day validation used local `Date` accessors, so it could depend on the host timezone and on daylight-saving transitions. It now uses UTC accessors.
+
+### Added
+
+- CI runs the suite under three timezones rather than only the runner's UTC. The timezone dependence above survived four years because a UTC-only suite cannot observe it.
+
+### Deferred
+
+- Local date-times still load as a plain `Date`, so `dump()` re-emits them as offset date-times (`...Z`). Round-tripping the *type* would need a flagged `Date` subclass along the lines of `smol-toml`'s `TomlDate`. That changes `dump()` output and is intentionally left for a separate decision within this major.
+
 ## [1.2.2] - 2026-08-04
 
 ### Security

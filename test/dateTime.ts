@@ -31,17 +31,39 @@ it('should support millisecond precision in offset date-times', () => {
   });
 });
 
-it('should support local date-times', () => {
-  timezoneMock.register('US/Pacific');
-  const input = `ldt1 = 1979-05-27T07:32:00
+// A local date-time carries no offset, so the wall clock is pinned to UTC and
+// the result must not depend on where the parse runs. The mock is here to prove
+// independence: both zones have to produce the same instant.
+it.each(['US/Pacific', 'Australia/Adelaide'] as const)(
+  'should support local date-times, identically under %s',
+  (zone) => {
+    timezoneMock.register(zone);
+    try {
+      const input = `ldt1 = 1979-05-27T07:32:00
 ldt2 = 1979-05-27T00:32:00.999`;
-  const result = load(input);
 
-  expect(result).toEqual({
-    ldt1: new Date(Date.UTC(1979, 4, 27, 14, 32, 0)),
-    ldt2: new Date(Date.UTC(1979, 4, 27, 7, 32, 0, 999)),
-  });
-  timezoneMock.unregister();
+      expect(load(input)).toEqual({
+        ldt1: new Date(Date.UTC(1979, 4, 27, 7, 32, 0)),
+        ldt2: new Date(Date.UTC(1979, 4, 27, 0, 32, 0, 999)),
+      });
+    } finally {
+      timezoneMock.unregister();
+    }
+  }
+);
+
+// The old host-local reading was ill-defined even on one machine: this wall
+// clock does not exist in Denver (spring forward), and 01:30 that November
+// occurs twice.
+it('should parse a date-time that falls in a local DST gap', () => {
+  timezoneMock.register('US/Pacific');
+  try {
+    expect(load('ldt = 2026-03-08T02:30:00')).toEqual({
+      ldt: new Date(Date.UTC(2026, 2, 8, 2, 30, 0)),
+    });
+  } finally {
+    timezoneMock.unregister();
+  }
 });
 
 it('should support local date', () => {
@@ -95,7 +117,7 @@ it('should support local date-times without seconds', () => {
   const input = 'ldt = 1979-05-27T07:32';
   const result = load(input);
 
-  expect(result).toEqual({ ldt: new Date(1979, 4, 27, 7, 32, 0) });
+  expect(result).toEqual({ ldt: new Date(Date.UTC(1979, 4, 27, 7, 32, 0)) });
 });
 
 it('should throw error for fractional seconds without whole seconds', () => {

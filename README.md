@@ -118,6 +118,36 @@ basic strings; multiline string output is not currently supported.
 | `ignoreUndefined` | `boolean`          | `false` | If `true`, properties with unsupported values (`undefined`, `Symbol`, `Function`) are silently dropped instead of throwing. |
 | `forceQuotes`     | `boolean`          | `false` | If `true`, string keys are always quoted, even when they only contain bare-key characters.   |
 
+## Dates and times
+
+TOML has four date/time types. Here is what `load()` gives you for each:
+
+| TOML type         | Example                     | You get                                    |
+| ----------------- | --------------------------- | ------------------------------------------ |
+| Offset date-time  | `1979-05-27T07:32:00Z`      | `Date` at that instant                     |
+| Local date-time   | `1979-05-27T07:32:00`       | `Date`, wall clock read as UTC             |
+| Local date        | `1979-05-27`                | `Date` at midnight UTC                     |
+| Local time        | `07:32:00`                  | `string`, unchanged                        |
+
+A local date-time carries no offset, so the TOML specification says converting
+it to an instant is implementation-specific. js-toml reads the wall clock as
+UTC, which is what `smol-toml` and `@iarna/toml` also do.
+
+The practical consequence: **read local date-times back with the `getUTC*`
+accessors, not the local ones.**
+
+```js
+const { start } = load('start = 2026-01-01T09:00:00');
+start.getUTCHours(); // 9, on every machine
+start.getHours(); // depends on where the code runs
+```
+
+Before 2.0.0 the wall clock was read as the host's local time instead. That
+made the same document parse to different instants on servers in different
+timezones, and it was ambiguous even on one machine: a time inside a
+daylight-saving gap does not exist, and a time inside a fall-back hour occurs
+twice.
+
 ## License
 
 MIT

@@ -105,11 +105,14 @@ const isValidTime = (value: string) => {
     const hour = Number(time[1]);
     const minute = Number(time[2]);
     const second = Number(time[3]);
-    const dateObject = new Date(0, 0, 0, hour, minute, second);
+    // UTC getters: the local ones would make validation depend on the host
+    // timezone, and a DST transition can shift the hour that comes back.
+    const dateObject = new Date(0);
+    dateObject.setUTCHours(hour, minute, second);
     return (
-      dateObject.getHours() === hour &&
-      dateObject.getMinutes() === minute &&
-      dateObject.getSeconds() === second
+      dateObject.getUTCHours() === hour &&
+      dateObject.getUTCMinutes() === minute &&
+      dateObject.getUTCSeconds() === second
     );
   }
 
@@ -161,5 +164,14 @@ registerTokenInterpreter(DateTime, (raw) => {
   // Canonicalize the delimiter and offset markers so Date() always takes the
   // ISO 8601 parsing path. V8's legacy parser (used for e.g. a space
   // delimiter) remaps years 00-99: new Date('0001-01-01 00:00:00Z') → 2001.
-  return new Date(value.replace(/[t ]/, 'T').replace(/z$/, 'Z'));
+  const canonical = value.replace(/[t ]/, 'T').replace(/z$/, 'Z');
+
+  // A date-time carrying no offset is local time to `Date()`, which makes the
+  // parsed instant depend on the host timezone. TOML local date-times have no
+  // offset, so pin them to UTC. Date-only forms are already parsed as UTC.
+  const tIndex = canonical.indexOf('T');
+  const isLocalDateTime =
+    tIndex !== -1 && !/[Z+-]/.test(canonical.slice(tIndex));
+
+  return new Date(isLocalDateTime ? `${canonical}Z` : canonical);
 });
