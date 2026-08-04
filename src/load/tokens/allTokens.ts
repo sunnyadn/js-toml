@@ -11,7 +11,12 @@ import { KeyValueSeparator } from './KeyValueSeparator.js';
 import { DotSeparator } from './DotSeparator.js';
 import { Comment } from './Comment.js';
 import { Float } from './Float.js';
-import { DateTime } from './DateTime.js';
+import {
+  OffsetDateTime,
+  LocalDateTime,
+  LocalDate,
+  LocalTime,
+} from './DateTime.js';
 import { ArrayOpen } from './ArrayOpen.js';
 import { ArraySep } from './ArraySep.js';
 import { InlineTableOpen } from './InlineTableOpen.js';
@@ -48,7 +53,10 @@ const valueTokens = [
   LiteralString,
   True,
   False,
-  DateTime,
+  OffsetDateTime,
+  LocalDateTime,
+  LocalDate,
+  LocalTime,
   Float,
   NonDecimalInteger,
   DecimalInteger,

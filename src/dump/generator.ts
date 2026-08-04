@@ -1,6 +1,7 @@
 import { DumpOptions } from './options.js';
 import { isPlainObject } from '../common/utils.js';
 import { SanitizedValue } from './sanitize.js';
+import { TomlDate } from '../common/TomlDate.js';
 
 type SanitizedTable = { [key: string]: SanitizedValue };
 
@@ -64,7 +65,18 @@ function dumpDate(date: Date): string {
   if (year < 0 || year > 9999) {
     throw new Error(`Cannot dump Date with out-of-range year ${year}`);
   }
-  return date.toISOString();
+
+  const iso = date.toISOString();
+
+  // A plain `Date` is one instant and nothing more, so it can only be written
+  // as an offset date-time. `load()` returns a `TomlDate`, which remembers
+  // that the document said local, and writing that back as `...Z` would assert
+  // a UTC instant the author never wrote.
+  if (!(date instanceof TomlDate) || !date.isLocal) {
+    return iso;
+  }
+
+  return date.isDateOnly ? iso.slice(0, 10) : iso.slice(0, -1);
 }
 
 function dumpValue(value: SanitizedValue, opts: NormalizedOptions): string {

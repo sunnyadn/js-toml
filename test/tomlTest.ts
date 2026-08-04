@@ -1,6 +1,6 @@
 import { globSync } from 'glob';
 import * as fs from 'fs';
-import { load, SyntaxParseError } from '../src/index.js';
+import { load, SyntaxParseError, TomlDate } from '../src/index.js';
 import { dump } from '../src/dump/index.js';
 import { isPlainObject } from '../src/common/utils.js';
 
@@ -49,6 +49,28 @@ const covertJsonFiles = (json) => {
   }
 };
 
+// Walks a loaded document and reports which TOML date/time type each Date came
+// from, so a round trip can be checked for kind and not only for instant.
+const dateKinds = (value) => {
+  if (Array.isArray(value)) {
+    return value.map(dateKinds);
+  }
+  if (value instanceof TomlDate) {
+    return value.isDateOnly ? 'date' : value.isLocal ? 'local' : 'offset';
+  }
+  if (value instanceof Date) {
+    return 'bare-date';
+  }
+  if (isPlainObject(value)) {
+    const obj = {};
+    Object.keys(value).forEach((key) => {
+      obj[key] = dateKinds(value[key]);
+    });
+    return obj;
+  }
+  return null;
+};
+
 const replaceWindowsNewLine = (result) => {
   if (Array.isArray(result)) {
     return result.map(replaceWindowsNewLine);
@@ -85,6 +107,10 @@ describe('Run TOML valid tests', () => {
         const dumped = dump(result);
         const doubleLoad = load(dumped);
         expect(replaceWindowsNewLine(doubleLoad)).toEqual(expected);
+        // toEqual compares Dates by instant, so it cannot see a local date-time
+        // re-emitted as `...Z`. Compare the TOML kind separately, which is the
+        // blind spot that let that go unnoticed.
+        expect(dateKinds(doubleLoad)).toEqual(dateKinds(result));
       } catch (e) {
         // Some properties might not be supported natively by our generator yet
         // but it's worth checking where it fails

@@ -103,15 +103,20 @@ throwing `SyntaxParseError`.
 
 #### Dates and times
 
-| TOML type        | Example                | You get                        |
-| ---------------- | ---------------------- | ------------------------------ |
-| Offset date-time | `1979-05-27T07:32:00Z` | `Date` at that instant         |
-| Local date-time  | `1979-05-27T07:32:00`  | `Date`, wall clock read as UTC |
-| Local date       | `1979-05-27`           | `Date` at midnight UTC         |
-| Local time       | `07:32:00`             | `string`, unchanged            |
+| TOML type        | Example                | You get                            |
+| ---------------- | ---------------------- | ---------------------------------- |
+| Offset date-time | `1979-05-27T07:32:00Z` | `TomlDate` at that instant         |
+| Local date-time  | `1979-05-27T07:32:00`  | `TomlDate`, wall clock read as UTC |
+| Local date       | `1979-05-27`           | `TomlDate` at midnight UTC         |
+| Local time       | `07:32:00`             | `string`, unchanged                |
 
 Local date-times carry no offset, so read them back with `getUTCHours()` and
 friends rather than `getHours()`, which would shift with the host timezone.
+
+`TomlDate` extends `Date` and adds `isLocal` and `isDateOnly`, which is how
+`dump()` knows to write each value back in the form it was read. Use
+`instanceof Date` to test one: `constructor === Date` is false, and
+`structuredClone` keeps the instant but returns a plain `Date`.
 
 ### dump(object: object, options?: DumpOptions): string
 

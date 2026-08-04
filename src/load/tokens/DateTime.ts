@@ -1,8 +1,12 @@
 import XRegExp from 'xregexp';
 import { digit } from './patterns.js';
 import { createToken } from 'chevrotain';
-import { registerTokenInterpreter } from './tokenInterpreters.js';
+import {
+  createCategoryToken,
+  registerTokenInterpreter,
+} from './tokenInterpreters.js';
 import { SyntaxParseError } from '../exception.js';
+import { TomlDate } from '../../common/TomlDate.js';
 
 const dateFullYear = XRegExp.build('{{digit}}{4}', { digit });
 const dateMonth = XRegExp.build('{{digit}}{2}', { digit });
@@ -54,19 +58,34 @@ const localDate = fullDate;
 
 const localTime = partialTime;
 
-const dateTime = XRegExp.build(
-  '{{offsetDateTime}}|{{localDateTime}}|{{localDate}}|{{localTime}}',
-  {
-    offsetDateTime,
-    localDateTime,
-    localDate,
-    localTime,
-  }
-);
+// One category with four concrete tokens rather than one token whose pattern
+// alternates: the lexer then reports which of TOML's date/time types matched,
+// instead of the interpreter re-deriving it from the string. `parser.ts` and
+// `interpreter.ts` consume the category and are unaffected.
+export const DateTime = createCategoryToken('DateTime');
 
-export const DateTime = createToken({
-  name: 'DateTime',
-  pattern: dateTime,
+export const OffsetDateTime = createToken({
+  name: 'OffsetDateTime',
+  pattern: offsetDateTime,
+  categories: [DateTime],
+});
+
+export const LocalDateTime = createToken({
+  name: 'LocalDateTime',
+  pattern: localDateTime,
+  categories: [DateTime],
+});
+
+export const LocalDate = createToken({
+  name: 'LocalDate',
+  pattern: localDate,
+  categories: [DateTime],
+});
+
+export const LocalTime = createToken({
+  name: 'LocalTime',
+  pattern: localTime,
+  categories: [DateTime],
 });
 
 const datePattern = XRegExp.build(
@@ -136,37 +155,40 @@ const secondsLessTime = XRegExp.build(
   { fullDate, timeDelim, timeHour, timeMinute }
 );
 
-const anchoredLocalDateTime = XRegExp.build('^{{localDateTime}}$', {
-  localDateTime,
-});
-
-registerTokenInterpreter(DateTime, (raw) => {
+// Normalize an omitted-seconds time (TOML 1.1) and reject an out-of-range
+// field, then canonicalize the delimiter and offset marker so `Date()` takes
+// the ISO 8601 path. Its legacy parser, which a space delimiter selects, remaps
+// years 00-99: `new Date('0001-01-01 00:00:00Z')` is 2001.
+const normalize = (raw: string) => {
   // O(1) seconds-presence gate before the regex replace: the first `:` in any
-  // DateTime token is always hour:minute, so seconds are present iff the char
+  // date/time token is hour:minute, so seconds are present iff the character
   // three positions later is another `:`. Date-only tokens have no `:` at all.
   const firstColon = raw.indexOf(':');
   const value =
     firstColon !== -1 && raw.charCodeAt(firstColon + 3) !== 58 /* ':' */
       ? raw.replace(secondsLessTime, '$1:00')
       : raw;
+
   if (!isValidDateTime(value)) {
     throw new SyntaxParseError(`Invalid date time: ${raw}`);
   }
 
-  const onlyTime = value.match(localTime)?.index === 0;
-  if (onlyTime) {
-    return value;
-  }
+  return value.replace(/[t ]/, 'T').replace(/z$/, 'Z');
+};
 
-  // Canonicalize the delimiter and offset markers so Date() always takes the
-  // ISO 8601 parsing path. V8's legacy parser (used for e.g. a space
-  // delimiter) remaps years 00-99: new Date('0001-01-01 00:00:00Z') → 2001.
-  const canonical = value.replace(/[t ]/, 'T').replace(/z$/, 'Z');
+registerTokenInterpreter(OffsetDateTime, (raw) => new TomlDate(normalize(raw)));
 
-  // Offset-less date-times are local time to `Date()`, so the instant would
-  // depend on the host timezone. Pin them to UTC. Matching the grammar rather
-  // than sniffing for offset characters keeps this tied to `timeOffset`.
-  return new Date(
-    anchoredLocalDateTime.test(canonical) ? `${canonical}Z` : canonical
-  );
-});
+registerTokenInterpreter(
+  LocalDateTime,
+  // The document states no offset, so reading the wall clock as anything but
+  // UTC would make the instant depend on where the parse happened to run.
+  (raw) => new TomlDate(`${normalize(raw)}Z`, { isLocal: true })
+);
+
+registerTokenInterpreter(
+  LocalDate,
+  (raw) => new TomlDate(normalize(raw), { isLocal: true, isDateOnly: true })
+);
+
+// A time of day is the one TOML date/time type with no `Date` to map onto.
+registerTokenInterpreter(LocalTime, (raw) => normalize(raw));

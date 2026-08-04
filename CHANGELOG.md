@@ -20,9 +20,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - CI runs the suite under three timezones rather than only the runner's UTC. The local date-time reading above survived four years because a UTC-only suite cannot observe it.
 
-### Deferred
+### Added
 
-- Local date-times still load as a plain `Date`, so `dump()` re-emits them as offset date-times (`...Z`). Round-tripping the *type* would need a flagged `Date` subclass along the lines of `smol-toml`'s `TomlDate`. That changes `dump()` output and is intentionally left for a separate decision within this major.
+- `TomlDate`, exported, is what `load()` now returns for every TOML date/time value. It extends `Date` and adds `isLocal` and `isDateOnly`. The flags are accessors rather than own properties, so deep-equality, `Object.keys` and object spread treat an instance exactly like the `Date` it extends; existing assertions comparing against a plain `Date` keep passing. `constructor === Date` is false, so test with `instanceof`, and `structuredClone` returns a plain `Date`, keeping the instant but dropping the type.
+- The toml-test round trip now compares which date/time type each value came from, not only the instant. Deep-equality compares `Date`s by instant alone, which is why a local date-time re-emitted as `...Z` went unnoticed: the implementation and the test oracle shared the same blind spot.
+
+### Changed
+
+- **BREAKING**: `dump()` writes each TOML date/time type back in its own form. A local date-time was previously re-emitted as `1979-05-27T07:32:00.000Z` and a local date as a full offset date-time, so a round trip through this library silently added a timezone claim the document never made. TOML defines a local date-time as carrying no relation to an offset or timezone at all. A plain `Date` supplied by a caller is still written as an offset date-time, since one instant is all it carries.
 
 ## [1.2.2] - 2026-08-04
 

@@ -1,4 +1,4 @@
-import { load, SyntaxParseError } from '../src/index.js';
+import { load, dump, SyntaxParseError, TomlDate } from '../src/index.js';
 import timezoneMock from 'timezone-mock';
 
 // A failing assertion inside a registered zone would otherwise leak the mocked
@@ -127,4 +127,49 @@ it('should throw error for fractional seconds without whole seconds', () => {
 it('should still validate hour and minute ranges for seconds-less times', () => {
   const input = 'lt = 24:00';
   expect(() => load(input)).toThrow(SyntaxParseError);
+});
+
+describe('type-preserving round trip', () => {
+  // `dump(load(x))` used to re-emit every local date-time as `...Z`, asserting
+  // a UTC instant the document never claimed. `TomlDate` carries the type so
+  // the pair round-trips the meaning, not only the value.
+  const cases: [string, string][] = [
+    ['offset date-time', 'x = 1979-05-27T07:32:00Z'],
+    ['local date-time', 'x = 1979-05-27T07:32:00'],
+    ['local date', 'x = 1979-05-27'],
+    ['fractional local date-time', 'x = 1979-05-27T00:32:00.999'],
+  ];
+
+  it.each(cases)('should round-trip a %s unchanged in kind', (_name, toml) => {
+    const first = dump(load(toml));
+    const { x } = load(toml) as { x: TomlDate };
+    const { x: back } = load(first) as { x: TomlDate };
+
+    expect(back.getTime()).toBe(x.getTime());
+    expect(back.isLocal).toBe(x.isLocal);
+    expect(back.isDateOnly).toBe(x.isDateOnly);
+    expect(dump(load(first))).toBe(first);
+  });
+
+  it('should not write an offset onto a local date-time', () => {
+    expect(dump(load('x = 1979-05-27T07:32:00'))).not.toContain('Z');
+  });
+
+  it('should write a local date as a date, with no time of day', () => {
+    expect(dump(load('x = 1979-05-27')).trim()).toBe('x = 1979-05-27');
+  });
+
+  it('should still write a plain Date as an offset date-time', () => {
+    // A user-supplied Date is one instant and carries no TOML type, so the
+    // only honest thing to write is an offset date-time.
+    const out = dump({ x: new Date('1979-05-27T07:32:00Z') });
+    expect(out.trim()).toBe('x = 1979-05-27T07:32:00.000Z');
+  });
+
+  it('should expose the type through instanceof rather than constructor', () => {
+    const { x } = load('x = 1979-05-27T07:32:00') as { x: TomlDate };
+    expect(x).toBeInstanceOf(Date);
+    expect(x).toBeInstanceOf(TomlDate);
+    expect(Object.keys(x)).toEqual([]);
+  });
 });
