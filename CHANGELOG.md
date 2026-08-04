@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.0.1] - 2026-08-04
 
+**Note on versioning**: 2.0.1 is breaking relative to 2.0.0. `TomlTime` changed from a `String` subclass to a `Date` subclass. 2.0.0 was published two hours earlier, its serialization defect was found immediately, and npm does not allow unpublishing any version of a package that has dependents. 2.0.0 is deprecated with a pointer here. If you installed 2.0.0 during that window, `t.split()` and `t.length` no longer work; use `String(t)` or `t.toISOString()`.
+
 Three coordinated breaks, one migration. Before this release, js-toml added
 timezone information that documents did not contain and lost the type of every
 date and time on a round trip. A major is the consent mechanism: the date
