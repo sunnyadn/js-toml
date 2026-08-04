@@ -57,6 +57,13 @@ function dumpDate(date: Date): string {
   if (Number.isNaN(date.getTime())) {
     throw new Error('Cannot dump invalid Date');
   }
+  // TOML dates run 0000 to 9999. Outside that `toISOString` emits the expanded
+  // form (`+010000-01-01T...`), which is not valid TOML and would only be
+  // caught when someone tried to read the document back.
+  const year = date.getUTCFullYear();
+  if (year < 0 || year > 9999) {
+    throw new Error(`Cannot dump Date with out-of-range year ${year}`);
+  }
   return date.toISOString();
 }
 
