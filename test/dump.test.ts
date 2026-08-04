@@ -203,6 +203,9 @@ describe('dump', () => {
     expect(() => dump({ d: new Date('+010000-01-01T00:00:00Z') })).toThrow(
       'out-of-range year'
     );
+    expect(() => dump({ d: new Date('-000001-01-01T00:00:00Z') })).toThrow(
+      'out-of-range year'
+    );
   });
 
   // TOML 1.1 documents must round-trip through dump(), while dump() itself
