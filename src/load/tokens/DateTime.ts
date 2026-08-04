@@ -171,6 +171,6 @@ registerTokenInterpreter(LocalDate, (raw) => {
   return new TomlDate(raw, 'local-date');
 });
 
-// The lexer admits `25:99`, so the range check is `TomlTime`'s, which it owns
-// for hand-built values too.
+// The lexer admits `25:99`, so `TomlTime` owns the range check, for values
+// built by hand as well as lexed ones.
 registerTokenInterpreter(LocalTime, (raw) => new TomlTime(raw));

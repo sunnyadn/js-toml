@@ -185,6 +185,10 @@ describe('local time', () => {
   it('should expose fields without a sentinel date to shift them', () => {
     const { t } = load('t = 07:32:00.5') as { t: TomlTime };
     expect([t.hour, t.minute, t.second]).toEqual([7, 32, 0]);
+    // The anchor instant is what `instanceof Date` consumers compare on, and
+    // nothing else in the suite reads it. `.5` is 500ms, not 5.
+    expect(t.getUTCMilliseconds()).toBe(500);
+    expect(t.getTime()).toBe(27120500);
   });
 
   // `dump()` writes a TomlTime bare, so anything that is not a time would come

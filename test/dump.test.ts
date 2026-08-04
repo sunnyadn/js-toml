@@ -197,6 +197,14 @@ describe('dump', () => {
     expect(() => dump(obj)).toThrow('Cannot dump invalid Date');
   });
 
+  // The sibling guard, on the path that forces both to live in dumpDate
+  // rather than on TomlDate: a plain Date the caller built themselves.
+  it('should throw when dumping a Date outside TOML year range', () => {
+    expect(() => dump({ d: new Date('+010000-01-01T00:00:00Z') })).toThrow(
+      'out-of-range year'
+    );
+  });
+
   // TOML 1.1 documents must round-trip through dump(), while dump() itself
   // keeps emitting TOML 1.0-compatible syntax only (documented decision).
   it('should round-trip TOML 1.1 syntax through 1.0-only dump output', () => {

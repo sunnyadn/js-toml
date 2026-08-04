@@ -17,9 +17,9 @@ export class TomlTime extends Date {
   /** Throws `SyntaxParseError` unless `raw` is a TOML local time. */
   constructor(raw: string) {
     const time = PARTIAL_TIME.exec(raw);
-    const hour = time ? Number(time[1]) : NaN;
-    const minute = time ? Number(time[2]) : NaN;
-    const second = time ? Number(time[3] ?? 0) : NaN;
+    const hour = Number(time?.[1]);
+    const minute = Number(time?.[2]);
+    const second = Number(time?.[3] ?? 0);
     if (!time || hour > 23 || minute > 59 || second > 59) {
       throw new SyntaxParseError(`Invalid local time: ${raw}`);
     }
@@ -28,8 +28,8 @@ export class TomlTime extends Date {
     // what `toISOString` returns and what `dump()` writes back.
     const normalized = `${time[1]}:${time[2]}:${time[3] ?? '00'}${time[4] ?? ''}`;
     // Milliseconds arithmetically rather than through `Date`'s string parser,
-    // which costs a measured 5% of the local-time parse path and made the
-    // anchor depend on that parser agreeing with the regex above.
+    // which would make the anchor depend on that parser agreeing with the
+    // regex above. `.5` means 500ms, hence the pad.
     const fraction = time[4];
     const millis = fraction ? Number(fraction.slice(1, 4).padEnd(3, '0')) : 0;
     super(hour * 3600000 + minute * 60000 + second * 1000 + millis);
@@ -63,8 +63,8 @@ export class TomlTime extends Date {
 
   /**
    * `Date`'s version would render the anchor day in the host timezone, so
-   * `13:37` prints as `06:37` in Edmonton. There is no day here to render,
-   * which is why this one type overrides it and `TomlDate` does not.
+   * `13:37` prints as `06:37` in Edmonton, and there is no day here to
+   * render. `TomlDate` abstains: `toString` is host-local by contract.
    */
   toString(): string {
     return this.toISOString();
