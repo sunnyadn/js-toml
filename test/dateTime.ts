@@ -1,6 +1,11 @@
 import { load, SyntaxParseError } from '../src/index.js';
 import timezoneMock from 'timezone-mock';
 
+// A failing assertion inside a registered zone would otherwise leak the mocked
+// Date into every later test in the file. Unregistering when none is installed
+// is a no-op, so this is safe for the tests that never register one.
+afterEach(() => timezoneMock.unregister());
+
 it('should support offset date-times', () => {
   const input = `odt1 = 1979-05-27T07:32:00Z
 odt2 = 1979-05-27T00:32:00-07:00
@@ -38,32 +43,24 @@ it.each(['US/Pacific', 'Australia/Adelaide'] as const)(
   'should support local date-times, identically under %s',
   (zone) => {
     timezoneMock.register(zone);
-    try {
-      const input = `ldt1 = 1979-05-27T07:32:00
+    const input = `ldt1 = 1979-05-27T07:32:00
 ldt2 = 1979-05-27T00:32:00.999`;
 
-      expect(load(input)).toEqual({
-        ldt1: new Date(Date.UTC(1979, 4, 27, 7, 32, 0)),
-        ldt2: new Date(Date.UTC(1979, 4, 27, 0, 32, 0, 999)),
-      });
-    } finally {
-      timezoneMock.unregister();
-    }
+    expect(load(input)).toEqual({
+      ldt1: new Date(Date.UTC(1979, 4, 27, 7, 32, 0)),
+      ldt2: new Date(Date.UTC(1979, 4, 27, 0, 32, 0, 999)),
+    });
   }
 );
 
-// The old host-local reading was ill-defined even on one machine: this wall
-// clock does not exist in Denver (spring forward), and 01:30 that November
-// occurs twice.
+// 02:30 does not exist in US/Pacific on this date (spring forward), which is
+// why the old host-local reading was ill-defined even on a single machine.
 it('should parse a date-time that falls in a local DST gap', () => {
   timezoneMock.register('US/Pacific');
-  try {
-    expect(load('ldt = 2026-03-08T02:30:00')).toEqual({
-      ldt: new Date(Date.UTC(2026, 2, 8, 2, 30, 0)),
-    });
-  } finally {
-    timezoneMock.unregister();
-  }
+
+  expect(load('ldt = 2026-03-08T02:30:00')).toEqual({
+    ldt: new Date(Date.UTC(2026, 2, 8, 2, 30, 0)),
+  });
 });
 
 it('should support local date', () => {

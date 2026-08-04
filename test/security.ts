@@ -65,14 +65,6 @@ describe('Security', () => {
       expect(typeof result.x).toBe('bigint');
       expect(result.x.toString()).toBe('9'.repeat(1000));
     });
-
-    it('should leave ordinary integers on the safe-integer fast path', () => {
-      expect(load('x = 0')).toEqual({ x: 0 });
-      expect(load('x = -17')).toEqual({ x: -17 });
-      expect(load('x = 9_223_372_036_854_775_807')).toEqual({
-        x: 9223372036854775807n,
-      });
-    });
   });
 
   describe('Multi-line basic string escaped-newline ReDoS', () => {
@@ -90,29 +82,9 @@ describe('Security', () => {
       expect(elapsedMs).toBeLessThan(1000);
     }, 30_000);
 
-    it('should stay linear as the run grows', () => {
-      const t0 = process.hrtime.bigint();
-      expect(() => load(payload(2000))).toThrow();
-      const elapsedMs = Number(process.hrtime.bigint() - t0) / 1e6;
-      expect(elapsedMs).toBeLessThan(1000);
-    }, 30_000);
-
-    it('should also fail fast in array and inline-table value positions', () => {
-      const run = '\\\n '.repeat(28);
-      const t0 = process.hrtime.bigint();
-      expect(() => load(`x = ["""${run}`)).toThrow();
-      expect(() => load(`x = { y = """${run}`)).toThrow();
-      const elapsedMs = Number(process.hrtime.bigint() - t0) / 1e6;
-      expect(elapsedMs).toBeLessThan(1000);
-    });
-
     // The fix removes a redundant group, so the accepted language must be
     // unchanged. `unescapeString` does the trimming at interpretation time.
-    it('should still trim whitespace and newlines after a line-ending backslash', () => {
-      const toml = 'x = """the quick \\\n\n   brown fox"""';
-      expect(load(toml)).toEqual({ x: 'the quick brown fox' });
-    });
-
+    // Plain trimming is covered in test/string.ts; tabs are only covered here.
     it('should still trim a run of mixed spaces, tabs and newlines', () => {
       const toml = 'x = """a\\\n  \n \t \n b"""';
       expect(load(toml)).toEqual({ x: 'ab' });

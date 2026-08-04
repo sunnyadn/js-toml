@@ -14,11 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Time-of-day validation used local `Date` accessors, so it could depend on the host timezone and on daylight-saving transitions. It now uses UTC accessors.
+- Time-of-day validation round-tripped its fields through a `Date` built from local components. The check is an hour/minute/second range test and now says so directly, which removes the clock, and with it the timezone surface, from a function that had no use for either. Behaviour is unchanged: the two forms agree on every input the grammar can produce, and leap seconds stay rejected.
 
 ### Added
 
-- CI runs the suite under three timezones rather than only the runner's UTC. The timezone dependence above survived four years because a UTC-only suite cannot observe it.
+- CI runs the suite under three timezones rather than only the runner's UTC. The local date-time reading above survived four years because a UTC-only suite cannot observe it.
 
 ### Deferred
 

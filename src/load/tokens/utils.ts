@@ -94,3 +94,17 @@ export const getMultiLineContent = (string) => {
   const content = string.substring(3, string.length - 3);
   return content.replace(/^(\r\n|\n)/, '');
 };
+
+// Shared by the decimal and radix integer interpreters, which both hand their
+// digits to `BigInt()`. 1000 matches jackson-core's `maxNumberLength` default
+// and sits far above TOML's 64-bit range, which needs 20 digits.
+export const MAX_INTEGER_LITERAL_LENGTH = 1000;
+
+// Takes a count rather than the digits so callers need not slice to ask.
+export const checkIntegerLiteralLength = (kind: string, digitCount: number) => {
+  if (digitCount > MAX_INTEGER_LITERAL_LENGTH) {
+    throw new SyntaxParseError(
+      `${kind} integer literal exceeds ${MAX_INTEGER_LITERAL_LENGTH} digits (length ${digitCount})`
+    );
+  }
+};

@@ -102,17 +102,10 @@ const isValidDate = (value: string) => {
 const isValidTime = (value: string) => {
   const time = XRegExp.exec(value, timePattern);
   if (time) {
-    const hour = Number(time[1]);
-    const minute = Number(time[2]);
-    const second = Number(time[3]);
-    // UTC getters: the local ones would make validation depend on the host
-    // timezone, and a DST transition can shift the hour that comes back.
-    const dateObject = new Date(0);
-    dateObject.setUTCHours(hour, minute, second);
+    // Same shape as isValidOffset below. A Date round-trip would say exactly
+    // this, only via a clock the check has no use for. Leap seconds stay out.
     return (
-      dateObject.getUTCHours() === hour &&
-      dateObject.getUTCMinutes() === minute &&
-      dateObject.getUTCSeconds() === second
+      Number(time[1]) <= 23 && Number(time[2]) <= 59 && Number(time[3]) <= 59
     );
   }
 
@@ -143,6 +136,10 @@ const secondsLessTime = XRegExp.build(
   { fullDate, timeDelim, timeHour, timeMinute }
 );
 
+const anchoredLocalDateTime = XRegExp.build('^{{localDateTime}}$', {
+  localDateTime,
+});
+
 registerTokenInterpreter(DateTime, (raw) => {
   // O(1) seconds-presence gate before the regex replace: the first `:` in any
   // DateTime token is always hour:minute, so seconds are present iff the char
@@ -166,12 +163,10 @@ registerTokenInterpreter(DateTime, (raw) => {
   // delimiter) remaps years 00-99: new Date('0001-01-01 00:00:00Z') → 2001.
   const canonical = value.replace(/[t ]/, 'T').replace(/z$/, 'Z');
 
-  // A date-time carrying no offset is local time to `Date()`, which makes the
-  // parsed instant depend on the host timezone. TOML local date-times have no
-  // offset, so pin them to UTC. Date-only forms are already parsed as UTC.
-  const tIndex = canonical.indexOf('T');
-  const isLocalDateTime =
-    tIndex !== -1 && !/[Z+-]/.test(canonical.slice(tIndex));
-
-  return new Date(isLocalDateTime ? `${canonical}Z` : canonical);
+  // Offset-less date-times are local time to `Date()`, so the instant would
+  // depend on the host timezone. Pin them to UTC. Matching the grammar rather
+  // than sniffing for offset characters keeps this tied to `timeOffset`.
+  return new Date(
+    anchoredLocalDateTime.test(canonical) ? `${canonical}Z` : canonical
+  );
 });
