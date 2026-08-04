@@ -137,11 +137,12 @@ const isValidOffset = (value: string) => {
   return !offset || (Number(offset[1]) <= 23 && Number(offset[2]) <= 59);
 };
 
-// Matches a seconds-less time (TOML 1.1) right before its end or offset, so the
-// omitted seconds can be normalized to `:00`. Encodes the same optional-seconds
-// grammar as `partialTime` above — the two must stay in sync.
+// Matches a seconds-less date-time (TOML 1.1) right before its end or offset,
+// so the omitted seconds can be normalized to `:00`. A bare local time is not
+// handled here: `TomlTime` normalizes its own. Encodes the same
+// optional-seconds grammar as `partialTime` above, and must stay in sync.
 const secondsLessTime = XRegExp.build(
-  '^((?:{{fullDate}}{{timeDelim}})?{{timeHour}}:{{timeMinute}})(?=$|[Zz+-])',
+  '^({{fullDate}}{{timeDelim}}{{timeHour}}:{{timeMinute}})(?=$|[Zz+-])',
   { fullDate, timeDelim, timeHour, timeMinute }
 );
 
@@ -185,8 +186,6 @@ registerTokenInterpreter(LocalDate, (raw) => {
 });
 
 // A time of day is not an instant, so it gets a `String` rather than a `Date`.
-registerTokenInterpreter(LocalTime, (raw) => {
-  const value = fillSeconds(raw);
-  if (!isValidTime(value)) throw invalid(raw);
-  return new TomlTime(value);
-});
+// The lexer admits `25:99`, so the range check is `TomlTime`'s, which it now
+// owns for hand-built values too.
+registerTokenInterpreter(LocalTime, (raw) => new TomlTime(raw));

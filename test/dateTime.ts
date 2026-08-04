@@ -205,6 +205,25 @@ describe('local time', () => {
     expect([t.hour, t.minute, t.second]).toEqual([7, 32, 0]);
   });
 
+  // `dump()` writes a TomlTime bare, so anything that is not a time would come
+  // back out as invalid TOML. The constructor is what makes that emit safe.
+  it.each([
+    ['not a time" #x'],
+    ['7:5'],
+    ['24:00:00'],
+    ['12:60'],
+    ['12:00:60'],
+    ['12:00:00.'],
+    [''],
+  ])('should refuse to construct from %j', (raw) => {
+    expect(() => new TomlTime(raw)).toThrow(SyntaxParseError);
+  });
+
+  it('should fill omitted seconds so the stored form is canonical', () => {
+    expect(new TomlTime('13:37').toString()).toBe('13:37:00');
+    expect(dump({ t: new TomlTime('13:37') }).trim()).toBe('t = 13:37:00');
+  });
+
   // `extends String` so every use of the old plain-string value keeps working.
   // What changes is `typeof` and `===`, and both fail loudly.
   it('should still behave as a string everywhere a string was used', () => {
