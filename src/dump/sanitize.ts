@@ -1,6 +1,5 @@
 import { DumpOptions } from './options.js';
 import { isPlainObject } from '../common/utils.js';
-import { TomlTime } from '../common/TomlTime.js';
 
 export type SanitizedValue =
   | string
@@ -8,7 +7,6 @@ export type SanitizedValue =
   | bigint
   | boolean
   | Date
-  | TomlTime
   | SanitizedValue[]
   | { [key: string]: SanitizedValue };
 
@@ -26,8 +24,7 @@ export function sanitize(
     typeof value === 'number' ||
     typeof value === 'bigint' ||
     typeof value === 'boolean' ||
-    value instanceof Date ||
-    value instanceof TomlTime
+    value instanceof Date
   ) {
     return value;
   }

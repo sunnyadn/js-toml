@@ -1,8 +1,6 @@
 import { DumpOptions } from './options.js';
 import { isPlainObject } from '../common/utils.js';
 import { SanitizedValue } from './sanitize.js';
-import { TomlDate, TomlDateKind } from '../common/TomlDate.js';
-import { TomlTime } from '../common/TomlTime.js';
 
 type SanitizedTable = { [key: string]: SanitizedValue };
 
@@ -58,15 +56,6 @@ function dumpNumber(num: number | bigint): string {
   return num.toString();
 }
 
-// Where to cut `toISOString()` for each TOML type. Both offsets depend on the
-// year guard below: `10` is a date only while the year stays four digits, and
-// `-1` drops a `Z` that is always exactly one character.
-const ISO_END: Record<TomlDateKind, number | undefined> = {
-  'offset-date-time': undefined,
-  'local-date-time': -1,
-  'local-date': 10,
-};
-
 function dumpDate(date: Date): string {
   if (Number.isNaN(date.getTime())) {
     throw new Error('Cannot dump invalid Date');
@@ -79,11 +68,10 @@ function dumpDate(date: Date): string {
     throw new Error(`Cannot dump Date with out-of-range year ${year}`);
   }
 
-  // A plain `Date` is one instant and nothing more, so it can only be written
-  // as an offset date-time. `load()` returns a `TomlDate`, which remembers
-  // what the document actually said.
-  const kind = date instanceof TomlDate ? date.kind : 'offset-date-time';
-  return date.toISOString().slice(0, ISO_END[kind]);
+  // `TomlDate` and `TomlTime` override `toISOString` to return the form the
+  // document wrote. A plain `Date` is one instant and nothing more, so its
+  // own `toISOString` is the only honest answer.
+  return date.toISOString();
 }
 
 function dumpValue(value: SanitizedValue, opts: NormalizedOptions): string {
@@ -91,9 +79,6 @@ function dumpValue(value: SanitizedValue, opts: NormalizedOptions): string {
   if (typeof value === 'number' || typeof value === 'bigint')
     return dumpNumber(value);
   if (typeof value === 'boolean') return value ? 'true' : 'false';
-  // Before the plain-string branch would have quoted it: a local time is a
-  // TOML type of its own, not a string that happens to look like a clock.
-  if (value instanceof TomlTime) return value.toString();
   if (value instanceof Date) return dumpDate(value);
   if (Array.isArray(value)) return dumpInlineArray(value, opts);
   return dumpInlineTable(value, opts);

@@ -108,17 +108,19 @@ throwing `SyntaxParseError`.
 | Offset date-time | `1979-05-27T07:32:00Z` | `TomlDate` at that instant         |
 | Local date-time  | `1979-05-27T07:32:00`  | `TomlDate`, wall clock read as UTC |
 | Local date       | `1979-05-27`           | `TomlDate` at midnight UTC         |
-| Local time       | `07:32:00`             | `TomlTime`, a `String` object      |
+| Local time       | `07:32:00`             | `TomlTime`, a `Date` with no day   |
 
 A local date-time carries no offset, so read it with `getUTCHours()` and
 friends; `getHours()` would shift with the host timezone.
 
-`TomlDate` extends `Date` and adds `kind`, one of `'offset-date-time'`,
-`'local-date-time'` or `'local-date'`, which is how `dump()` writes each value
-back in the form it was read. `TomlTime` extends `String` and adds `hour`,
-`minute`, `second` and `fraction`. Test either with `instanceof`, not `typeof`.
+All four are `Date` subclasses, so `instanceof Date` reaches every one and
+`toISOString()` returns the form the document wrote rather than an instant with
+a `Z` it never carried. `JSON.stringify` follows, since `toJSON` delegates
+there. `TomlDate` adds `kind`, one of `'offset-date-time'`, `'local-date-time'`
+or `'local-date'`; `TomlTime` adds `hour`, `minute`, `second` and `fraction`,
+and keeps the source precision that a millisecond-based encoding rounds away.
 
-Upgrading from 1.x: see the [2.0.0 notes](CHANGELOG.md#200---2026-08-04).
+Upgrading from 1.x: see the [2.0.1 notes](CHANGELOG.md#201---2026-08-04).
 
 ### dump(object: object, options?: DumpOptions): string
 

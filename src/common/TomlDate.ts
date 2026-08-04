@@ -26,4 +26,15 @@ export class TomlDate extends Date {
   get kind(): TomlDateKind {
     return this.#kind;
   }
+
+  /**
+   * The form the document wrote, so a local date-time does not claim a `Z` it
+   * never carried. `toJSON` delegates here, which is what keeps
+   * `JSON.stringify` and every external consumer honest, not only `dump()`.
+   */
+  toISOString(): string {
+    const iso = super.toISOString();
+    if (this.#kind === 'local-date') return iso.slice(0, 10);
+    return this.#kind === 'local-date-time' ? iso.slice(0, -1) : iso;
+  }
 }

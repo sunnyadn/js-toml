@@ -198,21 +198,41 @@ describe('local time', () => {
     expect(dump({ t: new TomlTime('13:37') }).trim()).toBe('t = 13:37:00');
   });
 
-  // `extends String` so every use of the old plain-string value keeps working.
-  // What changes is `typeof` and `===`, and both fail loudly.
-  it('should still behave as a string everywhere a string was used', () => {
-    const { t } = load('t = 07:32:00') as { t: TomlTime };
-    expect(`${t}`).toBe('07:32:00');
-    expect(t.split(':')).toEqual(['07', '32', '00']);
-    expect(t.startsWith('07')).toBe(true);
-    expect(t.length).toBe(8);
-    expect(JSON.stringify({ t })).toBe('{"t":"07:32:00"}');
-    expect(t).toBeInstanceOf(String);
+  // The whole point of extending `Date`: a generic walker dispatches on
+  // `instanceof Date` and has no branch for anything else. This is the exact
+  // chain teidesu/x-to-nix uses, which the String-based version fell through.
+  it('should be reachable by a generic value walker', () => {
+    const walk = (value: unknown) => {
+      if (typeof value === 'string') return `string:${value}`;
+      if (typeof value === 'number') return `number:${value}`;
+      if (value instanceof Date) return `date:${value.toISOString()}`;
+      if (typeof value === 'boolean') return `bool:${value}`;
+      if (Array.isArray(value)) return 'array';
+      if (value && typeof value === 'object') return 'OBJECT';
+      throw new Error('unsupported');
+    };
 
-    // Loose equality still holds at runtime, but TypeScript refuses to compile
-    // the comparison (TS2367, no overlap). That is the loud half of the change.
-    const loose = t as unknown;
-    expect(loose == '07:32:00').toBe(true);
-    expect(loose === '07:32:00').toBe(false);
+    const doc = load(`lt = 07:32:00.123456789
+ld = 1979-05-27
+ldt = 1979-05-27T07:32:00
+odt = 1979-05-27T07:32:00Z`);
+
+    expect(Object.values(doc).map(walk)).toEqual([
+      'date:07:32:00.123456789',
+      'date:1979-05-27',
+      'date:1979-05-27T07:32:00.000',
+      'date:1979-05-27T07:32:00.000Z',
+    ]);
+  });
+
+  // toJSON delegates to toISOString, so overriding one fixes every consumer
+  // that serializes rather than only this library's own dump().
+  it('should not claim an offset the document never wrote', () => {
+    const doc = load(
+      'lt = 07:32:00\nld = 1979-05-27\nldt = 1979-05-27T07:32:00'
+    );
+    expect(JSON.stringify(doc)).toBe(
+      '{"lt":"07:32:00","ld":"1979-05-27","ldt":"1979-05-27T07:32:00.000"}'
+    );
   });
 });

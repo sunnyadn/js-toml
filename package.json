@@ -1,6 +1,6 @@
 {
   "name": "js-toml",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A TOML parser for JavaScript/TypeScript, targeting TOML 1.1.0 Spec",
   "keywords": [
     "toml",
