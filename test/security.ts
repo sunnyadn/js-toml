@@ -40,6 +40,41 @@ describe('Security', () => {
     });
   });
 
+  describe('Decimal integer literal length cap', () => {
+    // Sibling of the radix cap above. The asymmetry was the bug: the same
+    // directory capped 0x/0o/0b and left plain decimals unbounded.
+    it('should reject decimal literals longer than 1000 digits', () => {
+      const toml = `x = ${'9'.repeat(1001)}`;
+      expect(() => load(toml)).toThrow(SyntaxParseError);
+    });
+
+    it('should apply the cap to the digits, not the sign', () => {
+      expect(() => load(`x = -${'9'.repeat(1001)}`)).toThrow(SyntaxParseError);
+      expect(() => load(`x = +${'9'.repeat(1000)}`)).not.toThrow();
+    });
+
+    it('should not count underscores towards the cap', () => {
+      // 1000 digits written with a separator after every digit
+      const toml = `x = ${'9_'.repeat(999)}9`;
+      const result = load(toml) as { x: bigint };
+      expect(result.x.toString()).toBe('9'.repeat(1000));
+    });
+
+    it('should accept decimal literals up to the 1000-digit cap', () => {
+      const result = load(`x = ${'9'.repeat(1000)}`) as { x: bigint };
+      expect(typeof result.x).toBe('bigint');
+      expect(result.x.toString()).toBe('9'.repeat(1000));
+    });
+
+    it('should leave ordinary integers on the safe-integer fast path', () => {
+      expect(load('x = 0')).toEqual({ x: 0 });
+      expect(load('x = -17')).toEqual({ x: -17 });
+      expect(load('x = 9_223_372_036_854_775_807')).toEqual({
+        x: 9223372036854775807n,
+      });
+    });
+  });
+
   describe('Falsy-primitive duplicate-key bypass (GHSA-m34p-749j-x6m6)', () => {
     // A falsy-typed value (false, 0, 0.0, -0.0, nan, "") followed by a table,
     // dotted-key sub-table, or array-of-tables sharing the same name must be a
