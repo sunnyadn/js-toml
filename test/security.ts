@@ -75,6 +75,55 @@ describe('Security', () => {
     });
   });
 
+  describe('Multi-line basic string escaped-newline ReDoS', () => {
+    // The escaped-newline rule used to end in an ambiguous `(ws|newline)*`,
+    // so an unterminated string backtracked exponentially: doubling every ~3
+    // bytes, ~100 bytes hung for 9 s. Request-size limits did not help.
+    const payload = (n: number) => `x = """${'\\\n '.repeat(n)}`;
+
+    it('should fail fast on an unterminated escaped-newline run', () => {
+      const t0 = process.hrtime.bigint();
+      expect(() => load(payload(30))).toThrow();
+      const elapsedMs = Number(process.hrtime.bigint() - t0) / 1e6;
+      // Unpatched: ~9000 ms here, and every extra repetition doubles it.
+      // Patched: ~1 ms. The threshold is loose enough for a slow CI runner.
+      expect(elapsedMs).toBeLessThan(1000);
+    }, 30_000);
+
+    it('should stay linear as the run grows', () => {
+      const t0 = process.hrtime.bigint();
+      expect(() => load(payload(2000))).toThrow();
+      const elapsedMs = Number(process.hrtime.bigint() - t0) / 1e6;
+      expect(elapsedMs).toBeLessThan(1000);
+    }, 30_000);
+
+    it('should also fail fast in array and inline-table value positions', () => {
+      const run = '\\\n '.repeat(28);
+      const t0 = process.hrtime.bigint();
+      expect(() => load(`x = ["""${run}`)).toThrow();
+      expect(() => load(`x = { y = """${run}`)).toThrow();
+      const elapsedMs = Number(process.hrtime.bigint() - t0) / 1e6;
+      expect(elapsedMs).toBeLessThan(1000);
+    });
+
+    // The fix removes a redundant group, so the accepted language must be
+    // unchanged. `unescapeString` does the trimming at interpretation time.
+    it('should still trim whitespace and newlines after a line-ending backslash', () => {
+      const toml = 'x = """the quick \\\n\n   brown fox"""';
+      expect(load(toml)).toEqual({ x: 'the quick brown fox' });
+    });
+
+    it('should still trim a run of mixed spaces, tabs and newlines', () => {
+      const toml = 'x = """a\\\n  \n \t \n b"""';
+      expect(load(toml)).toEqual({ x: 'ab' });
+    });
+
+    it('should still preserve whitespace that is not preceded by a backslash', () => {
+      const toml = 'x = """a  \n  b"""';
+      expect(load(toml)).toEqual({ x: 'a  \n  b' });
+    });
+  });
+
   describe('Falsy-primitive duplicate-key bypass (GHSA-m34p-749j-x6m6)', () => {
     // A falsy-typed value (false, 0, 0.0, -0.0, nan, "") followed by a table,
     // dotted-key sub-table, or array-of-tables sharing the same name must be a

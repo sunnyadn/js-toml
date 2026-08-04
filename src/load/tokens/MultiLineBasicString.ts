@@ -23,13 +23,15 @@ const multiLineBasicChar = XRegExp.build('{{basicUnescaped}}|{{escaped}}', {
 
 const whiteSpace = XRegExp.build('{{whiteSpaceChar}}*', { whiteSpaceChar });
 
+// Stops at the newline on purpose. A trailing `(whiteSpaceChar|newline)*` is
+// ambiguous with the enclosing `multiLineBasicContent*` loop over the same
+// characters and backtracks exponentially. `unescapeString` does the trimming.
 const multiLineBasicEscapedNewline = XRegExp.build(
-  '{{escape}}{{whiteSpace}}{{newline}}({{whiteSpaceChar}}|{{newline}})*',
+  '{{escape}}{{whiteSpace}}{{newline}}',
   {
     escape,
     whiteSpace,
     newline,
-    whiteSpaceChar,
   }
 );
 
