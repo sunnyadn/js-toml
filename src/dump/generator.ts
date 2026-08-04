@@ -58,8 +58,9 @@ function dumpNumber(num: number | bigint): string {
   return num.toString();
 }
 
-// Where to cut `toISOString()` for each TOML type. `slice(0, undefined)` keeps
-// the whole string, so the offset form needs no branch of its own.
+// Where to cut `toISOString()` for each TOML type. Both offsets depend on the
+// year guard below: `10` is a date only while the year stays four digits, and
+// `-1` drops a `Z` that is always exactly one character.
 const ISO_END: Record<TomlDateKind, number | undefined> = {
   'offset-date-time': undefined,
   'local-date-time': -1,

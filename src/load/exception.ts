@@ -1,11 +1,9 @@
 import { ILexingError, IRecognitionException } from 'chevrotain';
+import { SyntaxParseError } from '../common/exception.js';
 
-export class SyntaxParseError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'SyntaxParseError';
-  }
-}
+// Lives in common/ so shared types can reject input without depending on the
+// loader. Re-exported here because this is where callers expect to find it.
+export { SyntaxParseError };
 
 export class LexerError extends SyntaxParseError {
   errors: ILexingError[];

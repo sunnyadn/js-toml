@@ -55,14 +55,9 @@ const localDateTime = XRegExp.build(
   { fullDate, timeDelim, partialTime }
 );
 
-const localDate = fullDate;
-
-const localTime = partialTime;
-
 // One category with four concrete tokens rather than one token whose pattern
 // alternates: the lexer then reports which of TOML's date/time types matched,
-// instead of the interpreter re-deriving it from the string. `parser.ts` and
-// `interpreter.ts` consume the category and are unaffected.
+// instead of the interpreter re-deriving it from the string.
 export const DateTime = createCategoryToken('DateTime');
 
 export const OffsetDateTime = createToken({
@@ -79,13 +74,13 @@ export const LocalDateTime = createToken({
 
 export const LocalDate = createToken({
   name: 'LocalDate',
-  pattern: localDate,
+  pattern: fullDate,
   categories: [DateTime],
 });
 
 export const LocalTime = createToken({
   name: 'LocalTime',
-  pattern: localTime,
+  pattern: partialTime,
   categories: [DateTime],
 });
 
@@ -137,24 +132,15 @@ const isValidOffset = (value: string) => {
   return !offset || (Number(offset[1]) <= 23 && Number(offset[2]) <= 59);
 };
 
-// Matches a seconds-less date-time (TOML 1.1) right before its end or offset,
-// so the omitted seconds can be normalized to `:00`. A bare local time is not
-// handled here: `TomlTime` normalizes its own. Encodes the same
-// optional-seconds grammar as `partialTime` above, and must stay in sync.
-const secondsLessTime = XRegExp.build(
-  '^({{fullDate}}{{timeDelim}}{{timeHour}}:{{timeMinute}})(?=$|[Zz+-])',
-  { fullDate, timeDelim, timeHour, timeMinute }
-);
+// Date-times only: `fullDate` is 10 characters and the delimiter one, so the
+// seconds colon can only ever sit at index 16. A bare local time is not handled
+// here, `TomlTime` normalizes its own. Seconds are optional in TOML 1.1.
+const SECONDS_COLON = 16;
 
-// O(1) seconds-presence gate before the regex replace: the first `:` in a time
-// or date-time is hour:minute, so seconds are present iff the character three
-// positions later is another `:`.
-const fillSeconds = (raw: string) => {
-  const firstColon = raw.indexOf(':');
-  return raw.charCodeAt(firstColon + 3) === 58 /* ':' */
+const fillSeconds = (raw: string) =>
+  raw.charCodeAt(SECONDS_COLON) === 58 /* ':' */
     ? raw
-    : raw.replace(secondsLessTime, '$1:00');
-};
+    : `${raw.slice(0, SECONDS_COLON)}:00${raw.slice(SECONDS_COLON)}`;
 
 const invalid = (raw: string) =>
   new SyntaxParseError(`Invalid date time: ${raw}`);
@@ -162,14 +148,14 @@ const invalid = (raw: string) =>
 // `Date`'s legacy parser, which a space delimiter selects, remaps years 00-99:
 // `new Date('0001-01-01 00:00:00Z')` is 2001. Canonicalizing to ISO 8601 form
 // keeps it on the spec path.
-const toIso = (value: string) => value.replace(/[t ]/, 'T');
+const toIso = (value: string) => value.replace(/[t ]/, 'T').replace(/z$/, 'Z');
 
 registerTokenInterpreter(OffsetDateTime, (raw) => {
   const value = fillSeconds(raw);
   if (!isValidDate(value) || !isValidTime(value) || !isValidOffset(value)) {
     throw invalid(raw);
   }
-  return new TomlDate(toIso(value).replace(/z$/, 'Z'));
+  return new TomlDate(toIso(value));
 });
 
 registerTokenInterpreter(LocalDateTime, (raw) => {

@@ -11,14 +11,22 @@ import { isPlainObject } from '../common/utils.js';
 // Create a safe object without prototype pollution vulnerability
 const createSafeObject = () => Object.create(null);
 
-// Helper functions to safely handle symbols on objects created with Object.create(null)
-const setSymbol = (obj: unknown, symbol: symbol, value: unknown) => {
-  (obj as Record<symbol, unknown>)[symbol] = value;
+// How each table and array was declared, kept in a side table rather than
+// stamped onto the values themselves. Nothing internal ever reaches the caller,
+// so the finished document needs no cleanup pass to strip it back off.
+const marks = new WeakMap<object, Set<symbol>>();
+
+const setSymbol = (obj: unknown, symbol: symbol) => {
+  const set = marks.get(obj as object);
+  if (set) {
+    set.add(symbol);
+  } else {
+    marks.set(obj as object, new Set([symbol]));
+  }
 };
 
-const hasSymbol = (obj: unknown, symbol: symbol): boolean => {
-  return symbol in (obj as Record<symbol, unknown>);
-};
+const hasSymbol = (obj: unknown, symbol: symbol): boolean =>
+  marks.get(obj as object)?.has(symbol) ?? false;
 
 class DuplicateKeyError extends Error {}
 
@@ -58,7 +66,6 @@ export class Interpreter extends BaseCstVisitor {
     ctx.expression?.forEach(
       (expression) => (current = this.visit(expression, { current, root }))
     );
-    this.cleanInternalProperties(root);
     return root;
   }
 
@@ -103,7 +110,7 @@ export class Interpreter extends BaseCstVisitor {
 
   inlineTable(ctx) {
     const result = createSafeObject();
-    setSymbol(result, notEditable, true);
+    setSymbol(result, notEditable);
     if (ctx.inlineTableKeyValues) {
       this.visit(ctx.inlineTableKeyValues, result);
     }
@@ -128,7 +135,7 @@ export class Interpreter extends BaseCstVisitor {
 
   array(ctx) {
     const result = [];
-    setSymbol(result, notEditable, true);
+    setSymbol(result, notEditable);
     if (ctx.arrayValues) {
       return this.visit(ctx.arrayValues, result);
     }
@@ -170,29 +177,6 @@ export class Interpreter extends BaseCstVisitor {
     );
   }
 
-  private cleanInternalProperties(object) {
-    for (const symbol of Object.getOwnPropertySymbols(object)) {
-      delete object[symbol];
-    }
-    for (const key in object) {
-      if (Array.isArray(object[key])) {
-        for (const symbol of Object.getOwnPropertySymbols(object[key])) {
-          delete object[key][symbol];
-        }
-        // Only tables and arrays ever carry these symbols, so scalars need no
-        // walk. `for...in` over a String wrapper would enumerate one key per
-        // character, and a Date or TomlTime is `typeof 'object'` too.
-        object[key].forEach((item) => {
-          if (isPlainObject(item) || Array.isArray(item)) {
-            this.cleanInternalProperties(item);
-          }
-        });
-      } else if (isPlainObject(object[key])) {
-        this.cleanInternalProperties(object[key]);
-      }
-    }
-  }
-
   private interpret(ctx, ...candidates: TokenType[]) {
     for (const type of candidates) {
       if (ctx[type.name]) {
@@ -211,7 +195,7 @@ export class Interpreter extends BaseCstVisitor {
       throw new DuplicateKeyError();
     }
     if (isPlainObject(value)) {
-      setSymbol(value, explicitlyDeclared, true);
+      setSymbol(value, explicitlyDeclared);
     }
 
     object[key] = value;
@@ -244,7 +228,7 @@ export class Interpreter extends BaseCstVisitor {
     // header (e.g. `[a.b]` then `[a]`) becomes explicitly declared the first
     // time its own header appears, so a second `[a]` is rejected.
     if (declareSymbol) {
-      setSymbol(object[key], declareSymbol, true);
+      setSymbol(object[key], declareSymbol);
     }
 
     return object[key];

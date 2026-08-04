@@ -10,15 +10,18 @@ export type TomlDateKind =
 export class TomlDate extends Date {
   readonly #kind: TomlDateKind;
 
+  // Unlike `TomlTime` this does not validate `value`: `Date` is mutable, so a
+  // constructor check could be undone by a setter, and `dump()` has to guard
+  // plain user `Date`s regardless. The check lives in `dumpDate` instead.
   constructor(value: string, kind: TomlDateKind = 'offset-date-time') {
     super(value);
     this.#kind = kind;
   }
 
   /**
-   * An accessor rather than an own property, so `Object.keys`, spread and
-   * deep-equality treat an instance exactly like the `Date` it extends. Note
-   * `constructor === Date` is false; use `instanceof`.
+   * Which TOML form this was written in, and only that: not the offset it
+   * carried, nor precision below a millisecond. An accessor rather than an own
+   * property, so deep-equality treats an instance exactly like a `Date`.
    */
   get kind(): TomlDateKind {
     return this.#kind;

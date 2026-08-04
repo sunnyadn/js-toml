@@ -1,4 +1,4 @@
-import { SyntaxParseError } from '../load/exception.js';
+import { SyntaxParseError } from './exception.js';
 
 // partial-time = time-hour ":" time-minute [ ":" time-second [ time-secfrac ] ]
 // Anchored twin of the lexer's `partialTime` in load/tokens/DateTime.ts. The
