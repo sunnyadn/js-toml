@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.0] - 2026-08-04
+
+Three coordinated breaks, one migration. Before this release, js-toml added
+timezone information that documents did not contain and lost the type of every
+date and time on a round trip. A major is the consent mechanism: the date
+reading changes silently rather than throwing, so it should not arrive through
+`npm update` unannounced.
 
 ### Changed
 
@@ -22,12 +28,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `TomlTime`, exported, is what `load()` now returns for a local time, replacing a bare `string`. It extends `String`, so interpolation, `split`, `startsWith`, `length`, `JSON.stringify` and `==` all behave exactly as before, and it adds `hour`, `minute`, `second` and `fraction`. **Migration**: `typeof t === 'string'` is now false, use `instanceof String`; `t === '07:32:00'` is false, and TypeScript reports `TS2367` on that comparison, which makes it a compile error rather than a silent one. Deliberately not a `Date`: both `smol-toml` and `@iarna/toml` put local times on a sentinel date, where `getHours()` on `07:32:00` returns a number shifted by the host's UTC offset and sub-millisecond precision is rounded away. `TomlTime` keeps the source precision exactly.
 - `TomlDate`, exported, is what `load()` now returns for every TOML date/time value. It extends `Date` and adds `isLocal` and `isDateOnly`. The flags are accessors rather than own properties, so deep-equality, `Object.keys` and object spread treat an instance exactly like the `Date` it extends; existing assertions comparing against a plain `Date` keep passing. `constructor === Date` is false, so test with `instanceof`, and `structuredClone` returns a plain `Date`, keeping the instant but dropping the type.
 - The toml-test round trip now compares which date/time type each value came from, not only the instant. Deep-equality compares `Date`s by instant alone, which is why a local date-time re-emitted as `...Z` went unnoticed: the implementation and the test oracle shared the same blind spot.
 
 ### Changed
 
-- **BREAKING**: `dump()` writes each TOML date/time type back in its own form. A local date-time was previously re-emitted as `1979-05-27T07:32:00.000Z` and a local date as a full offset date-time, so a round trip through this library silently added a timezone claim the document never made. TOML defines a local date-time as carrying no relation to an offset or timezone at all. A plain `Date` supplied by a caller is still written as an offset date-time, since one instant is all it carries.
+- **BREAKING**: `dump()` writes each TOML date/time type back in its own form. A local date-time was previously re-emitted as `1979-05-27T07:32:00.000Z` and a local date as a full offset date-time, so a round trip through this library silently added a timezone claim the document never made. TOML defines a local date-time as carrying no relation to an offset or timezone at all. A local time was re-emitted as a quoted string, degrading it to a different TOML type. A plain `Date` supplied by a caller is still written as an offset date-time, since one instant is all it carries. Note that a time written without seconds still normalizes on load, so `07:32` round-trips as `07:32:00`: valid TOML, different bytes.
 
 ## [1.2.2] - 2026-08-04
 

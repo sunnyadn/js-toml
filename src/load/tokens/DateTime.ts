@@ -7,6 +7,7 @@ import {
 } from './tokenInterpreters.js';
 import { SyntaxParseError } from '../exception.js';
 import { TomlDate } from '../../common/TomlDate.js';
+import { TomlTime } from '../../common/TomlTime.js';
 
 const dateFullYear = XRegExp.build('{{digit}}{4}', { digit });
 const dateMonth = XRegExp.build('{{digit}}{2}', { digit });
@@ -190,5 +191,5 @@ registerTokenInterpreter(
   (raw) => new TomlDate(normalize(raw), { isLocal: true, isDateOnly: true })
 );
 
-// A time of day is the one TOML date/time type with no `Date` to map onto.
-registerTokenInterpreter(LocalTime, (raw) => normalize(raw));
+// A time of day is not an instant, so it gets a `String` rather than a `Date`.
+registerTokenInterpreter(LocalTime, (raw) => new TomlTime(normalize(raw)));

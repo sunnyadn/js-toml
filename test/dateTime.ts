@@ -1,4 +1,10 @@
-import { load, dump, SyntaxParseError, TomlDate } from '../src/index.js';
+import {
+  load,
+  dump,
+  SyntaxParseError,
+  TomlDate,
+  TomlTime,
+} from '../src/index.js';
 import timezoneMock from 'timezone-mock';
 
 // A failing assertion inside a registered zone would otherwise leak the mocked
@@ -75,7 +81,10 @@ it('should support local time', () => {
 lt2 = 00:32:00.999999`;
   const result = load(input);
 
-  expect(result).toEqual({ lt1: '07:32:00', lt2: '00:32:00.999999' });
+  expect(result).toEqual({
+    lt1: new TomlTime('07:32:00'),
+    lt2: new TomlTime('00:32:00.999999'),
+  });
 });
 
 it('should throw error when hour is over 23', () => {
@@ -94,7 +103,7 @@ it('should support local times without seconds and normalize to :00', () => {
   const input = 'lt = 13:37';
   const result = load(input);
 
-  expect(result).toEqual({ lt: '13:37:00' });
+  expect(result).toEqual({ lt: new TomlTime('13:37:00') });
 });
 
 it('should support offset date-times without seconds', () => {
@@ -171,5 +180,41 @@ describe('type-preserving round trip', () => {
     expect(x).toBeInstanceOf(Date);
     expect(x).toBeInstanceOf(TomlDate);
     expect(Object.keys(x)).toEqual([]);
+  });
+});
+
+describe('local time', () => {
+  it('should round-trip bare, not as a quoted string', () => {
+    expect(dump(load('t = 07:32:00')).trim()).toBe('t = 07:32:00');
+  });
+
+  it('should keep precision a Date-based encoding would round away', () => {
+    const src = 't = 07:32:00.123456789';
+    const { t } = load(src) as { t: TomlTime };
+    expect(t.fraction).toBe('.123456789');
+    expect(dump(load(src)).trim()).toBe(src);
+  });
+
+  it('should expose fields without a sentinel date to shift them', () => {
+    const { t } = load('t = 07:32:00.5') as { t: TomlTime };
+    expect([t.hour, t.minute, t.second]).toEqual([7, 32, 0]);
+  });
+
+  // `extends String` so every use of the old plain-string value keeps working.
+  // What changes is `typeof` and `===`, and both fail loudly.
+  it('should still behave as a string everywhere a string was used', () => {
+    const { t } = load('t = 07:32:00') as { t: TomlTime };
+    expect(`${t}`).toBe('07:32:00');
+    expect(t.split(':')).toEqual(['07', '32', '00']);
+    expect(t.startsWith('07')).toBe(true);
+    expect(t.length).toBe(8);
+    expect(JSON.stringify({ t })).toBe('{"t":"07:32:00"}');
+    expect(t).toBeInstanceOf(String);
+
+    // Loose equality still holds at runtime, but TypeScript refuses to compile
+    // the comparison (TS2367, no overlap). That is the loud half of the change.
+    const loose = t as unknown;
+    expect(loose == '07:32:00').toBe(true);
+    expect(loose === '07:32:00').toBe(false);
   });
 });

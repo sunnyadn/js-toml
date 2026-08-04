@@ -1,6 +1,6 @@
 import { globSync } from 'glob';
 import * as fs from 'fs';
-import { load, SyntaxParseError, TomlDate } from '../src/index.js';
+import { load, SyntaxParseError, TomlDate, TomlTime } from '../src/index.js';
 import { dump } from '../src/dump/index.js';
 import { isPlainObject } from '../src/common/utils.js';
 
@@ -28,7 +28,7 @@ const converters = {
   // `datetime-local` would be read as host-local time, so pin it to UTC to
   // match how the loader represents an offset-less date-time.
   'date-local': (value) => new Date(value),
-  'time-local': (value) => value,
+  'time-local': (value) => new TomlTime(value),
   'datetime-local': (value) => new Date(`${value}Z`),
 };
 
@@ -60,6 +60,9 @@ const dateKinds = (value) => {
   }
   if (value instanceof Date) {
     return 'bare-date';
+  }
+  if (value instanceof TomlTime) {
+    return 'time';
   }
   if (isPlainObject(value)) {
     const obj = {};

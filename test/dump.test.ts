@@ -214,7 +214,7 @@ describe('dump', () => {
     expect(dumped).toMatchInlineSnapshot(`
       "[table]
       esc = "\\u001b[1ma"
-      time = "13:37:00"
+      time = 13:37:00
 
       [table.nested]
       x = 1

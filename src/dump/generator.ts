@@ -2,6 +2,7 @@ import { DumpOptions } from './options.js';
 import { isPlainObject } from '../common/utils.js';
 import { SanitizedValue } from './sanitize.js';
 import { TomlDate } from '../common/TomlDate.js';
+import { TomlTime } from '../common/TomlTime.js';
 
 type SanitizedTable = { [key: string]: SanitizedValue };
 
@@ -84,6 +85,9 @@ function dumpValue(value: SanitizedValue, opts: NormalizedOptions): string {
   if (typeof value === 'number' || typeof value === 'bigint')
     return dumpNumber(value);
   if (typeof value === 'boolean') return value ? 'true' : 'false';
+  // Before the plain-string branch would have quoted it: a local time is a
+  // TOML type of its own, not a string that happens to look like a clock.
+  if (value instanceof TomlTime) return value.toString();
   if (value instanceof Date) return dumpDate(value);
   if (Array.isArray(value)) return dumpInlineArray(value, opts);
   return dumpInlineTable(value, opts);

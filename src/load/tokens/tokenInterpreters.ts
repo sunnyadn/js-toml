@@ -4,7 +4,7 @@ export type InterpreterFunc = (
   raw: string,
   token: IToken,
   category: string
-) => string | boolean | number | bigint | Date;
+) => string | boolean | number | bigint | Date | String; // eslint-disable-line @typescript-eslint/no-wrapper-object-types
 
 export const tokenInterpreters = new Map<string, InterpreterFunc>();
 

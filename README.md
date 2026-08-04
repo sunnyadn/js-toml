@@ -108,7 +108,7 @@ throwing `SyntaxParseError`.
 | Offset date-time | `1979-05-27T07:32:00Z` | `TomlDate` at that instant         |
 | Local date-time  | `1979-05-27T07:32:00`  | `TomlDate`, wall clock read as UTC |
 | Local date       | `1979-05-27`           | `TomlDate` at midnight UTC         |
-| Local time       | `07:32:00`             | `string`, unchanged                |
+| Local time       | `07:32:00`             | `TomlTime`, a `String`             |
 
 Local date-times carry no offset, so read them back with `getUTCHours()` and
 friends rather than `getHours()`, which would shift with the host timezone.
@@ -117,6 +117,11 @@ friends rather than `getHours()`, which would shift with the host timezone.
 `dump()` knows to write each value back in the form it was read. Use
 `instanceof Date` to test one: `constructor === Date` is false, and
 `structuredClone` keeps the instant but returns a plain `Date`.
+
+`TomlTime` extends `String`, because a time of day is not an instant. It reads
+and serializes like the plain string it used to be, and adds `hour`, `minute`,
+`second` and `fraction`. Test it with `instanceof String`: `typeof` is
+`'object'`, and `===` against a string literal is false.
 
 ### dump(object: object, options?: DumpOptions): string
 
