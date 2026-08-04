@@ -35,6 +35,9 @@ const CHAR_ESCAPE_MAP: Record<string, string> = {
   '\r': '\\r',
 };
 
+// The control range is the point, so the rule is off here rather than worked
+// around. C1 (\x80-\x9F) stays out on purpose: `nonAscii` in load/tokens
+// accepts it raw, and the two sides have to agree on what needs escaping.
 // eslint-disable-next-line no-control-regex
 const ESCAPE_REGEX = /["\\\x00-\x1F\x7F]/g;
 
