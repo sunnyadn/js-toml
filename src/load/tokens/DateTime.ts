@@ -99,54 +99,43 @@ const timePattern = XRegExp.build(
   { timeHour, timeMinute, timeSecond }
 );
 
+// Each check runs only where its token's grammar guarantees a match, so none
+// of them needs a "no match means valid" escape hatch.
 const isValidDate = (value: string) => {
+  // Indexed, not destructured: destructuring a match array goes through the
+  // iterator protocol, which measures slower on this path.
   const date = XRegExp.exec(value, datePattern);
-  if (date) {
-    const year = Number(date[1]);
-    const month = Number(date[2]);
-    const day = Number(date[3]);
-    // setUTCFullYear (not the Date constructor) so years 00-99 are not
-    // remapped to 1900-1999, which would use the wrong year's leap rules.
-    const dateObject = new Date(0);
-    dateObject.setUTCFullYear(year, month - 1, day);
-    return (
-      dateObject.getUTCFullYear() === year &&
-      dateObject.getUTCMonth() + 1 === month &&
-      dateObject.getUTCDate() === day
-    );
-  }
-
-  return true;
+  const year = Number(date[1]);
+  const month = Number(date[2]);
+  const day = Number(date[3]);
+  // setUTCFullYear (not the Date constructor) so years 00-99 are not
+  // remapped to 1900-1999, which would use the wrong year's leap rules.
+  const dateObject = new Date(0);
+  dateObject.setUTCFullYear(year, month - 1, day);
+  return (
+    dateObject.getUTCFullYear() === year &&
+    dateObject.getUTCMonth() + 1 === month &&
+    dateObject.getUTCDate() === day
+  );
 };
 
 const isValidTime = (value: string) => {
+  // A Date round-trip would say exactly this, only via a clock the check has
+  // no use for. Leap seconds stay out.
   const time = XRegExp.exec(value, timePattern);
-  if (time) {
-    // Same shape as isValidOffset below. A Date round-trip would say exactly
-    // this, only via a clock the check has no use for. Leap seconds stay out.
-    return (
-      Number(time[1]) <= 23 && Number(time[2]) <= 59 && Number(time[3]) <= 59
-    );
-  }
-
-  return true;
+  return (
+    Number(time[1]) <= 23 && Number(time[2]) <= 59 && Number(time[3]) <= 59
+  );
 };
 
-// Numeric offset at the end of an offset date-time (the date part never
-// matches: it has no `:`). RFC 3339: offset hour is 00-23, minute is 00-59.
+// RFC 3339: offset hour is 00-23, minute is 00-59. `Z` carries no numeric
+// offset, which is the one case this has nothing to check.
 const offsetPattern = /[+-](\d{2}):(\d{2})$/;
 
 const isValidOffset = (value: string) => {
   const offset = offsetPattern.exec(value);
-  if (offset) {
-    return Number(offset[1]) <= 23 && Number(offset[2]) <= 59;
-  }
-
-  return true;
+  return !offset || (Number(offset[1]) <= 23 && Number(offset[2]) <= 59);
 };
-
-const isValidDateTime = (value: string) =>
-  isValidDate(value) && isValidTime(value) && isValidOffset(value);
 
 // Matches a seconds-less time (TOML 1.1) right before its end or offset, so the
 // omitted seconds can be normalized to `:00`. Encodes the same optional-seconds
@@ -156,40 +145,48 @@ const secondsLessTime = XRegExp.build(
   { fullDate, timeDelim, timeHour, timeMinute }
 );
 
-// Normalize an omitted-seconds time (TOML 1.1) and reject an out-of-range
-// field, then canonicalize the delimiter and offset marker so `Date()` takes
-// the ISO 8601 path. Its legacy parser, which a space delimiter selects, remaps
-// years 00-99: `new Date('0001-01-01 00:00:00Z')` is 2001.
-const normalize = (raw: string) => {
-  // O(1) seconds-presence gate before the regex replace: the first `:` in any
-  // date/time token is hour:minute, so seconds are present iff the character
-  // three positions later is another `:`. Date-only tokens have no `:` at all.
+// O(1) seconds-presence gate before the regex replace: the first `:` in a time
+// or date-time is hour:minute, so seconds are present iff the character three
+// positions later is another `:`.
+const fillSeconds = (raw: string) => {
   const firstColon = raw.indexOf(':');
-  const value =
-    firstColon !== -1 && raw.charCodeAt(firstColon + 3) !== 58 /* ':' */
-      ? raw.replace(secondsLessTime, '$1:00')
-      : raw;
-
-  if (!isValidDateTime(value)) {
-    throw new SyntaxParseError(`Invalid date time: ${raw}`);
-  }
-
-  return value.replace(/[t ]/, 'T').replace(/z$/, 'Z');
+  return raw.charCodeAt(firstColon + 3) === 58 /* ':' */
+    ? raw
+    : raw.replace(secondsLessTime, '$1:00');
 };
 
-registerTokenInterpreter(OffsetDateTime, (raw) => new TomlDate(normalize(raw)));
+const invalid = (raw: string) =>
+  new SyntaxParseError(`Invalid date time: ${raw}`);
 
-registerTokenInterpreter(
-  LocalDateTime,
+// `Date`'s legacy parser, which a space delimiter selects, remaps years 00-99:
+// `new Date('0001-01-01 00:00:00Z')` is 2001. Canonicalizing to ISO 8601 form
+// keeps it on the spec path.
+const toIso = (value: string) => value.replace(/[t ]/, 'T');
+
+registerTokenInterpreter(OffsetDateTime, (raw) => {
+  const value = fillSeconds(raw);
+  if (!isValidDate(value) || !isValidTime(value) || !isValidOffset(value)) {
+    throw invalid(raw);
+  }
+  return new TomlDate(toIso(value).replace(/z$/, 'Z'));
+});
+
+registerTokenInterpreter(LocalDateTime, (raw) => {
+  const value = fillSeconds(raw);
+  if (!isValidDate(value) || !isValidTime(value)) throw invalid(raw);
   // The document states no offset, so reading the wall clock as anything but
   // UTC would make the instant depend on where the parse happened to run.
-  (raw) => new TomlDate(`${normalize(raw)}Z`, { isLocal: true })
-);
+  return new TomlDate(`${toIso(value)}Z`, 'local-date-time');
+});
 
-registerTokenInterpreter(
-  LocalDate,
-  (raw) => new TomlDate(normalize(raw), { isLocal: true, isDateOnly: true })
-);
+registerTokenInterpreter(LocalDate, (raw) => {
+  if (!isValidDate(raw)) throw invalid(raw);
+  return new TomlDate(raw, 'local-date');
+});
 
 // A time of day is not an instant, so it gets a `String` rather than a `Date`.
-registerTokenInterpreter(LocalTime, (raw) => new TomlTime(normalize(raw)));
+registerTokenInterpreter(LocalTime, (raw) => {
+  const value = fillSeconds(raw);
+  if (!isValidTime(value)) throw invalid(raw);
+  return new TomlTime(value);
+});

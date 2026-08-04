@@ -113,10 +113,11 @@ throwing `SyntaxParseError`.
 Local date-times carry no offset, so read them back with `getUTCHours()` and
 friends rather than `getHours()`, which would shift with the host timezone.
 
-`TomlDate` extends `Date` and adds `isLocal` and `isDateOnly`, which is how
-`dump()` knows to write each value back in the form it was read. Use
-`instanceof Date` to test one: `constructor === Date` is false, and
-`structuredClone` keeps the instant but returns a plain `Date`.
+`TomlDate` extends `Date` and adds `kind`, one of `'offset-date-time'`,
+`'local-date-time'` or `'local-date'`, which is how `dump()` knows to write
+each value back in the form it was read. Use `instanceof Date` to test one:
+`constructor === Date` is false, and `structuredClone` keeps the instant but
+returns a plain `Date`.
 
 `TomlTime` extends `String`, because a time of day is not an instant. It reads
 and serializes like the plain string it used to be, and adds `hour`, `minute`,

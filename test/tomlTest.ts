@@ -56,10 +56,7 @@ const dateKinds = (value) => {
     return value.map(dateKinds);
   }
   if (value instanceof TomlDate) {
-    return value.isDateOnly ? 'date' : value.isLocal ? 'local' : 'offset';
-  }
-  if (value instanceof Date) {
-    return 'bare-date';
+    return value.kind;
   }
   if (value instanceof TomlTime) {
     return 'time';

@@ -179,8 +179,15 @@ export class Interpreter extends BaseCstVisitor {
         for (const symbol of Object.getOwnPropertySymbols(object[key])) {
           delete object[key][symbol];
         }
-        object[key].forEach((item) => this.cleanInternalProperties(item));
-      } else if (typeof object[key] === 'object') {
+        // Only tables and arrays ever carry these symbols, so scalars need no
+        // walk. `for...in` over a String wrapper would enumerate one key per
+        // character, and a Date or TomlTime is `typeof 'object'` too.
+        object[key].forEach((item) => {
+          if (isPlainObject(item) || Array.isArray(item)) {
+            this.cleanInternalProperties(item);
+          }
+        });
+      } else if (isPlainObject(object[key])) {
         this.cleanInternalProperties(object[key]);
       }
     }

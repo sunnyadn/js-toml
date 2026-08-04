@@ -1,37 +1,26 @@
+/** Which of TOML's three date/time types produced a `TomlDate`. */
+export type TomlDateKind =
+  'offset-date-time' | 'local-date-time' | 'local-date';
+
 /**
- * A `Date` that remembers which of TOML's date/time types produced it.
- *
- * The three types are distinct in TOML but all map onto one instant in
- * JavaScript, so a plain `Date` cannot say whether the document carried an
- * offset. Without that, `dump(load(x))` re-emits every local date-time as
- * `...Z`, asserting a UTC instant the author never wrote.
- *
- * The flags are accessors rather than own properties, so `Object.keys`, object
- * spread and deep-equality treat an instance exactly like the `Date` it
- * extends. Two consequences are worth knowing: `constructor === Date` is false
- * (use `instanceof`), and `structuredClone` returns a plain `Date`, keeping the
- * instant but dropping the type.
+ * A `Date` that remembers which TOML type produced it. All three map onto one
+ * instant in JavaScript, so without this `dump(load(x))` re-emits a local
+ * date-time as `...Z`, asserting an offset the author never wrote.
  */
 export class TomlDate extends Date {
-  readonly #isLocal: boolean;
-  readonly #isDateOnly: boolean;
+  readonly #kind: TomlDateKind;
 
-  constructor(
-    value: string | number | Date,
-    { isLocal = false, isDateOnly = false } = {}
-  ) {
-    super(value as string);
-    this.#isLocal = isLocal;
-    this.#isDateOnly = isDateOnly;
+  constructor(value: string, kind: TomlDateKind = 'offset-date-time') {
+    super(value);
+    this.#kind = kind;
   }
 
-  /** True when the document carried no offset: a local date-time or date. */
-  get isLocal(): boolean {
-    return this.#isLocal;
-  }
-
-  /** True for a local date, which has no time of day at all. */
-  get isDateOnly(): boolean {
-    return this.#isDateOnly;
+  /**
+   * An accessor rather than an own property, so `Object.keys`, spread and
+   * deep-equality treat an instance exactly like the `Date` it extends. Note
+   * `constructor === Date` is false; use `instanceof`.
+   */
+  get kind(): TomlDateKind {
+    return this.#kind;
   }
 }

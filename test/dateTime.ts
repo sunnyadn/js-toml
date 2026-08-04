@@ -142,31 +142,35 @@ describe('type-preserving round trip', () => {
   // `dump(load(x))` used to re-emit every local date-time as `...Z`, asserting
   // a UTC instant the document never claimed. `TomlDate` carries the type so
   // the pair round-trips the meaning, not only the value.
-  const cases: [string, string][] = [
-    ['offset date-time', 'x = 1979-05-27T07:32:00Z'],
-    ['local date-time', 'x = 1979-05-27T07:32:00'],
-    ['local date', 'x = 1979-05-27'],
-    ['fractional local date-time', 'x = 1979-05-27T00:32:00.999'],
+  // Pinning the exact output subsumes instant-and-kind assertions: a stray `Z`
+  // on the local date-time, or a time of day on the local date, changes it.
+  const cases: [string, string, string][] = [
+    [
+      'offset date-time',
+      'x = 1979-05-27T07:32:00Z',
+      'x = 1979-05-27T07:32:00.000Z',
+    ],
+    [
+      'local date-time',
+      'x = 1979-05-27T07:32:00',
+      'x = 1979-05-27T07:32:00.000',
+    ],
+    ['local date', 'x = 1979-05-27', 'x = 1979-05-27'],
+    [
+      'fractional local date-time',
+      'x = 1979-05-27T00:32:00.999',
+      'x = 1979-05-27T00:32:00.999',
+    ],
   ];
 
-  it.each(cases)('should round-trip a %s unchanged in kind', (_name, toml) => {
-    const first = dump(load(toml));
-    const { x } = load(toml) as { x: TomlDate };
-    const { x: back } = load(first) as { x: TomlDate };
-
-    expect(back.getTime()).toBe(x.getTime());
-    expect(back.isLocal).toBe(x.isLocal);
-    expect(back.isDateOnly).toBe(x.isDateOnly);
-    expect(dump(load(first))).toBe(first);
-  });
-
-  it('should not write an offset onto a local date-time', () => {
-    expect(dump(load('x = 1979-05-27T07:32:00'))).not.toContain('Z');
-  });
-
-  it('should write a local date as a date, with no time of day', () => {
-    expect(dump(load('x = 1979-05-27')).trim()).toBe('x = 1979-05-27');
-  });
+  it.each(cases)(
+    'should round-trip a %s unchanged in kind',
+    (_name, toml, expected) => {
+      const first = dump(load(toml));
+      expect(first.trim()).toBe(expected);
+      expect(dump(load(first))).toBe(first);
+    }
+  );
 
   it('should still write a plain Date as an offset date-time', () => {
     // A user-supplied Date is one instant and carries no TOML type, so the
@@ -179,6 +183,7 @@ describe('type-preserving round trip', () => {
     const { x } = load('x = 1979-05-27T07:32:00') as { x: TomlDate };
     expect(x).toBeInstanceOf(Date);
     expect(x).toBeInstanceOf(TomlDate);
+    expect(x.kind).toBe('local-date-time');
     expect(Object.keys(x)).toEqual([]);
   });
 });

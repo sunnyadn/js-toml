@@ -1,7 +1,7 @@
 import { DumpOptions } from './options.js';
 import { isPlainObject } from '../common/utils.js';
 import { SanitizedValue } from './sanitize.js';
-import { TomlDate } from '../common/TomlDate.js';
+import { TomlDate, TomlDateKind } from '../common/TomlDate.js';
 import { TomlTime } from '../common/TomlTime.js';
 
 type SanitizedTable = { [key: string]: SanitizedValue };
@@ -58,6 +58,14 @@ function dumpNumber(num: number | bigint): string {
   return num.toString();
 }
 
+// Where to cut `toISOString()` for each TOML type. `slice(0, undefined)` keeps
+// the whole string, so the offset form needs no branch of its own.
+const ISO_END: Record<TomlDateKind, number | undefined> = {
+  'offset-date-time': undefined,
+  'local-date-time': -1,
+  'local-date': 10,
+};
+
 function dumpDate(date: Date): string {
   if (Number.isNaN(date.getTime())) {
     throw new Error('Cannot dump invalid Date');
@@ -70,17 +78,11 @@ function dumpDate(date: Date): string {
     throw new Error(`Cannot dump Date with out-of-range year ${year}`);
   }
 
-  const iso = date.toISOString();
-
   // A plain `Date` is one instant and nothing more, so it can only be written
   // as an offset date-time. `load()` returns a `TomlDate`, which remembers
-  // that the document said local, and writing that back as `...Z` would assert
-  // a UTC instant the author never wrote.
-  if (!(date instanceof TomlDate) || !date.isLocal) {
-    return iso;
-  }
-
-  return date.isDateOnly ? iso.slice(0, 10) : iso.slice(0, -1);
+  // what the document actually said.
+  const kind = date instanceof TomlDate ? date.kind : 'offset-date-time';
+  return date.toISOString().slice(0, ISO_END[kind]);
 }
 
 function dumpValue(value: SanitizedValue, opts: NormalizedOptions): string {
