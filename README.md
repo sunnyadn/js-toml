@@ -120,7 +120,7 @@ there. `TomlDate` adds `kind`, one of `'offset-date-time'`, `'local-date-time'`
 or `'local-date'`; `TomlTime` adds `hour`, `minute`, `second` and `fraction`,
 and keeps the source precision that a millisecond-based encoding rounds away.
 
-Upgrading from 1.x? [MIGRATION.md](MIGRATION.md) covers the two changes that alter values silently.
+Upgrading from 1.x? [MIGRATION.md](MIGRATION.md) is a search table for the date/time changes, all of which are silent.
 
 ### dump(object: object, options?: DumpOptions): string
 
