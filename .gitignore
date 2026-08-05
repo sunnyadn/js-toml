@@ -115,8 +115,9 @@ examples/*/bun.lock
 # Local agent tooling. Not part of the library: it runs session hooks and
 # carries spec templates for stacks this project does not use.
 .claude/
-.trellis/*
-!.trellis/workspace/
-!.trellis/tasks/
-.trellis/tasks/*
-!.trellis/tasks/archive/
+.trellis/
+AGENTS.md
+
+# Runtime trace from the local vouch hook. Grows per session and records
+# absolute paths from this machine.
+.vouch-trace.jsonl
