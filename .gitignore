@@ -116,5 +116,7 @@ examples/*/bun.lock
 # carries spec templates for stacks this project does not use.
 .claude/
 .trellis/*
-!.trellis/tasks/
 !.trellis/workspace/
+!.trellis/tasks/
+.trellis/tasks/*
+!.trellis/tasks/archive/
