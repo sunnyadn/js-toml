@@ -111,3 +111,10 @@ examples/*/yarn.lock
 examples/*/bun.lockb
 examples/*/package-lock.json
 examples/*/bun.lock
+
+# Local agent tooling. Not part of the library: it runs session hooks and
+# carries spec templates for stacks this project does not use.
+.claude/
+.trellis/*
+!.trellis/tasks/
+!.trellis/workspace/
