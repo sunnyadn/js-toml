@@ -181,6 +181,27 @@ polluted = true
       expect(result).toHaveProperty('constructor');
     });
 
+    it('should allow sub-tables of a table with its own constructor key', () => {
+      expect(load('[a]\nconstructor = 1\n\n[a.b]\nx = 1')).toEqual({
+        a: { constructor: 1, b: { x: 1 } },
+      });
+      expect(load('a.constructor = 1\na.b = 2')).toEqual({
+        a: { constructor: 1, b: 2 },
+      });
+      expect(load('[a]\nconstructor = 1\n\n[[a.b]]\nx = 1')).toEqual({
+        a: { constructor: 1, b: [{ x: 1 }] },
+      });
+    });
+
+    it('should still reject a table header over a constructor value', () => {
+      expect(() => load('constructor = 1\n[constructor]')).toThrow(
+        SyntaxParseError
+      );
+      expect(() => load('a.constructor = 1\n[a.constructor]')).toThrow(
+        SyntaxParseError
+      );
+    });
+
     it('should reproduce the authentication bypass scenario', () => {
       const toml = `
 [__proto__]

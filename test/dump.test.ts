@@ -185,6 +185,30 @@ describe('dump', () => {
     );
   });
 
+  it('should dump objects that have their own constructor key', () => {
+    expect(dump({ constructor: 1 })).toBe('constructor = 1\n');
+    expect(dump({ a: { constructor: 1 } })).toBe('[a]\nconstructor = 1\n');
+
+    const loaded = load('[a]\nconstructor = 1\n\n[a.b]\nx = 1');
+    expect(load(dump(loaded))).toEqual(loaded);
+  });
+
+  it('should still reject class instances, Maps and objects with a non-plain prototype', () => {
+    class Point {
+      x = 1;
+    }
+    const message = 'dump requires a plain object (TOML table) as input';
+    expect(() =>
+      dump(new Point() as unknown as Record<string, unknown>)
+    ).toThrow(message);
+    expect(() =>
+      dump(new Map([['x', 1]]) as unknown as Record<string, unknown>)
+    ).toThrow(message);
+    expect(() =>
+      dump(Object.create({ inherited: 1 }) as Record<string, unknown>)
+    ).toThrow(message);
+  });
+
   it('should throw on unsupported value types (Symbol)', () => {
     const obj = { s: Symbol('a') };
     expect(() => dump(obj as unknown as Record<string, unknown>)).toThrow(

@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- A table with its own `constructor` key no longer breaks the table around it. `load()` rejected any later sub-table of it (`[a]` with `constructor = 1`, then `[a.b]`) as "Cannot create table", and `dump({ constructor: 1 })` threw "dump requires a plain object". The plain-object check read `obj.constructor`, which such a key overrides; it now reads the prototype. As a side effect, `dump()` now rejects an object whose prototype is another plain object (`Object.create({})`), which the old check accepted. ([#9](https://github.com/sunnyadn/js-toml/issues/9))
+
 ## [2.0.1] - 2026-08-04
 
 **Note on versioning**: 2.0.1 is breaking relative to 2.0.0. `TomlTime` changed from a `String` subclass to a `Date` subclass. 2.0.0 was published two hours earlier, its serialization defect was found immediately, and npm does not allow unpublishing any version of a package that has dependents. 2.0.0 is deprecated with a pointer here. If you installed 2.0.0 during that window, `t.split()` and `t.length` no longer work; use `String(t)` or `t.toISOString()`.
