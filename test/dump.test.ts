@@ -183,6 +183,18 @@ describe('dump', () => {
     expect(() => dump([] as unknown as Record<string, unknown>)).toThrow(
       'dump requires a plain object (TOML table) as input'
     );
+    class Point {
+      x = 1;
+    }
+    for (const input of [
+      new Point(),
+      new Map([['x', 1]]),
+      Object.create({ inherited: 1 }),
+    ]) {
+      expect(() => dump(input)).toThrow(
+        'dump requires a plain object (TOML table) as input'
+      );
+    }
   });
 
   it('should dump objects that have their own constructor key', () => {
@@ -193,20 +205,15 @@ describe('dump', () => {
     expect(load(dump(loaded))).toEqual(loaded);
   });
 
-  it('should still reject class instances, Maps and objects with a non-plain prototype', () => {
-    class Point {
-      x = 1;
-    }
-    const message = 'dump requires a plain object (TOML table) as input';
-    expect(() =>
-      dump(new Point() as unknown as Record<string, unknown>)
-    ).toThrow(message);
-    expect(() =>
-      dump(new Map([['x', 1]]) as unknown as Record<string, unknown>)
-    ).toThrow(message);
-    expect(() =>
-      dump(Object.create({ inherited: 1 }) as Record<string, unknown>)
-    ).toThrow(message);
+  it('should keep a __proto__ key as an ordinary key', () => {
+    const loaded = load('[a.__proto__]\nx = 1\n\n[a]\ny = 2');
+    const dumped = dump(loaded);
+
+    expect(dumped).toBe('[a]\ny = 2\n\n[a.__proto__]\nx = 1\n');
+    expect(load(dumped)).toEqual(loaded);
+    expect(dump(JSON.parse('{"__proto__":{"x":1}}'))).toBe(
+      '[__proto__]\nx = 1\n'
+    );
   });
 
   it('should throw on unsupported value types (Symbol)', () => {

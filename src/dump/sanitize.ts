@@ -39,7 +39,8 @@ export function sanitize(
   }
 
   if (isPlainObject(value)) {
-    const result: { [key: string]: SanitizedValue } = {};
+    // A null prototype keeps keys such as `__proto__` as ordinary data.
+    const result: { [key: string]: SanitizedValue } = Object.create(null);
     for (const [k, v] of Object.entries(value)) {
       const sanitized = sanitize(v, options);
       if (sanitized !== undefined) result[k] = sanitized;

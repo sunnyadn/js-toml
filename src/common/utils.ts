@@ -6,7 +6,7 @@
  * may have its own `constructor` key, which is a valid TOML key.
  */
 export const isPlainObject = (obj: unknown): obj is Record<string, unknown> => {
-  if (obj == null || typeof obj !== 'object' || Array.isArray(obj)) {
+  if (typeof obj !== 'object' || obj === null) {
     return false;
   }
   const proto = Object.getPrototypeOf(obj);
