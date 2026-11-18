@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-11-18
+
 ### Fixed
 
 - A table with its own `constructor` key no longer breaks the table around it. `load()` rejected any later sub-table of it (`[a]` with `constructor = 1`, then `[a.b]`) as "Cannot create table", and `dump({ constructor: 1 })` threw "dump requires a plain object". The plain-object check read `obj.constructor`, which such a key overrides. It now reads the `constructor` the object inherits, so which objects count as tables is otherwise unchanged. ([#9](https://github.com/sunnyadn/js-toml/issues/9))
@@ -152,7 +154,8 @@ reading changes silently rather than throwing, so it should not arrive through
 - Support for Node.js, browsers, and Bun
 - ESM and CJS output formats
 
-[Unreleased]: https://github.com/sunnyadn/js-toml/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/sunnyadn/js-toml/compare/v2.0.2...HEAD
+[2.0.2]: https://github.com/sunnyadn/js-toml/compare/v2.0.1...v2.0.2
 [1.2.1]: https://github.com/sunnyadn/js-toml/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/sunnyadn/js-toml/compare/v1.1.3...v1.2.0
 [1.1.3]: https://github.com/sunnyadn/js-toml/compare/v1.1.2...v1.1.3
