@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- A table with its own `constructor` key no longer breaks the table around it. `load()` rejected any later sub-table of it (`[a]` with `constructor = 1`, then `[a.b]`) as "Cannot create table", and `dump({ constructor: 1 })` threw "dump requires a plain object". The plain-object check read `obj.constructor`, which such a key overrides; it now reads the prototype. As a side effect, `dump()` now rejects an object whose prototype is another plain object (`Object.create({})`), which the old check accepted. ([#9](https://github.com/sunnyadn/js-toml/issues/9))
+- A table with its own `constructor` key no longer breaks the table around it. `load()` rejected any later sub-table of it (`[a]` with `constructor = 1`, then `[a.b]`) as "Cannot create table", and `dump({ constructor: 1 })` threw "dump requires a plain object". The plain-object check read `obj.constructor`, which such a key overrides. It now reads the `constructor` the object inherits, so which objects count as tables is otherwise unchanged. ([#9](https://github.com/sunnyadn/js-toml/issues/9))
 - `dump()` silently dropped a table's `__proto__` key, for example after `load('[a.__proto__]\nx = 1')`. It built output tables as `{}`, where assigning `__proto__` sets the prototype instead of adding a key. Output tables now have a null prototype, the same as the tables `load()` returns.
 
 ## [2.0.1] - 2026-08-04

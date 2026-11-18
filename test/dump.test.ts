@@ -186,12 +186,13 @@ describe('dump', () => {
     class Point {
       x = 1;
     }
-    for (const input of [
+    const inputs: unknown[] = [
       new Point(),
       new Map([['x', 1]]),
-      Object.create({ inherited: 1 }),
-    ]) {
-      expect(() => dump(input)).toThrow(
+      Object.assign(new Point(), { constructor: Object }),
+    ];
+    for (const input of inputs) {
+      expect(() => dump(input as Record<string, unknown>)).toThrow(
         'dump requires a plain object (TOML table) as input'
       );
     }
